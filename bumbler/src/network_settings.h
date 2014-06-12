@@ -1,0 +1,6 @@
+#pragma once
+
+enum 
+{
+	NETWORK_PING, NETWORK_PONG, SERVER_STATUS
+};
