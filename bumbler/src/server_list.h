@@ -8,7 +8,7 @@ class server_list
 public:
 	server_list() 
 	{
-		
+		actor_system_ = std::unique_ptr<actor_system>(new actor_system("bumbler_system", 8558));
 	}
 	
 	~server_list()
@@ -31,11 +31,12 @@ public:
 	}
 	
 private:
+	std::unique_ptr<actor_system> actor_system_;
 	std::vector<server_info> servers_;
 	
 	void add_server_(std::string ip, int port)
 	{
-		server_info sv_info(ip, port);
+		servers_.push_back(server_info(ip, port, *actor_system_));
 	}
 };
 
