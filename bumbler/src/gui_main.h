@@ -17,7 +17,8 @@ public:
 	MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size);
 	
 private:
-	wxListBox *servers;
+	std::unique_ptr<wxListBox> servers;
+	std::unique_ptr<server_list> server_list_ptr;
 
 	void OnExit(wxCommandEvent& event);
 	void OnAbout(wxCommandEvent& event);
@@ -25,8 +26,6 @@ private:
 	void OnDeleteServer(wxCommandEvent& event);
 	void OnConnect(wxCommandEvent& event); //Used for button and double click on server hopefully...
 	wxDECLARE_EVENT_TABLE();
-	
-	 server_list server_list;
 
 };
 
@@ -47,6 +46,7 @@ EVT_LISTBOX_DCLICK(LISTBOX_Servers, MyFrame::OnConnect)
 wxEND_EVENT_TABLE()
 
 bool MyApp::OnInit() {
+	server_list = std::unique_ptr<class server_list>(new  class server_list());
 	MyFrame *frame = new MyFrame("Bumbling along", wxPoint(50, 50), wxSize(450, 340));
 	frame->Show(true);
 	return true;
@@ -65,7 +65,7 @@ MyFrame::MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
 	CreateStatusBar();
 	SetStatusText("Welcome to wxWidgets!");
 
-	servers = new wxListBox(this, LISTBOX_Servers, wxDefaultPosition, wxDefaultSize, 0, NULL, wxLB_HSCROLL | wxLB_SINGLE | wxLB_NEEDED_SB);
+	servers = std::unique_ptr<wxListBox>(new wxListBox(this, LISTBOX_Servers, wxDefaultPosition, wxDefaultSize, 0, NULL, wxLB_HSCROLL | wxLB_SINGLE | wxLB_NEEDED_SB));
 	wxButton *addServer = new wxButton(this, BUTTON_AddServer, _T("Add Server"), wxDefaultPosition, wxDefaultSize, 0);
 	wxButton *deleteServer = new wxButton(this, BUTTON_DeleteServer, _T("Delete Server"), wxDefaultPosition, wxDefaultSize, 0);
 	wxButton *connect = new wxButton(this, BUTTON_Connect, _T("Connect"), wxDefaultPosition, wxDefaultSize, 0);

@@ -1,0 +1,141 @@
+diff --git a/bumbler/bumbler.vcxproj b/bumbler/bumbler.vcxproj
+index 32f7311..124c336 100644
+--- a/bumbler/bumbler.vcxproj
++++ b/bumbler/bumbler.vcxproj
+@@ -90,6 +90,7 @@
+     <ClInclude Include="src\server_connection_actor.h" />
+     <ClInclude Include="src\server_info.h" />
+     <ClInclude Include="src\server_list.h" />
++    <ClInclude Include="src\server_status.h" />
+   </ItemGroup>
+   <ItemGroup>
+     <ProjectReference Include="..\libs\atan\atan.vcxproj">
+diff --git a/bumbler/bumbler.vcxproj.filters b/bumbler/bumbler.vcxproj.filters
+index 58ad121..50d5464 100644
+--- a/bumbler/bumbler.vcxproj.filters
++++ b/bumbler/bumbler.vcxproj.filters
+@@ -41,5 +41,8 @@
+     <ClInclude Include="src\server_list.h">
+       <Filter>Header Files</Filter>
+     </ClInclude>
++    <ClInclude Include="src\server_status.h">
++      <Filter>Header Files</Filter>
++    </ClInclude>
+   </ItemGroup>
+ </Project>
+\ No newline at end of file
+diff --git a/bumbler/src/gui_main.h b/bumbler/src/gui_main.h
+index 1f908ae..fce695a 100644
+--- a/bumbler/src/gui_main.h
++++ b/bumbler/src/gui_main.h
+@@ -1,14 +1,12 @@
+ #pragma once
+ 
+-#include <atan/actor_system/actor_system.h>
++#include "server_list.h"
+ 
+ #include <wx/wxprec.h>
+ #ifndef WX_PRECOMP
+ #include <wx/wx.h>
+ #endif
+ 
+-#include "bumbler_client_actor.h"
+-
+ class MyApp : public wxApp {
+ public:
+ 	virtual bool OnInit();
+@@ -28,7 +26,7 @@ private:
+ 	void OnConnect(wxCommandEvent& event); //Used for button and double click on server hopefully...
+ 	wxDECLARE_EVENT_TABLE();
+ 	
+-	std::unique_ptr<actor_system> actor_system_;
++	 server_list server_list;
+ 
+ };
+ 
+@@ -66,8 +64,6 @@ MyFrame::MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
+ 	SetMenuBar(menuBar);
+ 	CreateStatusBar();
+ 	SetStatusText("Welcome to wxWidgets!");
+-	
+-	actor_system_ = std::unique_ptr<actor_system>(new actor_system("bumbler_system", 8558));
+ 
+ 	servers = new wxListBox(this, LISTBOX_Servers, wxDefaultPosition, wxDefaultSize, 0, NULL, wxLB_HSCROLL | wxLB_SINGLE | wxLB_NEEDED_SB);
+ 	wxButton *addServer = new wxButton(this, BUTTON_AddServer, _T("Add Server"), wxDefaultPosition, wxDefaultSize, 0);
+diff --git a/bumbler/src/server_info.h b/bumbler/src/server_info.h
+index 38eea31..4b14e66 100644
+--- a/bumbler/src/server_info.h
++++ b/bumbler/src/server_info.h
+@@ -1,6 +1,6 @@
+ #pragma once
+ 
+-#Include <atan/actor/remote_actor.h>
++#include <atan/actor/remote_actor.h>
+ #include <memory>
+ #include "server_connection_actor.h"
+ #include "server_status.h"
+@@ -10,9 +10,9 @@ class server_info
+ public:
+ 	server_info(std::string ip, int port, actor_system& actor_system) : port_(port), ip_(ip) 
+ 	{
+-		std::string rpi_actor_ref = "server_actor$bumbler_server@" + ip + ":" + port;
++		std::string rpi_actor_ref = "server_actor$bumbler_server@" + ip + ":" + std::to_string(port);
+ 		server_connection_actor_ = std::shared_ptr<server_connection_actor>(new server_connection_actor(rpi_actor_ref, actor_system));
+-		actor_system->add_actor(server_connection_actor_);
++		actor_system.add_actor(server_connection_actor_);
+ 	}
+ 	
+ 	~server_info()
+diff --git a/bumbler/src/server_list.h b/bumbler/src/server_list.h
+index b3c056a..e51bcb7 100644
+--- a/bumbler/src/server_list.h
++++ b/bumbler/src/server_list.h
+@@ -6,6 +6,8 @@
+ class server_list
+ {
+ public:
++	std::vector<server_info> servers;
++
+ 	server_list() 
+ 	{
+ 		actor_system_ = std::unique_ptr<actor_system>(new actor_system("bumbler_system", 8558));
+@@ -32,11 +34,10 @@ public:
+ 	
+ private:
+ 	std::unique_ptr<actor_system> actor_system_;
+-	std::vector<server_info> servers_;
+ 	
+ 	void add_server_(std::string ip, int port)
+ 	{
+-		servers_.push_back(server_info(ip, port, *actor_system_));
++		servers.push_back(server_info(ip, port, *actor_system_));
+ 	}
+ };
+ 
+diff --git a/bumbler/src/server_status.h b/bumbler/src/server_status.h
+index a66f949..ca23aa4 100644
+--- a/bumbler/src/server_status.h
++++ b/bumbler/src/server_status.h
+@@ -17,6 +17,11 @@ public:
+ 	int players_online;
+ 	int players_max;
+ 	int ping;
++	
++	server_status()	
++	{		
++		server_status("", "", 0, 0, 0);
++	}
+ 
+ 	server_status(std::string name, std::string motd, int players_online, int players_max, int ping) 
+ 		: name(name), motd(motd), players_online(players_online), players_max(players_max), ping(ping) {}
+@@ -27,8 +32,8 @@ public:
+ 
+ 		boost::archive::text_iarchive in_archive(is);
+ 		server_status status;
+-		in_archive >> &status;
+-		std::memcpy(this, status, sizeof(status));
++		in_archive >> status;
++		std::memcpy(this, &status, sizeof(status));
+ 	}
+ 
+ 
