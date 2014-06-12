@@ -95,20 +95,20 @@ void MyFrame::OnAddServer(wxCommandEvent& event) {
 
 	if (dialog.ShowModal() == wxID_OK)
 	{
-		servers->Append(dialog.GetValue().ToStdString());
+		servers_->Append(dialog.GetValue().ToStdString());
 	}
 }
 
 void MyFrame::OnDeleteServer(wxCommandEvent& event) {
-	if (servers->GetSelection() == wxNOT_FOUND)
+	if (servers_->GetSelection() == wxNOT_FOUND)
 		wxMessageBox("No server selected", "Doh",wxOK | wxICON_INFORMATION);
 	else
-		servers->Delete(servers->GetSelection());
+		servers_->Delete(servers_->GetSelection());
 }
 
 void MyFrame::OnConnect(wxCommandEvent& event) {
 	wxString selection = wxT("Nothing selected");
-	if (servers->GetSelection() != wxNOT_FOUND)
-		selection = servers->GetString(servers->GetSelection());
+	if (servers_->GetSelection() != wxNOT_FOUND)
+		selection = servers_->GetString(servers_->GetSelection());
 	wxMessageBox(selection, "Lets pretend I'm connecting", wxOK | wxICON_INFORMATION);
 }
