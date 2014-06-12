@@ -17,6 +17,8 @@ public:
 	int players_online;
 	int players_max;
 	int ping;
+	
+	server_status()	{}
 
 	server_status(std::string name, std::string motd, int players_online, int players_max, int ping) 
 		: name(name), motd(motd), players_online(players_online), players_max(players_max), ping(ping) {}
@@ -27,8 +29,8 @@ public:
 
 		boost::archive::text_iarchive in_archive(is);
 		server_status status;
-		in_archive >> &status;
-		std::memcpy(this, status, sizeof(status));
+		in_archive >> status;
+		std::memcpy(this, &status, sizeof(status));
 	}
 
 

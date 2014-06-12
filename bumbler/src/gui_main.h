@@ -1,13 +1,11 @@
 #pragma once
 
-#include <atan/actor_system/actor_system.h>
+#include "server_list.h"
 
 #include <wx/wxprec.h>
 #ifndef WX_PRECOMP
 #include <wx/wx.h>
 #endif
-
-#include "bumbler_client_actor.h"
 
 class MyApp : public wxApp {
 public:
@@ -28,7 +26,7 @@ private:
 	void OnConnect(wxCommandEvent& event); //Used for button and double click on server hopefully...
 	wxDECLARE_EVENT_TABLE();
 	
-	std::unique_ptr<actor_system> actor_system_;
+	 server_list server_list;
 
 };
 
@@ -66,8 +64,6 @@ MyFrame::MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
 	SetMenuBar(menuBar);
 	CreateStatusBar();
 	SetStatusText("Welcome to wxWidgets!");
-	
-	actor_system_ = std::unique_ptr<actor_system>(new actor_system("bumbler_system", 8558));
 
 	servers = new wxListBox(this, LISTBOX_Servers, wxDefaultPosition, wxDefaultSize, 0, NULL, wxLB_HSCROLL | wxLB_SINGLE | wxLB_NEEDED_SB);
 	wxButton *addServer = new wxButton(this, BUTTON_AddServer, _T("Add Server"), wxDefaultPosition, wxDefaultSize, 0);
