@@ -1,11 +1,12 @@
 #pragma once
 
+#include <atan/actor_system/actor_system.h>
+
 #include <wx/wxprec.h>
 #ifndef WX_PRECOMP
 #include <wx/wx.h>
 #endif
 
-#include <atan/actor_system/actor_system.h>
 #include "bumbler_client_actor.h"
 
 class MyApp : public wxApp {
