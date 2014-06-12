@@ -9,7 +9,7 @@
 class remote_actor : public actor
 {
 public:
-	remote_actor(std::string name, actor_system& actor_system, actor_ref& network_actor_ref, int actor_sleep_ms = 10) 
+	remote_actor(std::string name, actor_system& actor_system, actor_ref network_actor_ref, int actor_sleep_ms = 10) 
 		: actor(name, actor_system, actor_sleep_ms), network_actor_ref_(network_actor_ref)
 	{
 		remote_actor_endpoint_ = boost::asio::ip::udp::endpoint(boost::asio::ip::address().from_string(network_actor_ref.ip), network_actor_ref.port);
@@ -19,7 +19,7 @@ public:
 
 	void tell(const message& msg)
 	{
-		add_message(msg);
+		tell_(msg);
 		//throw new wrong_actor_method("wrong tell method for network actor");
 	}
 

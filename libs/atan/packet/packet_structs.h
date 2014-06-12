@@ -39,15 +39,13 @@ public:
 	packet_data(char *data, size_t length) : data(std::string(data, data + sizeof(char)*length)) {}
 	packet_data(message& msg)
 	{
-		//std::ostringstream archive_stream;
-		//boost::archive::text_oarchive archive(archive_stream);
-		//archive << msg;
-		//std::string result = std::string(archive_stream.str());
-		//data = result;
-
-		data = msg.get_raw_message();
-
-		//data = std::vector<char>(result.begin(), result.end());
+		std::ostringstream archive_stream;
+		boost::archive::text_oarchive archive(archive_stream);
+		archive & msg;
+		data = archive_stream.str();
+		
+//		data = msg.get_raw_message();
+//		std::cout << "message is \t" << data << std::endl;
 	}
 	template<class Archive>
 	void serialize(Archive & ar, const unsigned int version)
