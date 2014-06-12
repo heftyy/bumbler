@@ -17,7 +17,7 @@ public:
 
 	//remote_actor(const remote_actor& actor, actor_system& actor_system) : actor(actor, actor_system) {}
 
-	void tell(const message& msg)
+	void tell(message& msg)
 	{
 		tell_(msg);
 		//throw new wrong_actor_method("wrong tell method for network actor");
