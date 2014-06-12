@@ -41,5 +41,8 @@
     <ClInclude Include="src\server_list.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\server_status.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
