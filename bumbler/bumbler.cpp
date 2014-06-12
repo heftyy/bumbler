@@ -1,6 +1,6 @@
 // bumbler.cpp : Defines the entry point for the console application.
 //
-#include "src/gui_main.h"
+#include "src/my_app.h"
 
 int main(int argc, char* argv[])
 {

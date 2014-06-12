@@ -10,8 +10,8 @@
 class server_connection_actor : public remote_actor
 {
 public:
-	server_connection_actor(std::string& remote_actor_ref, actor_system& actor_system, int actor_sleep_ms = 10)
-		: remote_actor("server_connection_actor", actor_system, actor_ref(remote_actor_ref), actor_sleep_ms)
+	server_connection_actor(std::string name, std::string& remote_actor_ref, actor_system& actor_system, std::function<void(std::string)> update_server_function, int actor_sleep_ms = 10)
+		: remote_actor(name, actor_system, actor_ref(remote_actor_ref), actor_sleep_ms), update_server_function_(update_server_function)
 	{
 		//actor_system_.add_actor(std::shared_ptr<test_actor>(this));
 	}
@@ -22,6 +22,8 @@ public:
 
 private:
 
+	std::function<void(std::string)> update_server_function_;
+
 	void on_receive(message msg)
 	{
 		std::cout << "[SERVER_CONNECTION_ACTOR] on_receive thread id = " << std::this_thread::get_id() << std::endl;
@@ -31,6 +33,7 @@ private:
 		if (msg.type == SERVER_STATUS)
 		{
 			std::cout << "[SERVER_CONNECTION_ACTOR] SERVER STATUS RECEIVED" << std::endl;
+			update_server_function_(get_self().ip);
 		}
 
 		std::string msg_string = std::string(msg.data.begin(), msg.data.end());

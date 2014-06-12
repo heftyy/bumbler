@@ -7,15 +7,11 @@
 #include <wx/wx.h>
 #endif
 
-class MyApp : public wxApp {
-public:
-	virtual bool OnInit();
-};
-
 class MyFrame : public wxFrame {
 public:
 	MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size);
-	
+	void UpdateServer(const std::string ip, std::string server_info);
+
 private:
 	std::unique_ptr<wxListBox> servers_;
 	std::unique_ptr<server_list> server_list_;
@@ -44,12 +40,6 @@ EVT_BUTTON(BUTTON_Connect, MyFrame::OnConnect)
 EVT_BUTTON(BUTTON_DeleteServer, MyFrame::OnDeleteServer)
 EVT_LISTBOX_DCLICK(LISTBOX_Servers, MyFrame::OnConnect)
 wxEND_EVENT_TABLE()
-
-bool MyApp::OnInit() {
-	MyFrame *frame = new MyFrame("Bumbling along", wxPoint(50, 50), wxSize(450, 340));
-	frame->Show(true);
-	return true;
-}
 
 MyFrame::MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
 : wxFrame(NULL, wxID_ANY, title, pos, size) {
@@ -101,7 +91,7 @@ void MyFrame::OnAddServer(wxCommandEvent& event) {
 
 void MyFrame::OnDeleteServer(wxCommandEvent& event) {
 	if (servers_->GetSelection() == wxNOT_FOUND)
-		wxMessageBox("No server selected", "Doh",wxOK | wxICON_INFORMATION);
+		wxMessageBox("No server selected", "Doh", wxOK | wxICON_INFORMATION);
 	else
 		servers_->Delete(servers_->GetSelection());
 }
@@ -111,4 +101,9 @@ void MyFrame::OnConnect(wxCommandEvent& event) {
 	if (servers_->GetSelection() != wxNOT_FOUND)
 		selection = servers_->GetString(servers_->GetSelection());
 	wxMessageBox(selection, "Lets pretend I'm connecting", wxOK | wxICON_INFORMATION);
+}
+
+void MyFrame::UpdateServer(const std::string ip, std::string server_info)
+{
+	wxMessageBox("updating "+ip, server_info, wxOK | wxICON_INFORMATION);
 }
