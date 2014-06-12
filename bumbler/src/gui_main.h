@@ -1,11 +1,12 @@
 #pragma once
 
+#include <atan/actor_system/actor_system.h>
+
 #include <wx/wxprec.h>
 #ifndef WX_PRECOMP
 #include <wx/wx.h>
 #endif
 
-#include <atan/actor_system/actor_system.h>
 #include "bumbler_client_actor.h"
 
 class MyApp : public wxApp {
@@ -18,30 +19,37 @@ public:
 	MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size);
 	
 private:
-	void OnHello(wxCommandEvent& event);
-	void OnAddServer(wxCommandEvent& event);
+	wxListBox *servers;
+
 	void OnExit(wxCommandEvent& event);
 	void OnAbout(wxCommandEvent& event);
+	void OnAddServer(wxCommandEvent& event);
+	void OnDeleteServer(wxCommandEvent& event);
+	void OnConnect(wxCommandEvent& event); //Used for button and double click on server hopefully...
 	wxDECLARE_EVENT_TABLE();
 	
 	std::unique_ptr<actor_system> actor_system_;
-	
-	std::string get_address();
+
 };
 
 enum {
-	ID_Hello = 1,
-	ID_AddServer
+	BUTTON_AddServer = wxID_HIGHEST,
+	BUTTON_Connect,
+	BUTTON_DeleteServer,
+	BUTTON_AddText,
+	LISTBOX_Servers
 };
 wxBEGIN_EVENT_TABLE(MyFrame, wxFrame)
-EVT_MENU(ID_Hello, MyFrame::OnHello)
-EVT_MENU(ID_AddServer, MyFrame::OnAddServer)
 EVT_MENU(wxID_EXIT, MyFrame::OnExit)
 EVT_MENU(wxID_ABOUT, MyFrame::OnAbout)
+EVT_BUTTON(BUTTON_AddServer, MyFrame::OnAddServer)
+EVT_BUTTON(BUTTON_Connect, MyFrame::OnConnect)
+EVT_BUTTON(BUTTON_DeleteServer, MyFrame::OnDeleteServer)
+EVT_LISTBOX_DCLICK(LISTBOX_Servers, MyFrame::OnConnect)
 wxEND_EVENT_TABLE()
 
 bool MyApp::OnInit() {
-	MyFrame *frame = new MyFrame("Hello World", wxPoint(50, 50), wxSize(450, 340));
+	MyFrame *frame = new MyFrame("Bumbling along", wxPoint(50, 50), wxSize(450, 340));
 	frame->Show(true);
 	return true;
 }
@@ -49,9 +57,6 @@ bool MyApp::OnInit() {
 MyFrame::MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
 : wxFrame(NULL, wxID_ANY, title, pos, size) {
 	wxMenu *menuFile = new wxMenu;
-	menuFile->Append(ID_Hello, "&Hello...\tCtrl-H",
-			"Help string shown in status bar for this menu item");
-	menuFile->AppendSeparator();
 	menuFile->Append(wxID_EXIT);
 	wxMenu *menuHelp = new wxMenu;
 	menuHelp->Append(wxID_ABOUT);
@@ -63,6 +68,20 @@ MyFrame::MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
 	SetStatusText("Welcome to wxWidgets!");
 	
 	actor_system_ = std::unique_ptr<actor_system>(new actor_system("bumbler_system", 8558));
+
+	servers = new wxListBox(this, LISTBOX_Servers, wxDefaultPosition, wxDefaultSize, 0, NULL, wxLB_HSCROLL | wxLB_SINGLE | wxLB_NEEDED_SB);
+	wxButton *addServer = new wxButton(this, BUTTON_AddServer, _T("Add Server"), wxDefaultPosition, wxDefaultSize, 0);
+	wxButton *deleteServer = new wxButton(this, BUTTON_DeleteServer, _T("Delete Server"), wxDefaultPosition, wxDefaultSize, 0);
+	wxButton *connect = new wxButton(this, BUTTON_Connect, _T("Connect"), wxDefaultPosition, wxDefaultSize, 0);
+
+	wxBoxSizer *vbox = new wxBoxSizer(wxVERTICAL);
+	vbox->Add(addServer, 1);
+	vbox->Add(deleteServer, 1);
+	vbox->Add(connect, 1);
+	wxBoxSizer *hbox = new wxBoxSizer(wxHORIZONTAL);
+	hbox->Add(servers, 10, wxEXPAND);
+	hbox->Add(vbox, 1, wxEXPAND);
+	SetSizer(hbox);
 }
 
 void MyFrame::OnExit(wxCommandEvent& event) {
@@ -74,44 +93,25 @@ void MyFrame::OnAbout(wxCommandEvent& event) {
 			"About Hello World", wxOK | wxICON_INFORMATION);
 }
 
-void MyFrame::OnHello(wxCommandEvent& event) {
-	wxLogMessage("Hello world from wxWidgets!");
-}
-
-
 void MyFrame::OnAddServer(wxCommandEvent& event) {
-	std::string address = get_address();
-	
-	if(address.length() == 0) 
-	{
-		wxLogMessage("Error, wrong address!");
-	}
-	
-	std::string rpi_actor_ref = "server_actor$bumbler_server@" + address;
-
-	auto client_actor = std::shared_ptr<bumbler_client_actor>(new bumbler_client_actor(rpi_actor_ref, *actor_system_));
-	actor_system_->add_actor(client_actor);
-
-	client_actor->tell(1, "hello");
-	
-	std::chrono::milliseconds sleep_duration(1000);
-	std::this_thread::sleep_for(sleep_duration);
-
-	actor_system_->stop();
-}
-
-std::string MyFrame::get_address()
-{
-	wxTextEntryDialog dialog(this,
-		wxT("")
-		wxT("Add [ip:port]:"),
-		wxT("Bumbler server"),
-		wxT("127.0.0.1:8556"),
-		wxOK | wxCANCEL);
+	wxTextEntryDialog dialog(this, wxT("Type type"), wxT("Random text"), wxT(""), wxOK | wxCANCEL);
 
 	if (dialog.ShowModal() == wxID_OK)
 	{
-		return dialog.GetValue().ToStdString();
+		servers->Append(dialog.GetValue().ToStdString());
 	}
-	return "";
+}
+
+void MyFrame::OnDeleteServer(wxCommandEvent& event) {
+	if (servers->GetSelection() == wxNOT_FOUND)
+		wxMessageBox("No server selected", "Doh",wxOK | wxICON_INFORMATION);
+	else
+		servers->Delete(servers->GetSelection());
+}
+
+void MyFrame::OnConnect(wxCommandEvent& event) {
+	wxString selection = wxT("Nothing selected");
+	if (servers->GetSelection() != wxNOT_FOUND)
+		selection = servers->GetString(servers->GetSelection());
+	wxMessageBox(selection, "Lets pretend I'm connecting", wxOK | wxICON_INFORMATION);
 }
