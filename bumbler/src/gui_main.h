@@ -46,7 +46,6 @@ EVT_LISTBOX_DCLICK(LISTBOX_Servers, MyFrame::OnConnect)
 wxEND_EVENT_TABLE()
 
 bool MyApp::OnInit() {
-	server_list_ = std::unique_ptr<server_list>(new server_list());
 	MyFrame *frame = new MyFrame("Bumbling along", wxPoint(50, 50), wxSize(450, 340));
 	frame->Show(true);
 	return true;
@@ -54,6 +53,8 @@ bool MyApp::OnInit() {
 
 MyFrame::MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
 : wxFrame(NULL, wxID_ANY, title, pos, size) {
+	server_list_ = std::unique_ptr<server_list>(new server_list());
+
 	wxMenu *menuFile = new wxMenu;
 	menuFile->Append(wxID_EXIT);
 	wxMenu *menuHelp = new wxMenu;
