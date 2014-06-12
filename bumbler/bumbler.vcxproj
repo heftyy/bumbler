@@ -90,6 +90,7 @@
     <ClInclude Include="src\server_connection_actor.h" />
     <ClInclude Include="src\server_info.h" />
     <ClInclude Include="src\server_list.h" />
+    <ClInclude Include="src\server_status.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\libs\atan\atan.vcxproj">
