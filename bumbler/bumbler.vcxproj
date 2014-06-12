@@ -82,14 +82,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="bumbler.cpp" />
+    <ClCompile Include="src\frame_servers.cpp" />
     <ClCompile Include="src\my_app.cpp" />
     <ClCompile Include="src\server_info.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\my_app.h" />
-    <ClInclude Include="src\launcher.h" />
-    <ClInclude Include="src\bumbler_client_actor.h" />
-    <ClInclude Include="src\gui_main.h" />
+    <ClInclude Include="src\frame_servers.h" />
     <ClInclude Include="src\network_settings.h" />
     <ClInclude Include="src\server_connection_actor.h" />
     <ClInclude Include="src\server_info.h" />

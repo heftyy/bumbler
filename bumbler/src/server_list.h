@@ -18,26 +18,28 @@ public:
 		
 	}
 	
-	void add_server(std::string address) 
+	server_info& add_server(std::string address)
 	{
 		int port_start = address.find(':');
-		std::string ip = address.substr(0, port_start - 1);
+		std::string ip = address.substr(0, port_start);
 		int port = atoi(address.substr(port_start + 1, address.length() - port_start - 1).c_str());
 		
-		add_server_(ip, port);
+		return add_server_(ip, port);
 	}
 	
-	void add_server(std::string ip, int port) 
+	server_info& add_server(std::string ip, int port)
 	{
-		add_server_(ip, port);
+		return add_server_(ip, port);
 	}
 	
 private:
 	std::unique_ptr<actor_system> actor_system_;
 	
-	void add_server_(std::string ip, int port)
+	server_info& add_server_(std::string ip, int port)
 	{
-		servers.push_back(server_info(ip, port, *actor_system_));
+		server_info server_info(ip, port, *actor_system_);
+		servers.push_back(server_info);
+		return servers.back();
 	}
 };
 

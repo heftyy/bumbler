@@ -1,29 +1,4 @@
-#pragma once
-
-#include "server_list.h"
-
-#include <wx/wxprec.h>
-#ifndef WX_PRECOMP
-#include <wx/wx.h>
-#endif
-
-class MyFrame : public wxFrame {
-public:
-	MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size);
-	void UpdateServer(const std::string ip, std::string server_info);
-
-private:
-	std::unique_ptr<wxListBox> servers_;
-	std::unique_ptr<server_list> server_list_;
-
-	void OnExit(wxCommandEvent& event);
-	void OnAbout(wxCommandEvent& event);
-	void OnAddServer(wxCommandEvent& event);
-	void OnDeleteServer(wxCommandEvent& event);
-	void OnConnect(wxCommandEvent& event); //Used for button and double click on server hopefully...
-	wxDECLARE_EVENT_TABLE();
-
-};
+#include "frame_servers.h"
 
 enum {
 	BUTTON_AddServer = wxID_HIGHEST,
@@ -77,7 +52,7 @@ void MyFrame::OnExit(wxCommandEvent& event) {
 
 void MyFrame::OnAbout(wxCommandEvent& event) {
 	wxMessageBox("This is a wxWidgets' Hello world sample",
-			"About Hello World", wxOK | wxICON_INFORMATION);
+		"About Hello World", wxOK | wxICON_INFORMATION);
 }
 
 void MyFrame::OnAddServer(wxCommandEvent& event) {
@@ -85,7 +60,8 @@ void MyFrame::OnAddServer(wxCommandEvent& event) {
 
 	if (dialog.ShowModal() == wxID_OK)
 	{
-		servers_->Append(dialog.GetValue().ToStdString());
+		server_info info = server_list_->add_server(dialog.GetValue().ToStdString());
+		servers_->Append(info.to_string());
 	}
 }
 
@@ -105,5 +81,5 @@ void MyFrame::OnConnect(wxCommandEvent& event) {
 
 void MyFrame::UpdateServer(const std::string ip, std::string server_info)
 {
-	wxMessageBox("updating "+ip, server_info, wxOK | wxICON_INFORMATION);
+	wxMessageBox("updating " + ip, server_info, wxOK | wxICON_INFORMATION);
 }

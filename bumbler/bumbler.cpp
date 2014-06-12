@@ -8,7 +8,7 @@ int main(int argc, char* argv[])
 	wxEntryStart(argc, argv);
 	wxTheApp->OnInit();
 
-	std::cout << "bumbler  test" << std::endl;
+	std::cout << "bumbler test" << std::endl;
 
 	wxTheApp->OnRun();
 	wxTheApp->OnExit();
