@@ -60,8 +60,15 @@ void MyFrame::OnAddServer(wxCommandEvent& event) {
 
 	if (dialog.ShowModal() == wxID_OK)
 	{
-		server_info info = server_list_->add_server(dialog.GetValue().ToStdString());
-		servers_->Append(info.to_string());
+		try
+		{
+			server_info info = server_list_->add_server(dialog.GetValue().ToStdString());
+			servers_->Append(info.to_string());
+		}
+		catch (boost::system::system_error& ec)
+		{
+			wxMessageBox("Not a valid ip and port", "Error", wxOK | wxICON_INFORMATION);
+		}
 	}
 }
 

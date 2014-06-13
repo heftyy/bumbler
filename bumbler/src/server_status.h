@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <array>
+#include <string>
 #include <sstream>
 #include <memory>
 #include <boost/archive/text_oarchive.hpp>
@@ -17,10 +18,15 @@ public:
 	int players_online;
 	int players_max;
 	int ping;
-	
-	server_status()	{}
 
-	server_status(std::string name, std::string motd, int players_online, int players_max, int ping) 
+	server_status() 
+	{
+		players_online = 0;
+		players_max = 0;
+		ping = 0;
+	}
+
+	server_status(std::string name, std::string motd, int players_online, int players_max, int ping)
 		: name(name), motd(motd), players_online(players_online), players_max(players_max), ping(ping) {}
 
 	server_status(std::string received_data)
@@ -33,6 +39,11 @@ public:
 		std::memcpy(this, &status, sizeof(status));
 	}
 
+	std::string to_string()
+	{
+		//std::string result = name + "\t" + std::to_string(players_online) + "/" std::to_string(players_max) + "\t" + std::to_string(ping);
+		return name + "\t" + std::to_string(players_online) + "/" + std::to_string(players_max) + "\t" + std::to_string(ping);
+	}
 
 	std::string get_serialized()
 	{

@@ -20,7 +20,7 @@ public:
 
 	std::string to_string()
 	{
-		return ip_ + " server info to_string";
+		return ip_ + ":" + std::to_string(port_) + ", " + server_status_.to_string();
 	}
 			
 private:
