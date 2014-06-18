@@ -5,7 +5,7 @@
 #include <atan/interruptible_thread.h>
 #include <atan/actor/remote_actor.h>
 #include <atan/actor_system/actor_system.h>
-#include <message_settings.h>
+#include <communication/message_settings.h>
 
 class server_connection_actor : public remote_actor
 {
