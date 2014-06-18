@@ -7,7 +7,7 @@
 #include <boost/uuid/uuid_io.hpp>
 #include <boost/lexical_cast.hpp>
 #include "server_connection_actor.h"
-#include "server_status.h"
+#include <server_status.h>
 
 class server_info
 {
