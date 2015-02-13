@@ -22,8 +22,11 @@ public:
 
 private:
     actor_system_storage() {}
-    actor_system_storage(actor_system_storage const&);              // Don't Implement.
-    void operator=(actor_system_storage const&); // Don't implement
+    // C++ 11
+    // =======
+    // We can use the better technique of deleting the methods we don't want.
+    actor_system_storage(actor_system_storage const&) = delete;
+    void operator=(actor_system_storage const&) = delete;
     ~actor_system_storage();
 
     std::map<std::string, std::shared_ptr<actor_system>> systems_;
