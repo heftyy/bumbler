@@ -5,60 +5,28 @@
 #include <mutex>
 #include <queue>
 #include <thread>
+#include <memory>
+#include "actor_ref.h"
 #include "../message.h"
 #include "../interruptible_thread.h"
 #include "../packet/packet.h"
 
 class actor_system;
 
-class actor
+class actor : public std::enable_shared_from_this<actor>
 {
 public:
-	actor(const std::string& name, actor_system& actor_system, int actor_sleep_ms = 10);
-	//actor(const actor& actor, actor_system& actor_system) : actor_system_(actor_system) {}
+	friend class actor_system;
 
-	~actor();
+	actor_ref init();
 
-	virtual void tell(const message& msg) {}
-	virtual void tell(int type, std::string msg, std::shared_ptr<actor> sender_actor = nullptr) {}
-	virtual void on_receive(message msg) {}
-	std::string actor_name();
-	std::string system_name();
-	void reply(int type, std::string msg, actor_ref& target_ref);
-	bool is_busy() { return busy_; }
-
-	void init()
-	{
-		message_queue_ = std::queue<message>();
-		queue_thread_ = std::unique_ptr<interruptible_thread>(new interruptible_thread());
-		queue_thread_->start_thread([this]() {
-			while (1)
-			{
-				if (stopped_) return;
-				queue_thread_->check_for_interrupt();
-				this->read_messages();
-				std::chrono::milliseconds sleep_duration(actor_sleep_ms_);
-				std::this_thread::sleep_for(sleep_duration);
-			}
-		});
-	}
-
-	void add_message(const message msg)
-	{
-		std::lock_guard<std::mutex> guard(queue_mutex_);
-		message_queue_.push(msg);
-	}
-
-	bool compare(std::shared_ptr<actor> actor)
-	{
-		if (this->actor_name().compare(actor->actor_name()) == 0) return true;
-		return false;
-	}
-
-	actor_ref get_self()
-	{
-		return actor_ref(actor_name(), system_name());
-	}
+    template<class T, typename ...Args>
+    static actor_ref create_actor(Args&& ... args)
+    {
+        std::shared_ptr<T> actor = std::shared_ptr<T>(new T(args...));
+        actor->init();
+        return actor->get_self();
+    }
 
 protected:
 	std::mutex task_mutex_;
@@ -69,7 +37,34 @@ protected:
 	std::atomic<bool> busy_;
 	std::atomic<bool> stopped_;
 	std::string actor_name_;
-	actor_system& actor_system_;
+	std::shared_ptr<actor_system> actor_system_;
+
+	actor(const std::string name, std::shared_ptr<actor_system> actor_system, int actor_sleep_ms = 10);
+	~actor();
+
+	virtual void tell(const message& msg) {}
+	virtual void tell(int type, std::string msg, std::shared_ptr<actor> sender_actor = nullptr) {}
+	virtual void on_receive(message msg) {}
+	std::string actor_name();
+	std::string system_name();
+	void reply(int type, std::string msg, actor_ref& target_ref);
+	bool is_busy() { return busy_; }
+
+	void add_message(const message msg)
+	{
+		std::lock_guard<std::mutex> guard(queue_mutex_);
+		message_queue_.push(msg);
+	}
+
+	bool compare(std::shared_ptr<actor> actor)
+	{
+		return this->actor_name().compare(actor->actor_name()) == 0;
+	}
+
+	actor_ref get_self()
+	{
+		return actor_ref(actor_name(), system_name());
+	}
 
 	packet message_to_packet(message& msg)
 	{
@@ -85,6 +80,7 @@ protected:
 	void read_messages()
 	{
 		std::unique_ptr<message> msg = get_first_message();
+
 		if (msg != nullptr)
 		{
 			run_task(std::move(msg));
@@ -111,12 +107,12 @@ protected:
 
 	void run_task(std::unique_ptr<message> msg)
 	{
-		busy_ = true;
+		busy_.store(true);
 		std::cout << "[ACTOR] queueing new task" << std::endl;
 		std::lock_guard<std::mutex> guard(task_mutex_);
 		std::cout << "[ACTOR] starting new task" << std::endl;
 		on_receive(*msg.release());
-		busy_ = false;
+		busy_.store(false);
 	}
 
 	/** synchronous wait for the actor to end all tasks and stop all thread

@@ -1,4 +1,5 @@
 #pragma once
+
 #include <vector>
 #include <sstream>
 #include <boost/archive/text_oarchive.hpp>
@@ -17,14 +18,14 @@ public:
 	//std::vector<char> data;
 
 	message() : type(-1) {}
-	message(const actor_ref& target, const actor_ref& sender, const std::vector<char>& d, int type) : target(target), sender(sender), data(d.begin(), d.end()), type(type) {}
+	message(const actor_ref target, const actor_ref sender, const std::vector<char> d, int type) : target(target), sender(sender), data(d.begin(), d.end()), type(type) {}
 	message(std::unique_ptr<actor_ref> target, std::unique_ptr<actor_ref> sender, const std::vector<char>& d, int type) : data(d.begin(), d.end()), type(type)
 	{
 		if (target) this->target = *target.release();
 		if (sender) this->sender = *sender.release();
 	}
-	message(const actor_ref& target, const actor_ref& sender, const std::string& d, int type) : target(target), sender(sender), data(d), type(type) {} 
-	message(std::unique_ptr<actor_ref> target, std::unique_ptr<actor_ref> sender, const std::string& d, int type) : data(d), type(type) 
+	message(const actor_ref target, const actor_ref sender, const std::string d, int type) : target(target), sender(sender), data(d), type(type) {}
+	message(std::unique_ptr<actor_ref> target, std::unique_ptr<actor_ref> sender, const std::string d, int type) : data(d), type(type)
 	{
 		if (target) this->target = *target.release();
 		if (sender) this->sender = *sender.release();

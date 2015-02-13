@@ -10,7 +10,8 @@
 class server_connection_actor : public remote_actor
 {
 public:
-	server_connection_actor(std::string name, std::string& remote_actor_ref, actor_system& actor_system, std::function<void(std::string)> update_server_function, int actor_sleep_ms = 10)
+	server_connection_actor(std::string name, std::string remote_actor_ref, std::shared_ptr<actor_system> actor_system,
+			std::function<void(std::string)> update_server_function, int actor_sleep_ms = 10)
 		: remote_actor(name, actor_system, actor_ref(remote_actor_ref), actor_sleep_ms), update_server_function_(update_server_function)
 	{
 		//actor_system_.add_actor(std::shared_ptr<test_actor>(this));

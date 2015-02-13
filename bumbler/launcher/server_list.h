@@ -10,7 +10,9 @@ public:
 
 	server_list() 
 	{
-		actor_system_ = std::unique_ptr<actor_system>(new actor_system("bumbler_system", 8558));
+		actor_system_ = std::shared_ptr<actor_system>(new actor_system("bumbler_system", 8558));
+
+        //actor_system_->schedule("Abc", <#(message&)message#>, 1000, 5000);
 	}
 	
 	~server_list()
@@ -33,11 +35,11 @@ public:
 	}
 	
 private:
-	std::unique_ptr<actor_system> actor_system_;
+	std::shared_ptr<actor_system> actor_system_;
 	
 	server_info& add_server_(std::string ip, int port)
 	{
-		server_info server_info(ip, port, *actor_system_);
+		server_info server_info(ip, port, actor_system_);
 		servers.push_back(server_info);
 		return servers.back();
 	}

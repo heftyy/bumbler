@@ -7,6 +7,7 @@ enum {
 	BUTTON_AddText,
 	LISTBOX_Servers
 };
+
 wxBEGIN_EVENT_TABLE(MyFrame, wxFrame)
 EVT_MENU(wxID_EXIT, MyFrame::OnExit)
 EVT_MENU(wxID_ABOUT, MyFrame::OnAbout)

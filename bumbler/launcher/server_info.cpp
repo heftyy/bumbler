@@ -1,6 +1,6 @@
 #include "my_app.h"
 
-server_info::server_info(std::string ip, int port, actor_system& actor_system) : port_(port), ip_(ip)
+server_info::server_info(std::string ip, int port, std::shared_ptr<actor_system> actor_system) : port_(port), ip_(ip)
 {
 	boost::uuids::basic_random_generator<boost::mt19937> gen;
 	boost::uuids::uuid uuid = gen();
@@ -11,5 +11,5 @@ server_info::server_info(std::string ip, int port, actor_system& actor_system) :
 	{
 		MyApp::frame_servers->UpdateServer(ip, to_string());
 	});
-	actor_system.add_actor(server_connection_actor_);
+	server_connection_actor_->init();
 }

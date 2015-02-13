@@ -9,6 +9,7 @@ int main(int argc, char* argv[])
 	try
 	{
 		actor_system actor_system("bumbler_server", 8556);
+        actor_system.setup();
 		auto actor = std::shared_ptr<server_actor>(new server_actor(actor_system));
 		actor_system.add_actor(actor);
 

@@ -2,6 +2,9 @@
 
 #include <memory>
 #include <iostream>
+#include "../actor_system/actor_system_storage.h"
+
+class message;
 
 class actor_ref
 {
@@ -12,7 +15,12 @@ public:
 	int port;
 
 	actor_ref() : port(0) {}
-	actor_ref(const std::string& actor_name, const std::string& system_name) : actor_name(actor_name), system_name(system_name), port(0) {}
+	actor_ref(const std::string& actor_name, const std::string& system_name)
+            : actor_name(actor_name), system_name(system_name), port(0) {}
+
+	actor_ref(const std::string& actor_name, const std::string& system_name, const std::string& ip, const int port)
+            : actor_name(actor_name), system_name(system_name), ip(ip), port(port) {}
+
 	actor_ref(const std::string& actor_ref) /**[actor]$[system_name]@[ip]:[port]*/
 	{
 		int system_name_start = actor_ref.find('$');
@@ -24,16 +32,22 @@ public:
 		port = atoi(actor_ref.substr(port_start + 1, actor_ref.length() - port_start - 1).c_str());
 	}
 
+    static actor_ref none()
+    {
+        return actor_ref();
+    }
+
+    void tell(const int type, const std::string text, const actor_ref sender);
+    void tell(const message& msg);
+
 	bool exists()
 	{
-		if (actor_name.length() > 0 && system_name.length() > 0) return true;
-		return false;
+		return actor_name.length() > 0 && system_name.length() > 0;
 	}
 
 	bool valid_address()
 	{
-		if (actor_name.length() > 0 && system_name.length() > 0 && ip.length() > 0 && port > 0) return true;
-		return false;
+		return actor_name.length() > 0 && system_name.length() > 0 && ip.length() > 0 && port > 0;
 	}
 
 	template<class Archive>

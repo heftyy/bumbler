@@ -12,7 +12,7 @@
 class server_info
 {
 public:
-	server_info(std::string ip, int port, actor_system& actor_system);
+	server_info(std::string ip, int port, std::shared_ptr<actor_system>);
 
 	~server_info()
 	{
