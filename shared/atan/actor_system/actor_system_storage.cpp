@@ -9,17 +9,17 @@ void actor_system_storage::destroy()
 void actor_system_storage::add_system(std::shared_ptr<actor_system> actor_system)
 {
     std::lock_guard<std::mutex> guard(this->systems_mutex_);
-    systems_.push_back(actor_system);
+    systems_.insert(std::make_pair(actor_system->system_name(), actor_system));
 }
 
 std::shared_ptr<actor_system> actor_system_storage::get_system(std::string system_name)
 {
     std::lock_guard<std::mutex> guard(this->systems_mutex_);
-    for(std::shared_ptr<actor_system> system : systems_)
+    for(auto pair : systems_)
     {
-        if(system_name.compare(system->system_name()) == 0)
+        if(system_name.compare(pair.second->system_name()) == 0)
         {
-            return system;
+            return pair.second;
         }
     }
 

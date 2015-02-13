@@ -1,7 +1,7 @@
 #pragma once
 
 #include <memory>
-#include <vector>
+#include <map>
 #include <iostream>
 #include <mutex>
 
@@ -25,6 +25,6 @@ private:
     actor_system_storage(actor_system_storage const&);              // Don't Implement.
     void operator=(actor_system_storage const&); // Don't implement
 
-    std::vector<std::shared_ptr<actor_system>> systems_;
+    std::map<std::string, std::shared_ptr<actor_system>> systems_;
     std::mutex systems_mutex_;
 };
