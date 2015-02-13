@@ -1,6 +1,11 @@
 #include "actor_system_storage.h"
 #include "actor_system.h"
 
+void actor_system_storage::destroy()
+{
+    this->systems_.clear();
+}
+
 void actor_system_storage::add_system(std::shared_ptr<actor_system> actor_system)
 {
     std::lock_guard<std::mutex> guard(this->systems_mutex_);

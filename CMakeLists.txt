@@ -14,6 +14,7 @@ set(BUMBLER_SOURCE_FILES
     bumbler/launcher/server_list.h
     bumbler/bumbler.cpp
     bumbler/out_actor.h
+    shared/utility.cpp
 )
 
 set(SERVER_SOURCE_FILES

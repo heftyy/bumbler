@@ -29,14 +29,18 @@ public:
 
         stopped_.store(false);
         boost::asio::io_service::work work(io_service_);
+
         server_ = std::shared_ptr<udp_server>(new udp_server(io_service_, port_));
         server_->send_completed_function = [&](){ send_completed(); };
         server_->receive_function = [&](std::unique_ptr<packet> packet, boost::asio::ip::udp::endpoint sender_endpoint) { receive(std::move(packet), sender_endpoint); };
+
         io_service_thread_ = std::unique_ptr<std::thread>(new std::thread([this]()
         {
             std::cout << "[ACTOR_SYSTEM] STARTED ON PORT " << port_ << std::endl;
             io_service_.run();
         }));
+
+        scheduler_ = std::shared_ptr<scheduler>(new scheduler());
     }
 
 	void stop()
@@ -127,9 +131,14 @@ public:
 		return system_name_;
 	}
 
-    void schedule(std::string actor_name, message& message, long initial_delay_ms, long interval_delay_ms)
+    void schedule(message& message, long initial_delay_ms, long interval_delay_ms)
     {
-        scheduler_->schedule(actor_ref(system_name_, actor_name), message, initial_delay_ms, interval_delay_ms);
+        scheduler_->schedule(message, initial_delay_ms, interval_delay_ms);
+    }
+
+    void schedule_once(message& message, long initial_delay_ms)
+    {
+        scheduler_->schedule_once(message, initial_delay_ms);
     }
 
 private:

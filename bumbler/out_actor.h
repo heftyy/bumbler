@@ -14,7 +14,7 @@ public:
 
 	~out_actor()
 	{
-		std::cout << "[SERVER_CONNECTION_ACTOR] destructor" << std::endl;
+		std::cout << "[OUT_ACTOR] destructor" << std::endl;
 	}
 
 private:

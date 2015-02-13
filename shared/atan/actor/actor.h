@@ -18,10 +18,8 @@ class actor : public std::enable_shared_from_this<actor>
 public:
 	friend class actor_system;
 
-	actor_ref init();
-
     template<class T, typename ...Args>
-    static actor_ref create_actor(Args&& ... args)
+    static actor_ref create_actor(Args&& ...args)
     {
         std::shared_ptr<T> actor = std::shared_ptr<T>(new T(args...));
         actor->init();
@@ -37,18 +35,18 @@ protected:
 	std::atomic<bool> busy_;
 	std::atomic<bool> stopped_;
 	std::string actor_name_;
-	std::shared_ptr<actor_system> actor_system_;
+	std::weak_ptr<actor_system> actor_system_;
 
-	actor(const std::string name, std::shared_ptr<actor_system> actor_system, int actor_sleep_ms = 10);
+	actor(const std::string name, std::weak_ptr<actor_system> actor_system, int actor_sleep_ms = 10);
 	~actor();
 
 	virtual void tell(const message& msg) {}
-	virtual void tell(int type, std::string msg, std::shared_ptr<actor> sender_actor = nullptr) {}
 	virtual void on_receive(message msg) {}
 	std::string actor_name();
 	std::string system_name();
 	void reply(int type, std::string msg, actor_ref& target_ref);
 	bool is_busy() { return busy_; }
+    actor_ref init();
 
 	void add_message(const message msg)
 	{

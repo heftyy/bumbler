@@ -3,25 +3,25 @@
 
 actor_ref actor::init()
 {
-	this->actor_system_->add_actor(shared_from_this());
+	this->actor_system_.lock()->add_actor(shared_from_this());
 }
 
 void remote_actor::tell_(message& msg)
 {
-	if (!actor_system_->server()) atan_error(ATAN_SERVER_DOESNT_EXIST, "server doesn't exist");
+	if (!actor_system_.lock()->server()) atan_error(ATAN_SERVER_DOESNT_EXIST, "server doesn't exist");
 
 	packet p = message_to_packet(msg);
 
-	actor_system_->server()->do_send(p.get_raw_packet(), remote_actor_endpoint_);
+	actor_system_.lock()->server()->do_send(p.get_raw_packet(), remote_actor_endpoint_);
 }
 
 message remote_actor::future_(message& msg, int timeout_ms)
 {
-	if (!actor_system_->server()) atan_error(ATAN_SERVER_DOESNT_EXIST, "server doesn't exist");
+	if (!actor_system_.lock()->server()) atan_error(ATAN_SERVER_DOESNT_EXIST, "server doesn't exist");
 
 	packet p = message_to_packet(msg);
 
-	std::unique_ptr<packet> received_packet = actor_system_->server()->future(p.get_raw_packet(), remote_actor_endpoint_, timeout_ms);
+	std::unique_ptr<packet> received_packet = actor_system_.lock()->server()->future(p.get_raw_packet(), remote_actor_endpoint_, timeout_ms);
 	if (received_packet)
 	{
 		message received_message;

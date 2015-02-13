@@ -16,8 +16,8 @@ public:
         return instance;
     }
 
+    void destroy();
     void add_system(std::shared_ptr<actor_system> actor_system);
-
     std::shared_ptr<actor_system> get_system(std::string system_name);
 
 private:

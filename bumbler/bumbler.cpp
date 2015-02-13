@@ -3,8 +3,7 @@
 #include <thread>
 
 #include "out_actor.h"
-
-using namespace std;
+#include "utility.h"
 
 int main(int argc, char* argv[])
 {
@@ -17,8 +16,15 @@ int main(int argc, char* argv[])
 
     local_actor.tell(1, "THIS IS A MESSAGE", actor_ref::none());
 
-    std::chrono::milliseconds sleep_duration(1000);
+    message msg(local_actor, actor_ref::none(), "MESSAGE FROM SCHEDULER", 1);
+    system->schedule_once(msg, 500);
+
+    std::chrono::milliseconds sleep_duration(2000);
     std::this_thread::sleep_for(sleep_duration);
+
+    std::cout << "EXIT" << std::endl;
+
+    actor_system_storage::instance().destroy();
 
 	return 0;
 

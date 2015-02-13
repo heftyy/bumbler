@@ -26,7 +26,7 @@ public:
 private:
 	std::string ip_;
 	int port_;
-	std::shared_ptr<remote_actor> server_connection_actor_;
+	actor_ref server_connection_actor_;
 	server_status server_status_;
 
 	void get_server_status()

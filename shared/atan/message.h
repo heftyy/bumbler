@@ -1,5 +1,4 @@
 #pragma once
-
 #include <vector>
 #include <sstream>
 #include <boost/archive/text_oarchive.hpp>
