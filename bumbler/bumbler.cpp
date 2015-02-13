@@ -24,8 +24,6 @@ int main(int argc, char* argv[])
 
     std::cout << "EXIT" << std::endl;
 
-    actor_system_storage::instance().destroy();
-
 	return 0;
 
     /*

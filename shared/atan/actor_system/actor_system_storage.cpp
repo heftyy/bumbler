@@ -1,6 +1,11 @@
 #include "actor_system_storage.h"
 #include "actor_system.h"
 
+actor_system_storage::~actor_system_storage()
+{
+    this->destroy();
+}
+
 void actor_system_storage::destroy()
 {
     this->systems_.clear();
