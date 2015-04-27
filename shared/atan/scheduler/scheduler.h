@@ -3,6 +3,7 @@
 #include <map>
 #include <mutex>
 #include <memory>
+#include <atan/actor_system/actor_system.h>
 #include "../actor/actor_ref.h"
 #include "../interruptible_thread.h"
 #include "utility.h"
@@ -15,14 +16,14 @@ public:
 
     ~scheduler()
     {
-        std::cout << "[SCHEDULER] DESTROY" << std::endl;
+        BOOST_LOG_TRIVIAL(debug) << "[SCHEDULER] DESTROY";
         for(auto& pair : this->threads_map_)
         {
             pair.second->stop();
         }
     }
 
-    void schedule(message& message, long initial_delay_ms, long interval_ms)
+    void schedule(const message& message, long initial_delay_ms, long interval_ms)
     {
         std::shared_ptr<interruptible_thread> thread = std::shared_ptr<interruptible_thread>(new interruptible_thread());
 
@@ -36,7 +37,9 @@ public:
             {
                 thread->check_for_interrupt();
 
-                std::cout << std::this_thread::get_id() << " " << utility::get_current_time() <<std::endl;
+                BOOST_LOG_TRIVIAL(debug) << "[SCHEDULER] sending message to " << message.target.to_string();
+
+                message.send();
 
                 if(interval_ms == 0) break;
 

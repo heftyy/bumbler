@@ -6,6 +6,7 @@
 #include <queue>
 #include <thread>
 #include <memory>
+#include <logger/logger.h>
 #include "actor_ref.h"
 #include "../message.h"
 #include "../interruptible_thread.h"
@@ -26,6 +27,8 @@ public:
         return actor->get_self();
     }
 
+    virtual actor_ref init() {}
+
 protected:
 	std::mutex task_mutex_;
 	std::mutex queue_mutex_;
@@ -42,11 +45,11 @@ protected:
 
 	virtual void tell(const message& msg) {}
 	virtual void on_receive(message msg) {}
+
 	std::string actor_name();
 	std::string system_name();
 	void reply(int type, std::string msg, actor_ref& target_ref);
 	bool is_busy() { return busy_; }
-    actor_ref init();
 
 	void add_message(const message msg)
 	{
@@ -106,9 +109,9 @@ protected:
 	void run_task(std::unique_ptr<message> msg)
 	{
 		busy_.store(true);
-		std::cout << "[ACTOR] queueing new task" << std::endl;
+        BOOST_LOG_TRIVIAL(debug) << "[ACTOR] queueing new task";
 		std::lock_guard<std::mutex> guard(task_mutex_);
-		std::cout << "[ACTOR] starting new task" << std::endl;
+        BOOST_LOG_TRIVIAL(debug) << "[ACTOR] starting new task";
 		on_receive(*msg.release());
 		busy_.store(false);
 	}
@@ -121,7 +124,7 @@ protected:
 		{
 			if (queue_thread_ && get_first_message() == nullptr)
 			{
-				std::cout << "[ACTOR] stopping actor" << std::endl;
+                BOOST_LOG_TRIVIAL(debug) << "[ACTOR] stopping actor";
 				queue_thread_->stop();
 				queue_thread_.release();
 				break;

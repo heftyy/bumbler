@@ -2,7 +2,7 @@
 
 #include <memory>
 #include <iostream>
-#include "../actor_system/actor_system_storage.h"
+#include <sstream>
 
 class message;
 
@@ -32,20 +32,27 @@ public:
 		port = atoi(actor_ref.substr(port_start + 1, actor_ref.length() - port_start - 1).c_str());
 	}
 
+    std::string to_string() const
+    {
+        std::stringstream ss;
+        ss << actor_name << "$" << system_name << "@" << ip << ":" << port;
+        return ss.str();
+    }
+
     static actor_ref none()
     {
         return actor_ref();
     }
 
-    void tell(const int type, const std::string text, const actor_ref sender);
-    void tell(const message& msg);
+    void tell(const int type, const std::string text, const actor_ref sender) const;
+    void tell(const message& msg) const;
 
-	bool exists()
+	bool exists() const
 	{
 		return actor_name.length() > 0 && system_name.length() > 0;
 	}
 
-	bool valid_address()
+	bool valid_address() const
 	{
 		return actor_name.length() > 0 && system_name.length() > 0 && ip.length() > 0 && port > 0;
 	}

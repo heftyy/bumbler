@@ -3,13 +3,14 @@
 
 #include <atan/actor_system/actor_system.h>
 #include "src/server_actor.h"
+#include "logger/logger.h"
 
 int main(int argc, char* argv[])
 {
 	try
 	{
 		actor_system actor_system("bumbler_server", 8556);
-        actor_system.setup();
+        actor_system.init();
 		auto actor = std::shared_ptr<server_actor>(new server_actor(actor_system));
 		actor_system.add_actor(actor);
 

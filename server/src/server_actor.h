@@ -22,9 +22,9 @@ private:
 
 	void on_receive(message msg)
 	{
-		std::cout << "[server_actor] on_receive thread id = " << std::this_thread::get_id() << std::endl;
-		std::cout << "server_actor received message from " << msg.sender.actor_name << std::endl;
-		std::cout << "message was " << std::string(msg.data.begin(), msg.data.end()) << std::endl;
+        BOOST_LOG_TRIVIAL(debug) << "[server_actor] on_receive thread id = " << std::this_thread::get_id();
+        BOOST_LOG_TRIVIAL(debug) << "server_actor received message from " << msg.sender.actor_name;
+        BOOST_LOG_TRIVIAL(debug) << "message was " << std::string(msg.data.begin(), msg.data.end());
 
 		if (msg.type == 1)
 		{

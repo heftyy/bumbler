@@ -36,7 +36,7 @@ public:
 
         io_service_thread_ = std::unique_ptr<std::thread>(new std::thread([this]()
         {
-            std::cout << "[ACTOR_SYSTEM] STARTED ON PORT " << port_ << std::endl;
+            BOOST_LOG_TRIVIAL(debug) << "[ACTOR_SYSTEM] STARTED ON PORT " << port_;
             io_service_.run();
         }));
 
@@ -46,7 +46,7 @@ public:
 	void stop()
 	{
 		if (stopped_.load()) return;
-		std::cout << "[ACTOR_SYSTEM] SHUTTING DOWN" << std::endl;
+        BOOST_LOG_TRIVIAL(debug) << "[ACTOR_SYSTEM] SHUTTING DOWN";
 		stopped_.store(true);
 		server_->stop();
 		if (!io_service_.stopped()) io_service_.stop();
@@ -106,7 +106,7 @@ public:
 		//throw new actor_not_found(message.target.actor_name);
 	}
 
-	std::shared_ptr<actor> get_actor(std::string actor_name)
+	actor_ref get_actor(std::string actor_name)
 	{
 		if (stopped_) nullptr;
 		std::lock_guard<std::mutex> guard(actors_mutex_);
@@ -115,10 +115,10 @@ public:
 			//std::shared_ptr<class actor> iter_actor = *iter;
 			if (actor_name.compare(actor->actor_name()) == 0)
 			{
-				return actor;
+				return actor->get_self();
 			}
 		}
-		return nullptr;
+		return actor_ref::none();
 	}
 
 	std::shared_ptr<udp_server> server()

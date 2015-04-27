@@ -14,16 +14,16 @@ public:
 
 	~out_actor()
 	{
-		std::cout << "[OUT_ACTOR] destructor" << std::endl;
+		BOOST_LOG_TRIVIAL(debug) << "[OUT_ACTOR] destructor";
 	}
 
 private:
 
 	void on_receive(message msg)
 	{
-		std::cout << "[OUT_ACTOR] on_receive thread id = " << std::this_thread::get_id() << std::endl;
-		std::cout << "[OUT_ACTOR] received message from " << msg.sender.actor_name << std::endl;
-		std::cout << "[OUT_ACTOR] message was " << std::string(msg.data.begin(), msg.data.end()) << std::endl;
+        BOOST_LOG_TRIVIAL(debug) << "[OUT_ACTOR] on_receive thread id = " << std::this_thread::get_id();
+        BOOST_LOG_TRIVIAL(debug) << "[OUT_ACTOR] received message from " << msg.sender.actor_name;
+        BOOST_LOG_TRIVIAL(debug) << "[OUT_ACTOR] message was " << std::string(msg.data.begin(), msg.data.end());
 
 		std::string msg_string = std::string(msg.data.begin(), msg.data.end());
 		//reply(msg_string, msg.sender);

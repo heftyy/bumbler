@@ -6,6 +6,7 @@
 #include <atomic>
 #include <boost/asio.hpp>
 #include "../packet/packet.h"
+#include "logger/logger.h"
 
 #define PACKET_MAX_LENGTH 4096
 
@@ -100,7 +101,7 @@ public:
 		}
 		catch (...)
 		{
-			std::cout << "Got an exception!" << std::endl;
+            BOOST_LOG_TRIVIAL(debug) << "Got an exception!";
 		}
 		stop_deadline = true;
 		deadline_check.join();
@@ -125,7 +126,7 @@ public:
 		socket_address.append(socket_.remote_endpoint().address().to_string());
 		socket_address.append(":");
 		//socket_address.append(socket_.remote_endpoint().port());
-		std::cout << "Peer IP: " << socket_.remote_endpoint().address().to_string() << std::endl;
+        BOOST_LOG_TRIVIAL(debug) << "Peer IP: " << socket_.remote_endpoint().address().to_string();
 		return socket_address;
 	}
 
@@ -144,7 +145,7 @@ private:
 		{		
 			if (!ec && bytes_recvd > 0)
 			{
-				std::cout << "do_receive thread id = " << std::this_thread::get_id() << " received bytes " << bytes_recvd << std::endl;
+                BOOST_LOG_TRIVIAL(debug) << "do_receive thread id = " << std::this_thread::get_id() << " received bytes " << bytes_recvd;
 				std::string string_data(data_.begin(), data_.begin() + bytes_recvd*sizeof(char));
 				try
 				{

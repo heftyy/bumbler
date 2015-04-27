@@ -4,6 +4,7 @@
 #include <memory>
 #include <stdexcept>
 #include <string>
+#include <boost/log/trivial.hpp>
 
 class interrupt_thread_error : public std::runtime_error {
 public:
@@ -55,7 +56,7 @@ public:
 		if (thread_ && thread_->joinable())
 		{
 			thread_->join();
-			std::cout << "[INTERRUPTIBLE_THREAD] thread joined: " << this->thread_id_ << std::endl;
+            BOOST_LOG_TRIVIAL(debug) << "[INTERRUPTIBLE_THREAD] thread joined: " << this->thread_id_;
 		}
 	}
 

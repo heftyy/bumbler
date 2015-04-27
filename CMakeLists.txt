@@ -25,10 +25,11 @@ include_directories(shared)
 include_directories(../boost_1_55_0)
 add_subdirectory(shared/atan)
 
-set(Boost_USE_STATIC_LIBS ${USE_STATIC_BOOST})
+ADD_DEFINITIONS(-DBOOST_LOG_DYN_LINK)
+set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_MULTITHREADED ON)
 set(BOOST_ROOT ../boost_1_55_0)
-find_package(Boost REQUIRED COMPONENTS system serialization)
+find_package(Boost REQUIRED COMPONENTS system serialization log)
 
 find_package(wxWidgets REQUIRED COMPONENTS core base)
 include( "${wxWidgets_USE_FILE}" )

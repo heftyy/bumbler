@@ -1,4 +1,5 @@
 #pragma once
+
 #include <vector>
 #include <sstream>
 #include <boost/archive/text_oarchive.hpp>
@@ -41,6 +42,13 @@ public:
 			return true;
 		}
 	}
+
+    bool send() const
+    {
+        if(target.exists()) {
+            target.tell(*this);
+        }
+    }
 
 	//static void restore_message(message& msg, std::vector<char>& received_data)
 	static void restore_message(message& msg, std::string& received_data)
