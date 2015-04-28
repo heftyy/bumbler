@@ -1,75 +1,93 @@
 #pragma once
 #include <mutex>
+#include <condition_variable>
 #include <thread>
 #include <memory>
 #include <stdexcept>
 #include <string>
+#include <atomic>
 #include <boost/log/trivial.hpp>
 
 class interrupt_thread_error : public std::runtime_error {
 public:
-	interrupt_thread_error(const std::string& message) : std::runtime_error(message) { };
+    interrupt_thread_error(const std::string& message) : std::runtime_error(message) { };
 };
 
-class interruptible_thread {
+
+class cancellation_point
+{
 public:
-	interruptible_thread() : _flag(false) {}
+    cancellation_point(): stop_(false) {}
 
-	//template <typename Function, typename... Args>
-	//void start_thread(Function&& fun, Args&&... args) {
-	template <typename Function>
-	void start_thread(Function&& fun) {
-		//thread_ = std::unique_ptr<std::thread>(new std::thread([](Function fun, Args... args)
-		thread_ = std::unique_ptr<std::thread>(new std::thread([&](Function fun)
-		{
-            this->thread_id_ = std::this_thread::get_id();
-			try
-			{
-				fun();
-			}
-			catch (std::runtime_error e)
-			{
-                std::cerr << e.what() << std::endl;
-			}
-		}, std::forward<Function>(fun)));
-		//}, std::forward<Function>(fun), std::forward<Args>(args)...));
-	}
+    void cancel() {
+        std::unique_lock<std::mutex> lock(mutex_);
+        stop_ = true;
+        cond_.notify_all();
+    }
 
-	~interruptible_thread()
-	{
-		join();
-	}
+    template <typename P>
+    void wait(const P& period) {
+        std::unique_lock<std::mutex> lock(mutex_);
+        if (stop_ || cond_.wait_for(lock, period) == std::cv_status::no_timeout) {
+            stop_ = false;
+            throw interrupt_thread_error("thread stopped");
+        }
+    }
+private:
+    bool stop_;
+    std::mutex mutex_;
+    std::condition_variable cond_;
+};
 
-	bool stopping() const
-	{
-		return _flag;
-	}
 
-	void stop()
-	{
-		_flag = true;
-		join();
-	}
+class interruptible_thread
+{
+public:
+    interruptible_thread() {}
+    ~interruptible_thread()
+    {
+        stop();
+    }
 
-	void join() {
-		std::lock_guard<std::mutex> lock(_thread_mutex);
-		if (thread_ && thread_->joinable())
-		{
-			thread_->join();
-            BOOST_LOG_TRIVIAL(debug) << "[INTERRUPTIBLE_THREAD] thread joined: " << this->thread_id_;
-		}
-	}
+    template <typename Function, typename P>
+    void start(Function&& fun, const P& period)
+    {
+        thread_ = std::unique_ptr<std::thread>(
+                new std::thread(
+                        [fun, period, this]() {
+                            this->run(fun, period);
+                        })
+        );
+    }
 
-	void check_for_interrupt() {
-		if (!_flag.load()) { return; }
-
-		throw interrupt_thread_error("thread interrupted");
-	}
+    void stop()
+    {
+        cpoint_.cancel();
+        if(thread_ && thread_->joinable())
+        {
+            thread_->join();
+        }
+    }
 
 private:
-	std::atomic<bool> _flag;
-	std::unique_ptr<std::thread> thread_;
-	std::mutex _thread_mutex;
-    std::thread::id thread_id_;
-};
+    template <typename Function, typename P>
+    void run(Function&& fun, const P& period)
+    {
+        std::cout << "thread started\n";
+        try {
+            while (true) {
+                fun();
+                if(period == std::chrono::milliseconds(0))
+                {
+                    break;
+                }
+                cpoint_.wait(period);
+            }
+        } catch (const interrupt_thread_error&) {
+            BOOST_LOG_TRIVIAL(debug) << "thread canelled";
+        }
+    }
 
+    std::unique_ptr<std::thread> thread_;
+    cancellation_point cpoint_;
+};

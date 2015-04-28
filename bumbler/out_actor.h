@@ -14,7 +14,7 @@ public:
 
 	~out_actor()
 	{
-		BOOST_LOG_TRIVIAL(debug) << "[OUT_ACTOR] destructor";
+		//BOOST_LOG_TRIVIAL(debug) << "[OUT_ACTOR] destructor";
 	}
 
 private:

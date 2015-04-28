@@ -82,7 +82,7 @@ protected:
 	{
 		std::unique_ptr<message> msg = get_first_message();
 
-		if (msg != nullptr)
+		if (msg)
 		{
 			run_task(std::move(msg));
 			remove_finished_message();

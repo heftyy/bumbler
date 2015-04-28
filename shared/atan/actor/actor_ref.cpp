@@ -10,5 +10,9 @@ void actor_ref::tell(const int type, const std::string text, const actor_ref sen
 
 void actor_ref::tell(const message& msg) const
 {
-    actor_system_storage::instance().get_system(system_name)->tell_actor(msg);
+    int result = actor_system_storage::instance().get_system(system_name)->tell_actor(msg);
+    if(result == ACTOR_SYSTEM_STOPPED)
+    {
+        BOOST_LOG_TRIVIAL(warning) << "[ACTOR_REF] actor system doesn't exist";
+    }
 }

@@ -19,6 +19,8 @@ void actor_system_storage::add_system(std::shared_ptr<actor_system> actor_system
 
 std::shared_ptr<actor_system> actor_system_storage::get_system(std::string system_name)
 {
+    std::cout << "searching for system " << system_name << std::endl;
+
     std::lock_guard<std::mutex> guard(this->systems_mutex_);
     for(auto pair : systems_)
     {

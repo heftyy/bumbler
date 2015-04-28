@@ -61,6 +61,6 @@ static int atan_error(int error_code, const std::string& msg)
 		case ACTOR_SYSTEM_DOESNT_EXIST:
 			error_name = "ACTOR_SYSTEM_DOESNT_EXIST";
 	}
-	std::cerr << error_code << ":" << error_name << " " << msg << std::endl;
+    BOOST_LOG_TRIVIAL(error) << error_code << ":" << error_name << " " << msg;
 	return error_code;
 }

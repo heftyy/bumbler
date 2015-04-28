@@ -91,13 +91,13 @@ public:
 				}
 				catch (std::exception e)
 				{
-					std::cerr << "[UDP_SERVER] parsing error on received packet" << std::endl;
+					BOOST_LOG_TRIVIAL(error) << "[UDP_SERVER] parsing error on received packet";
 				}
 			}
 		}
 		catch (boost::system::system_error& ec)
 		{
-			std::cerr << "boost::system:error_code = " << ec.what() << std::endl;
+            BOOST_LOG_TRIVIAL(error) << "boost::system:error_code = " << ec.what();
 		}
 		catch (...)
 		{
@@ -154,7 +154,7 @@ private:
 				}
 				catch (std::exception e)
 				{
-					std::cerr << "parsing error on received packet" << std::endl;
+                    BOOST_LOG_TRIVIAL(error) << "parsing error on received packet";
 				}
 			}
 			do_receive();
