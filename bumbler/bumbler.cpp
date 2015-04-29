@@ -3,40 +3,6 @@
 #include <logger/logger.h>
 #include "out_actor.h"
 
-class actor_a
-{
-public:
-    std::shared_ptr<interruptible_thread> thread;
-
-    actor_a()
-    {
-        thread = std::shared_ptr<interruptible_thread>(new interruptible_thread());
-
-        thread->start([this]() {
-
-            BOOST_LOG_TRIVIAL(debug) << "[ACTOR_TEST] thread_id: " << std::this_thread::get_id();
-
-        }, std::chrono::milliseconds(500));
-    };
-
-    ~actor_a()
-    {
-        thread->stop();
-    }
-};
-
-class system_a
-{
-public:
-    actor_a ac;
-
-    system_a() {}
-    ~system_a()
-    {
-
-    }
-};
-
 int main(int argc, char* argv[])
 {
 //    system_a s;
@@ -49,10 +15,12 @@ int main(int argc, char* argv[])
     local_actor.tell(1, "THIS IS A MESSAGE", actor_ref::none());
 
     message msg(local_actor, actor_ref::none(), "MESSAGE FROM SCHEDULER", 1);
-//    system->schedule_once(msg, 500);
+    system->schedule_once(msg, 500);
 
     std::chrono::milliseconds sleep_duration(1000);
-//    std::this_thread::sleep_for(sleep_duration);
+    std::this_thread::sleep_for(sleep_duration);
+
+    system->stop();
 
     BOOST_LOG_TRIVIAL(info) << "EXIT";
 

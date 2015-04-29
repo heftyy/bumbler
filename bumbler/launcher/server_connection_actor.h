@@ -18,7 +18,7 @@ public:
 	}
 	~server_connection_actor()
 	{
-		std::cout << "[SERVER_CONNECTION_ACTOR] destructor" << std::endl;
+		BOOST_LOG_TRIVIAL(debug) << "[SERVER_CONNECTION_ACTOR] destructor";
 	}
 
 private:
@@ -27,13 +27,13 @@ private:
 
 	void on_receive(message msg)
 	{
-		std::cout << "[SERVER_CONNECTION_ACTOR] on_receive thread id = " << std::this_thread::get_id() << std::endl;
-		std::cout << "[SERVER_CONNECTION_ACTOR] received message from " << msg.sender.actor_name << std::endl;
-		std::cout << "message was " << std::string(msg.data.begin(), msg.data.end()) << std::endl;
+        BOOST_LOG_TRIVIAL(debug) << "[SERVER_CONNECTION_ACTOR] on_receive thread id = " << std::this_thread::get_id();
+        BOOST_LOG_TRIVIAL(debug) << "[SERVER_CONNECTION_ACTOR] received message from " << msg.sender.actor_name;
+        BOOST_LOG_TRIVIAL(debug) << "message was " << std::string(msg.data.begin(), msg.data.end());
 
 		if (msg.type == SERVER_STATUS)
 		{
-			std::cout << "[SERVER_CONNECTION_ACTOR] SERVER STATUS RECEIVED" << std::endl;
+            BOOST_LOG_TRIVIAL(debug) << "[SERVER_CONNECTION_ACTOR] SERVER STATUS RECEIVED";
 			update_server_function_(get_self().ip);
 		}
 

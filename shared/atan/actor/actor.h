@@ -124,9 +124,11 @@ protected:
 		{
 			if (queue_thread_ && get_first_message() == nullptr)
 			{
-                BOOST_LOG_TRIVIAL(debug) << "[ACTOR] stopping actor";
+                BOOST_LOG_TRIVIAL(debug) << "[ACTOR] stopping";
 				queue_thread_->stop();
 				queue_thread_.release();
+                stopped_.store(true);
+                BOOST_LOG_TRIVIAL(debug) << "[ACTOR] stopped";
 				break;
 			}
 			else if (stopped_)

@@ -46,7 +46,6 @@ public:
 	}
 
 	std::string get_raw_packet()
-	//std::unique_ptr<std::vector<char>> get_raw_packet()
 	{
 		if (header.type == 0)
 		{

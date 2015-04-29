@@ -1,4 +1,5 @@
 #pragma once
+#include <chrono>
 #include <mutex>
 #include <condition_variable>
 #include <thread>
@@ -49,12 +50,18 @@ public:
         stop();
     }
 
-    template <typename Function, typename P>
-    void start(Function&& fun, const P& period)
+    template <typename Function>
+    void start(Function&& fun, long period = 0, long initial_delay = 0)
     {
         thread_ = std::unique_ptr<std::thread>(
                 new std::thread(
-                        [fun, period, this]() {
+                        [fun, period, initial_delay, this]() {
+                            if(initial_delay > 0)
+                            {
+                                std::chrono::milliseconds sleep_duration(initial_delay);
+                                std::this_thread::sleep_for(sleep_duration);
+                            }
+
                             this->run(fun, period);
                         })
         );
@@ -70,20 +77,19 @@ public:
     }
 
 private:
-    template <typename Function, typename P>
-    void run(Function&& fun, const P& period)
+    template <typename Function>
+    void run(Function&& fun, long period)
     {
-        std::cout << "thread started\n";
         try {
             while (true) {
                 fun();
-                if(period == std::chrono::milliseconds(0))
+                if(period == 0)
                 {
                     break;
                 }
-                cpoint_.wait(period);
+                cpoint_.wait(std::chrono::milliseconds(period));
             }
-        } catch (const interrupt_thread_error&) {
+        } catch (...) {
             BOOST_LOG_TRIVIAL(debug) << "thread canelled";
         }
     }

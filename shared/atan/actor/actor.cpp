@@ -10,7 +10,6 @@ actor::actor(const std::string name, std::weak_ptr<actor_system> actor_system, i
 actor::~actor()
 {
     BOOST_LOG_TRIVIAL(debug) << "[ACTOR] destructor";
-	stopped_.store(true);
 	this->stop_actor();
 }
 

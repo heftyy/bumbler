@@ -47,6 +47,12 @@ public:
     {
         if (stopped_.load()) return;
 
+        for(auto iter = actors_.begin(); iter != actors_.end(); )
+        {
+            iter->second->stop_actor();
+            actors_.erase(iter++);
+        }
+
         BOOST_LOG_TRIVIAL(debug) << "[ACTOR_SYSTEM] SHUTTING DOWN";
         stopped_.store(true);
         server_->stop();
@@ -92,11 +98,7 @@ public:
 
     int tell_actor(const message& message)
     {
-        std::cout << "stopped = " << stopped_.load() << std::endl;
-
         if (stopped_.load()) return atan_error(ACTOR_SYSTEM_STOPPED, system_name_);
-
-        std::cout << "checking system name" << std::endl;
 
         if (message.target.system_name.compare(system_name_) != 0) return atan_error(ATAN_WRONG_ACTOR_SYSTEM, system_name_);
         //if (message.target.system_name.compare(system_name_) != 0) throw new wrong_actor_system(system_name_);

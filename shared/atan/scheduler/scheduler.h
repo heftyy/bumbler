@@ -3,7 +3,7 @@
 #include <map>
 #include <mutex>
 #include <memory>
-#include <atan/actor_system/actor_system.h>
+#include "../thread_pool/ctpl_stl.h"
 #include "../actor/actor_ref.h"
 #include "../interruptible_thread.h"
 #include "utility.h"
@@ -12,7 +12,15 @@ class scheduler
 {
 public:
 
-    scheduler() {}
+    scheduler()
+    {
+        thread_pool_.resize(10);
+
+        thread_pool_.push([](int id){  // lambda
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+            std::cout << "hello from " << id << ' ' << '\n';
+        });
+    }
 
     ~scheduler()
     {
@@ -26,32 +34,28 @@ public:
         }
     }
 
-    void schedule(const message& message, long initial_delay_ms, long interval_ms)
+    void schedule(const message& message, long interval_ms, long initial_delay_ms)
     {
-        std::thread([this, initial_delay_ms, interval_ms, &message]() {
-            std::chrono::milliseconds init_sleep_duration(initial_delay_ms);
-            std::this_thread::sleep_for(init_sleep_duration);
+        std::shared_ptr<interruptible_thread> thread = std::shared_ptr<interruptible_thread>(new interruptible_thread());
+        this->add_thread(thread);
 
-            std::shared_ptr<interruptible_thread> thread = std::shared_ptr<interruptible_thread>(new interruptible_thread());
-            this->add_thread(thread);
+        thread->start([&message]() {
+            BOOST_LOG_TRIVIAL(debug) << "[SCHEDULER] thread_id: " << std::this_thread::get_id() << " sending message to " << message.target.to_string();
 
-            thread->start([&message]() {
-                BOOST_LOG_TRIVIAL(debug) << "[SCHEDULER] thread_id: " << std::this_thread::get_id() << " sending message to " << message.target.to_string();
-
-                message.send();
-            }, std::chrono::milliseconds(interval_ms));
-        });
+            message.send();
+        }, interval_ms, initial_delay_ms);
     }
 
     void schedule_once(message& message, long initial_delay_ms)
     {
-        schedule(message, initial_delay_ms, 0);
+        schedule(message, 0, initial_delay_ms);
     }
 
 private:
 
     std::map<std::thread::id, std::shared_ptr<interruptible_thread>> threads_map_;
     std::mutex threads_map_mutex_;
+    ctpl::thread_pool thread_pool_;
 
     void add_thread(std::shared_ptr<interruptible_thread> thread)
     {
