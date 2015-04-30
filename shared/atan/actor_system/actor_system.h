@@ -11,12 +11,17 @@
 #include "../actor/actor.h"
 #include "../packet/packet.h"
 #include "../scheduler/scheduler.h"
+#include "../scheduler/cancellable.h"
 
 class actor_system : public std::enable_shared_from_this<actor_system>
 {
 public:
     friend class actor;
-    actor_system(const std::string& name, int port) : system_name_(name), port_(port) {}
+
+    actor_system(const std::string &name, int port, int thread_pool_size = 5) : system_name_(name), port_(port)
+    {
+        scheduler_ = std::shared_ptr<scheduler>(new scheduler(thread_pool_size));
+    }
 
     ~actor_system()
     {
@@ -31,25 +36,28 @@ public:
         boost::asio::io_service::work work(io_service_);
 
         server_ = std::shared_ptr<udp_server>(new udp_server(io_service_, port_));
-        server_->send_completed_function = [&](){ send_completed(); };
-        server_->receive_function = [&](std::unique_ptr<packet> packet, boost::asio::ip::udp::endpoint sender_endpoint) { receive(std::move(packet), sender_endpoint); };
+        server_->send_completed_function = [&]() { send_completed(); };
+        server_->receive_function = [&](std::unique_ptr<packet> packet, boost::asio::ip::udp::endpoint sender_endpoint) {
+            receive(std::move(packet), sender_endpoint);
+        };
 
-        io_service_thread_ = std::unique_ptr<std::thread>(new std::thread([this]()
-                                                                          {
-                                                                              BOOST_LOG_TRIVIAL(debug) << "[ACTOR_SYSTEM] STARTED ON PORT " << port_;
-                                                                              io_service_.run();
-                                                                          }));
-
-        scheduler_ = std::shared_ptr<scheduler>(new scheduler());
+        io_service_thread_ = std::unique_ptr<std::thread>(new std::thread([this]() {
+                BOOST_LOG_TRIVIAL(debug) << "[ACTOR_SYSTEM] STARTED ON PORT " << port_;
+                io_service_.run();
+            })
+        );
     }
 
-    void stop()
+    /**
+     * stop the actor system, if wait is true system is going to wait for actors to finish all their tasks in the queue
+     */
+    void stop(bool wait = false)
     {
         if (stopped_.load()) return;
 
-        for(auto iter = actors_.begin(); iter != actors_.end(); )
+        for (auto iter = actors_.begin(); iter != actors_.end();)
         {
-            iter->second->stop_actor();
+            iter->second->stop_actor(wait);
             actors_.erase(iter++);
         }
 
@@ -60,8 +68,8 @@ public:
         if (!io_service_.stopped()) io_service_.stop();
         if (io_service_thread_->joinable()) io_service_thread_->join();
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(500));
-        server_.reset();
+        //std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        //server_.reset();
     }
 
     template<class actor_type>
@@ -70,7 +78,7 @@ public:
         if (stopped_) return atan_error(ACTOR_SYSTEM_STOPPED, system_name_);
         std::lock_guard<std::mutex> guard(actors_mutex_);
         auto search = actors_.find(actor->actor_name());
-        if(search != actors_.end())
+        if (search != actors_.end())
         {
             return atan_error(ATAN_ACTOR_ALREADY_EXISTS, actor->actor_name());
         }
@@ -85,7 +93,7 @@ public:
         std::lock_guard<std::mutex> guard(actors_mutex_);
 
         auto search = actors_.find(actor->actor_name());
-        if(search != actors_.end())
+        if (search != actors_.end())
         {
             actors_.erase(search);
         }
@@ -96,18 +104,19 @@ public:
         //throw new actor_not_found(actor->actor_name());
     }
 
-    int tell_actor(const message& message)
+    int tell_actor(const message &message)
     {
         if (stopped_.load()) return atan_error(ACTOR_SYSTEM_STOPPED, system_name_);
 
-        if (message.target.system_name.compare(system_name_) != 0) return atan_error(ATAN_WRONG_ACTOR_SYSTEM, system_name_);
+        if (message.target.system_name.compare(system_name_) != 0)
+            return atan_error(ATAN_WRONG_ACTOR_SYSTEM, system_name_);
         //if (message.target.system_name.compare(system_name_) != 0) throw new wrong_actor_system(system_name_);
         std::lock_guard<std::mutex> guard(actors_mutex_);
 
         std::string actor_name = message.target.actor_name;
 
         auto search = actors_.find(actor_name);
-        if(search != actors_.end())
+        if (search != actors_.end())
         {
             actors_[actor_name]->tell(message);
             return 0;
@@ -125,7 +134,7 @@ public:
         std::lock_guard<std::mutex> guard(actors_mutex_);
 
         auto search = actors_.find(actor_name);
-        if(search != actors_.end())
+        if (search != actors_.end())
         {
             return actors_[actor_name]->get_self();
         }
@@ -135,24 +144,29 @@ public:
         }
     }
 
-    std::shared_ptr<udp_server> server()
+    std::shared_ptr<cancellable> schedule(message &message, long initial_delay_ms, long interval_delay_ms)
+    {
+        return scheduler_->schedule(message, initial_delay_ms, interval_delay_ms);
+    }
+
+    std::shared_ptr<cancellable> schedule_once(message &message, long initial_delay_ms)
+    {
+        return scheduler_->schedule_once(message, initial_delay_ms);
+    }
+
+    std::shared_ptr<udp_server> get_server()
     {
         return server_;
+    }
+
+    std::shared_ptr<scheduler> get_scheduler()
+    {
+        return scheduler_;
     }
 
     std::string system_name()
     {
         return system_name_;
-    }
-
-    void schedule(message& message, long initial_delay_ms, long interval_delay_ms)
-    {
-        scheduler_->schedule(message, initial_delay_ms, interval_delay_ms);
-    }
-
-    void schedule_once(message& message, long initial_delay_ms)
-    {
-        scheduler_->schedule_once(message, initial_delay_ms);
     }
 
 private:
@@ -171,7 +185,7 @@ private:
         //std::cout << "SEND COMPLETED" << std::endl;
     }
 
-    void receive(std::unique_ptr<packet> packet, boost::asio::ip::udp::endpoint& sender_endpoint)
+    void receive(std::unique_ptr<packet> packet, boost::asio::ip::udp::endpoint &sender_endpoint)
     {
         message msg;
         message::restore_message(msg, packet->data.data);
@@ -184,7 +198,7 @@ private:
             {
                 tell_actor(msg);
             }
-            catch (std::runtime_error& e)
+            catch (std::runtime_error &e)
             {
                 BOOST_LOG_TRIVIAL(error) << "actor_system receive error: " << e.what();
             }

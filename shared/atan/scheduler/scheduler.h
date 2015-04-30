@@ -3,75 +3,99 @@
 #include <map>
 #include <mutex>
 #include <memory>
+#include <iostream>
+#include "cancellable.h"
 #include "../thread_pool/ctpl_stl.h"
 #include "../actor/actor_ref.h"
 #include "../interruptible_thread.h"
 #include "utility.h"
 
+class actor_system;
+
 class scheduler
 {
 public:
+    friend class actor_system;
 
-    scheduler()
+    scheduler(int thread_pool_size)
     {
-        thread_pool_.resize(10);
-
-        thread_pool_.push([](int id){  // lambda
-            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
-            std::cout << "hello from " << id << ' ' << '\n';
-        });
+        resize(thread_pool_size);
+        cancellable_vector_it_ = cancellable_vector_.begin();
     }
 
     ~scheduler()
     {
         BOOST_LOG_TRIVIAL(debug) << "[SCHEDULER] DESTROY";
+        thread_pool_.stop(true);
 
-        std::lock_guard<std::mutex> lock(threads_map_mutex_);
-        for(auto& pair : this->threads_map_)
+        for(std::shared_ptr<cancellable> cancellable : cancellable_vector_)
         {
-            BOOST_LOG_TRIVIAL(debug) << "thread id: " << pair.first;
-            pair.second->stop();
+            if(!cancellable->is_cancelled())
+            {
+                cancellable->cancel();
+            }
         }
     }
 
-    void schedule(const message& message, long interval_ms, long initial_delay_ms)
+    void resize(int thread_pool_size)
     {
-        std::shared_ptr<interruptible_thread> thread = std::shared_ptr<interruptible_thread>(new interruptible_thread());
-        this->add_thread(thread);
-
-        thread->start([&message]() {
-            BOOST_LOG_TRIVIAL(debug) << "[SCHEDULER] thread_id: " << std::this_thread::get_id() << " sending message to " << message.target.to_string();
-
-            message.send();
-        }, interval_ms, initial_delay_ms);
+        thread_pool_.resize(thread_pool_size);
     }
 
-    void schedule_once(message& message, long initial_delay_ms)
+protected:
+    std::shared_ptr<cancellable> schedule(const message& message, long initial_delay_ms, long interval_ms)
     {
-        schedule(message, 0, initial_delay_ms);
+        std::shared_ptr<cancellable> ret_cancellable = std::shared_ptr<cancellable>(new cancellable());
+        auto cancel_it = cancellable_vector_.insert(cancellable_vector_it_, ret_cancellable);
+
+        thread_pool_.push([this, &message, initial_delay_ms, interval_ms, ret_cancellable, &cancel_it](int id) {
+            ret_cancellable->thread_id = std::this_thread::get_id();
+
+            if(initial_delay_ms > 0)
+            {
+                std::chrono::milliseconds initial_delay(initial_delay_ms);
+                std::this_thread::sleep_for(initial_delay);
+            }
+
+            if(ret_cancellable->check_cancel())
+            {
+                ret_cancellable->cancelled();
+                cancellable_vector_.erase(cancel_it);
+                return;
+            }
+
+            while(!ret_cancellable->check_cancel())
+            {
+                BOOST_LOG_TRIVIAL(debug) << "[SCHEDULER] thread_id: " << std::this_thread::get_id() << " sending message to " << message.target.to_string();
+                BOOST_LOG_TRIVIAL(debug) << "hello from " << id << ' ' << '\n';
+
+                message.send();
+                if(initial_delay_ms > 0)
+                {
+                    std::chrono::milliseconds interval(interval_ms);
+                    std::this_thread::sleep_for(interval);
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            ret_cancellable->cancelled();
+            cancellable_vector_.erase(cancel_it);
+        });
+
+        return ret_cancellable;
+    }
+
+    std::shared_ptr<cancellable> schedule_once(message& message, long initial_delay_ms)
+    {
+        return schedule(message, initial_delay_ms, 0);
     }
 
 private:
-
-    std::map<std::thread::id, std::shared_ptr<interruptible_thread>> threads_map_;
-    std::mutex threads_map_mutex_;
     ctpl::thread_pool thread_pool_;
+    std::vector<std::shared_ptr<cancellable>> cancellable_vector_;
+    std::vector<std::shared_ptr<cancellable>>::iterator cancellable_vector_it_;
 
-    void add_thread(std::shared_ptr<interruptible_thread> thread)
-    {
-        std::lock_guard<std::mutex> lock(threads_map_mutex_);
-
-        std::thread::id thread_id = std::this_thread::get_id();
-        this->threads_map_.emplace(thread_id, std::move(thread));
-    }
-
-    void remove_thread()
-    {
-        std::lock_guard<std::mutex> lock(threads_map_mutex_);
-
-        auto search = this->threads_map_.find(std::this_thread::get_id());
-        if(search != this->threads_map_.end()) {
-            this->threads_map_.erase(search);
-        }
-    }
 };

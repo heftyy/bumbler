@@ -30,31 +30,33 @@ public:
     virtual actor_ref init() {}
 
 protected:
-	std::mutex task_mutex_;
-	std::mutex queue_mutex_;
+	std::mutex mutex_;
 	std::unique_ptr<interruptible_thread> queue_thread_;
 	std::queue<message> message_queue_;
-	std::atomic<int> actor_sleep_ms_;
 	std::atomic<bool> busy_;
-	std::atomic<bool> stopped_;
+	std::atomic<bool> stop_flag_;
 	std::string actor_name_;
 	std::weak_ptr<actor_system> actor_system_;
+    std::condition_variable cv;
 
-	actor(const std::string name, std::weak_ptr<actor_system> actor_system, int actor_sleep_ms = 10);
+	actor(const std::string name, std::weak_ptr<actor_system> actor_system);
 	~actor();
 
 	virtual void tell(const message& msg) {}
 	virtual void on_receive(message msg) {}
 
-	std::string actor_name();
-	std::string system_name();
+    packet message_to_packet(message& msg);
+    std::string actor_name();
+    std::string system_name();
 	void reply(int type, std::string msg, actor_ref& target_ref);
 	bool is_busy() { return busy_; }
 
 	void add_message(const message msg)
 	{
-		std::lock_guard<std::mutex> guard(queue_mutex_);
+        BOOST_LOG_TRIVIAL(debug) << "[ACTOR] queueing new task";
+        std::unique_lock<std::mutex> lock(this->mutex_);
 		message_queue_.push(msg);
+        cv.notify_all();
 	}
 
 	bool compare(std::shared_ptr<actor> actor)
@@ -67,79 +69,45 @@ protected:
 		return actor_ref(actor_name(), system_name());
 	}
 
-	packet message_to_packet(message& msg)
-	{
-		packet_header header;
-		header.type = PACKET_DATA;
-
-		packet_data data(msg);
-		packet p(header, data);
-
-		return p;
-	}
-
 	void read_messages()
 	{
-		std::unique_ptr<message> msg = get_first_message();
-
-		if (msg)
-		{
-			run_task(std::move(msg));
-			remove_finished_message();
-		}
+        while(message_queue_.size() > 0)
+        {
+            message msg = message_queue_.front();
+            run_task(msg);
+            message_queue_.pop();
+        }
 	}
 
-	std::unique_ptr<message> get_first_message()
-	{
-		std::lock_guard<std::mutex> guard(queue_mutex_);
-		if (message_queue_.size() > 0)
-		{
-			std::unique_ptr<message> msg = std::unique_ptr<message>(new message(message_queue_.front()));
-			return msg;
-		}
-		return nullptr;
-	}
-
-	void remove_finished_message()
-	{
-		std::lock_guard<std::mutex> guard(queue_mutex_);
-		if (message_queue_.size() > 0) message_queue_.pop();
-	}
-
-	void run_task(std::unique_ptr<message> msg)
+	void run_task(message msg)
 	{
 		busy_.store(true);
-        BOOST_LOG_TRIVIAL(debug) << "[ACTOR] queueing new task";
-		std::lock_guard<std::mutex> guard(task_mutex_);
         BOOST_LOG_TRIVIAL(debug) << "[ACTOR] starting new task";
-		on_receive(*msg.release());
+		on_receive(msg);
 		busy_.store(false);
 	}
 
+    void clear_queue() {
+        std::unique_lock<std::mutex> lock(this->mutex_);
+        while (!this->message_queue_.empty())
+            this->message_queue_.pop();  // empty the queue
+    }
+
 	/** synchronous wait for the actor to end all tasks and stop all thread
 	*/
-	void stop_actor()
-	{
-		while (1)
-		{
-			if (queue_thread_ && get_first_message() == nullptr)
-			{
-                BOOST_LOG_TRIVIAL(debug) << "[ACTOR] stopping";
-				queue_thread_->stop();
-				queue_thread_.release();
-                stopped_.store(true);
-                BOOST_LOG_TRIVIAL(debug) << "[ACTOR] stopped";
-				break;
-			}
-			else if (stopped_)
-			{
-				break;
-			}
-			else
-			{
-				std::chrono::milliseconds sleep_duration(actor_sleep_ms_);
-				std::this_thread::sleep_for(sleep_duration);
-			}
-		}
-	}
+    void stop_actor(bool wait = false)
+    {
+        if (!wait)
+            clear_queue();
+
+        if (queue_thread_)
+        {
+            BOOST_LOG_TRIVIAL(debug) << "[ACTOR] stopping";
+            stop_flag_.store(true);
+            cv.notify_all();
+            queue_thread_->stop();
+            queue_thread_.release();
+            BOOST_LOG_TRIVIAL(debug) << "[ACTOR] stopped";
+        }
+    }
 };

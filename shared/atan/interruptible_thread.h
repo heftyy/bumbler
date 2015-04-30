@@ -51,7 +51,7 @@ public:
     }
 
     template <typename Function>
-    void start(Function&& fun, long period = 0, long initial_delay = 0)
+    void start(Function&& fun, long initial_delay = 0, long period = 0)
     {
         thread_ = std::unique_ptr<std::thread>(
                 new std::thread(
@@ -85,7 +85,7 @@ private:
                 fun();
                 if(period == 0)
                 {
-                    break;
+                    return;
                 }
                 cpoint_.wait(std::chrono::milliseconds(period));
             }

@@ -43,9 +43,6 @@ public:
 		boost::archive::text_oarchive archive(archive_stream);
 		archive & msg;
 		data = archive_stream.str();
-		
-//		data = msg.get_raw_message();
-//		std::cout << "message is \t" << data << std::endl;
 	}
 	template<class Archive>
 	void serialize(Archive & ar, const unsigned int version)

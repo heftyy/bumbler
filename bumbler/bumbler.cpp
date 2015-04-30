@@ -1,6 +1,4 @@
 #include <atan/actor_system/actor_system.h>
-#include <atan/interruptible_thread.h>
-#include <logger/logger.h>
 #include "out_actor.h"
 
 int main(int argc, char* argv[])
@@ -10,15 +8,17 @@ int main(int argc, char* argv[])
     std::shared_ptr<actor_system> system = std::shared_ptr<actor_system>(new actor_system("bumbler_system", 4444));
     system->init();
 
-	actor_ref local_actor = actor::create_actor<out_actor>("out_actor", system, 10);
+	actor_ref local_actor = actor::create_actor<out_actor>("out_actor", system);
 
     local_actor.tell(1, "THIS IS A MESSAGE", actor_ref::none());
 
     message msg(local_actor, actor_ref::none(), "MESSAGE FROM SCHEDULER", 1);
-    system->schedule_once(msg, 500);
+    std::shared_ptr<cancellable> cancellable = system->schedule(msg, 500, 200);
 
     std::chrono::milliseconds sleep_duration(1000);
     std::this_thread::sleep_for(sleep_duration);
+
+//    cancellable->cancel();
 
     system->stop();
 

@@ -13,8 +13,8 @@ public:
     actor_ref init();
 
 protected:
-	remote_actor(std::string name, std::shared_ptr<actor_system> actor_system, actor_ref network_actor_ref, int actor_sleep_ms = 10)
-		: actor(name, actor_system, actor_sleep_ms), network_actor_ref_(network_actor_ref)
+	remote_actor(std::string name, std::shared_ptr<actor_system> actor_system, actor_ref network_actor_ref)
+		: actor(name, actor_system), network_actor_ref_(network_actor_ref)
 	{
 		remote_actor_endpoint_ = boost::asio::ip::udp::endpoint(boost::asio::ip::address().from_string(network_actor_ref.ip), network_actor_ref.port);
 	}

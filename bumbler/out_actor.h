@@ -9,8 +9,8 @@
 class out_actor : public local_actor
 {
 public:
-    out_actor(std::string name, std::shared_ptr<actor_system> actor_system, int actor_sleep_ms = 10)
-		: local_actor(name, actor_system, actor_sleep_ms) {}
+    out_actor(std::string name, std::shared_ptr<actor_system> actor_system)
+		: local_actor(name, actor_system) {}
 
 	~out_actor()
 	{

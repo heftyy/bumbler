@@ -10,7 +10,7 @@ class server_actor: public local_actor
 {
 public:
 
-	server_actor(actor_system& actor_system, int actor_sleep_ms = 10) : local_actor("server_actor", actor_system, actor_sleep_ms)
+	server_actor(actor_system& actor_system) : local_actor("server_actor", actor_system)
 	{
 	}
 

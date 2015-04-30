@@ -1,10 +1,10 @@
 #include "actor.h"
 #include "../actor_system/actor_system.h"
 
-actor::actor(const std::string name, std::weak_ptr<actor_system> actor_system, int actor_sleep_ms)
-	: actor_name_(name), actor_system_(actor_system), actor_sleep_ms_(actor_sleep_ms)
+actor::actor(const std::string name, std::weak_ptr<actor_system> actor_system)
+	: actor_name_(name), actor_system_(actor_system)
 {
-	stopped_.store(false);
+	stop_flag_.store(false);
 }
 
 actor::~actor()
@@ -23,9 +23,20 @@ std::string actor::system_name()
 	return actor_system_.lock()->system_name_;
 }
 
+packet actor::message_to_packet(message& msg)
+{
+    packet_header header;
+    header.type = PACKET_DATA;
+
+    packet_data data(msg);
+    packet p(header, data);
+
+    return p;
+}
+
 void actor::reply(int type, std::string msg, actor_ref& target_ref)
 {
-	if (stopped_.load()) return;
+	if (stop_flag_.load()) return;
     BOOST_LOG_TRIVIAL(debug) << "reply";
 	message message;
 	message.type = type;
@@ -37,6 +48,6 @@ void actor::reply(int type, std::string msg, actor_ref& target_ref)
         BOOST_LOG_TRIVIAL(debug) << "[ACTOR] replied to " << target_ref.to_string();
 		packet p = message_to_packet(message);
 		auto remote_actor_endpoint = boost::asio::ip::udp::endpoint(boost::asio::ip::address().from_string(message.target.ip), message.target.port);
-		actor_system_.lock()->server()->do_send(p.get_raw_packet(), remote_actor_endpoint);
+		actor_system_.lock()->get_server()->do_send(p.get_raw_packet(), remote_actor_endpoint);
 	}
 }
