@@ -43,12 +43,13 @@ public:
     }
 
 protected:
-    std::shared_ptr<cancellable> schedule(const message& message, long initial_delay_ms, long interval_ms)
+    template<typename T>
+    std::shared_ptr<cancellable> schedule(message<T>& msg, long initial_delay_ms, long interval_ms)
     {
         std::shared_ptr<cancellable> ret_cancellable = std::shared_ptr<cancellable>(new cancellable());
         auto cancel_it = cancellable_vector_.insert(cancellable_vector_it_, ret_cancellable);
 
-        thread_pool_.push([this, &message, initial_delay_ms, interval_ms, ret_cancellable, &cancel_it](int id) {
+        thread_pool_.push([this, &msg, initial_delay_ms, interval_ms, ret_cancellable, &cancel_it](int id) {
             ret_cancellable->thread_id = std::this_thread::get_id();
 
             if(initial_delay_ms > 0)
@@ -66,10 +67,10 @@ protected:
 
             while(!ret_cancellable->check_cancel())
             {
-                BOOST_LOG_TRIVIAL(debug) << "[SCHEDULER] thread_id: " << std::this_thread::get_id() << " sending message to " << message.target.to_string();
+                BOOST_LOG_TRIVIAL(debug) << "[SCHEDULER] thread_id: " << std::this_thread::get_id() << " sending message to " << msg.target.to_string();
                 BOOST_LOG_TRIVIAL(debug) << "hello from " << id << ' ' << '\n';
 
-                message.send();
+                msg.send();
                 if(initial_delay_ms > 0)
                 {
                     std::chrono::milliseconds interval(interval_ms);
@@ -88,9 +89,10 @@ protected:
         return ret_cancellable;
     }
 
-    std::shared_ptr<cancellable> schedule_once(message& message, long initial_delay_ms)
+    template<typename T>
+    std::shared_ptr<cancellable> schedule_once(message<T>& msg, long initial_delay_ms)
     {
-        return schedule(message, initial_delay_ms, 0);
+        return schedule<T>(msg, initial_delay_ms, 0);
     }
 
 private:

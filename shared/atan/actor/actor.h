@@ -27,35 +27,41 @@ public:
         return actor->get_self();
     }
 
-    virtual actor_ref init() {}
+    virtual actor_ref init() = 0;
 
 protected:
 	std::mutex mutex_;
 	std::unique_ptr<interruptible_thread> queue_thread_;
-	std::queue<message> message_queue_;
+	std::queue<std::shared_ptr<message_interface>> message_queue_;
 	std::atomic<bool> busy_;
 	std::atomic<bool> stop_flag_;
 	std::string actor_name_;
 	std::weak_ptr<actor_system> actor_system_;
     std::condition_variable cv;
+    actor_ref sender;
 
 	actor(const std::string name, std::weak_ptr<actor_system> actor_system);
 	~actor();
 
-	virtual void tell(const message& msg) {}
-	virtual void on_receive(message msg) {}
+    template<typename T>
+    void tell(message<T>& msg) {};
+    template<class T>
+	void on_receive(T data) {};
+    template<typename T>
+    packet message_to_packet(message<T>& msg);
 
-    packet message_to_packet(message& msg);
     std::string actor_name();
     std::string system_name();
-	void reply(int type, std::string msg, actor_ref& target_ref);
+    template<typename T>
+	void reply(T data, actor_ref sender = actor_ref::none());
 	bool is_busy() { return busy_; }
 
-	void add_message(const message msg)
+    template<typename T>
+	void add_message(const message<T> msg)
 	{
         BOOST_LOG_TRIVIAL(debug) << "[ACTOR] queueing new task";
         std::unique_lock<std::mutex> lock(this->mutex_);
-		message_queue_.push(msg);
+		message_queue_.push(std::shared_ptr<message_interface>(msg));
         cv.notify_all();
 	}
 
@@ -69,23 +75,42 @@ protected:
 		return actor_ref(actor_name(), system_name());
 	}
 
+    actor_ref get_sender()
+    {
+        return sender;
+    }
+
 	void read_messages()
 	{
         while(message_queue_.size() > 0)
         {
-            message msg = message_queue_.front();
+            std::shared_ptr<message_interface> msg = message_queue_.front();
             run_task(msg);
             message_queue_.pop();
         }
 	}
 
-	void run_task(message msg)
+	void run_task(std::shared_ptr<message_interface> msg)
 	{
 		busy_.store(true);
         BOOST_LOG_TRIVIAL(debug) << "[ACTOR] starting new task";
+        this->sender = msg->get_sender();
 		on_receive(msg);
+        this->sender = actor_ref::none();
 		busy_.store(false);
 	}
+
+    template<typename T>
+    packet message_to_packet(message<T>& msg)
+    {
+        packet_header header;
+        header.type = PACKET_DATA;
+
+        packet_data data(msg);
+        packet p(header, data);
+
+        return p;
+    }
 
     void clear_queue() {
         std::unique_lock<std::mutex> lock(this->mutex_);

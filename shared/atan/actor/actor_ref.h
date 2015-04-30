@@ -4,8 +4,6 @@
 #include <iostream>
 #include <sstream>
 
-class message;
-
 class actor_ref
 {
 public:
@@ -44,8 +42,11 @@ public:
         return actor_ref();
     }
 
-    void tell(const int type, const std::string text, const actor_ref sender) const;
-    void tell(const message& msg) const;
+    template<typename T>
+    void tell(T data, actor_ref sender = actor_ref::none())
+    {
+        tell_<T>(data, sender);
+    }
 
 	bool exists() const
 	{
@@ -65,4 +66,9 @@ public:
 		ar & ip;
 		ar & port;
 	}
+
+private:
+    template<typename T>
+    void tell_(T data, actor_ref sender);
+
 };

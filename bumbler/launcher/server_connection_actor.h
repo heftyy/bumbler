@@ -25,20 +25,18 @@ private:
 
 	std::function<void(std::string)> update_server_function_;
 
-	void on_receive(message msg)
+    template<typename T>
+	void on_receive(T data)
 	{
         BOOST_LOG_TRIVIAL(debug) << "[SERVER_CONNECTION_ACTOR] on_receive thread id = " << std::this_thread::get_id();
-        BOOST_LOG_TRIVIAL(debug) << "[SERVER_CONNECTION_ACTOR] received message from " << msg.sender.actor_name;
-        BOOST_LOG_TRIVIAL(debug) << "message was " << std::string(msg.data.begin(), msg.data.end());
+        BOOST_LOG_TRIVIAL(debug) << "[SERVER_CONNECTION_ACTOR] received message from " << get_sender().actor_name;
+        BOOST_LOG_TRIVIAL(debug) << "message was " << data;
 
-		if (msg.type == SERVER_STATUS)
+		if (data == SERVER_STATUS)
 		{
             BOOST_LOG_TRIVIAL(debug) << "[SERVER_CONNECTION_ACTOR] SERVER STATUS RECEIVED";
 			update_server_function_(get_self().ip);
 		}
-
-		std::string msg_string = std::string(msg.data.begin(), msg.data.end());
-		//reply(msg_string, msg.sender);
 	}
 };
 

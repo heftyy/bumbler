@@ -10,10 +10,11 @@ int main(int argc, char* argv[])
 
 	actor_ref local_actor = actor::create_actor<out_actor>("out_actor", system);
 
-    local_actor.tell(1, "THIS IS A MESSAGE", actor_ref::none());
+    std::string msg = "message";
+    local_actor.tell(int(5));
 
-    message msg(local_actor, actor_ref::none(), "MESSAGE FROM SCHEDULER", 1);
-    std::shared_ptr<cancellable> cancellable = system->schedule(msg, 500, 200);
+//    message<std::string> msg(local_actor, actor_ref::none(), "MESSAGE FROM SCHEDULER", 1);
+//    std::shared_ptr<cancellable> cancellable = system->schedule(msg, 500, 200);
 
     std::chrono::milliseconds sleep_duration(1000);
     std::this_thread::sleep_for(sleep_duration);

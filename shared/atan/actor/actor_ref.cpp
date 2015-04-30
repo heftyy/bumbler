@@ -2,14 +2,10 @@
 #include "../message.h"
 #include "../actor_system/actor_system.h"
 
-void actor_ref::tell(const int type, const std::string text, const actor_ref sender) const
+template<typename T>
+void actor_ref::tell_(T data, actor_ref sender)
 {
-    message msg(*this, sender, text, type);
-    this->tell(msg);
-}
-
-void actor_ref::tell(const message& msg) const
-{
+    message<T> msg = message<T>(*this, sender, data, 1);
     int result = actor_system_storage::instance().get_system(system_name)->tell_actor(msg);
     if(result == ACTOR_SYSTEM_STOPPED)
     {

@@ -104,26 +104,27 @@ public:
         //throw new actor_not_found(actor->actor_name());
     }
 
-    int tell_actor(const message &message)
+    template<typename T>
+    int tell_actor(message<T>& msg)
     {
         if (stopped_.load()) return atan_error(ACTOR_SYSTEM_STOPPED, system_name_);
 
-        if (message.target.system_name.compare(system_name_) != 0)
+        if (msg.target.system_name.compare(system_name_) != 0)
             return atan_error(ATAN_WRONG_ACTOR_SYSTEM, system_name_);
-        //if (message.target.system_name.compare(system_name_) != 0) throw new wrong_actor_system(system_name_);
+
         std::lock_guard<std::mutex> guard(actors_mutex_);
 
-        std::string actor_name = message.target.actor_name;
+        std::string actor_name = msg.target.actor_name;
 
         auto search = actors_.find(actor_name);
         if (search != actors_.end())
         {
-            actors_[actor_name]->tell(message);
+            actors_[actor_name]->tell<T>(msg);
             return 0;
         }
         else
         {
-            return atan_error(ATAN_ACTOR_NOT_FOUND, message.target.actor_name);
+            return atan_error(ATAN_ACTOR_NOT_FOUND, msg.target.actor_name);
         }
         //throw new actor_not_found(message.target.actor_name);
     }
@@ -144,14 +145,16 @@ public:
         }
     }
 
-    std::shared_ptr<cancellable> schedule(message &message, long initial_delay_ms, long interval_delay_ms)
+    template<typename T>
+    std::shared_ptr<cancellable> schedule(message<T> msg, long initial_delay_ms, long interval_ms)
     {
-        return scheduler_->schedule(message, initial_delay_ms, interval_delay_ms);
+        scheduler_->schedule(msg, initial_delay_ms, interval_ms);
     }
 
-    std::shared_ptr<cancellable> schedule_once(message &message, long initial_delay_ms)
+    template<typename T>
+    std::shared_ptr<cancellable> schedule_once(message<T>& msg, long initial_delay_ms)
     {
-        return scheduler_->schedule_once(message, initial_delay_ms);
+        scheduler_->schedule_once(msg, initial_delay_ms);
     }
 
     std::shared_ptr<udp_server> get_server()
@@ -187,8 +190,8 @@ private:
 
     void receive(std::unique_ptr<packet> packet, boost::asio::ip::udp::endpoint &sender_endpoint)
     {
-        message msg;
-        message::restore_message(msg, packet->data.data);
+        message<std::string> msg;
+        message<std::string>::restore_message(msg, packet->data.data);
         msg.sender.ip = sender_endpoint.address().to_string();
         msg.sender.port = sender_endpoint.port();
 

@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <boost/asio.hpp>
+#include <boost/any.hpp>
 #include "actor.h"
 #include "actor_ref.h"
 #include "../packet/packet.h"
@@ -19,12 +20,14 @@ protected:
 		remote_actor_endpoint_ = boost::asio::ip::udp::endpoint(boost::asio::ip::address().from_string(network_actor_ref.ip), network_actor_ref.port);
 	}
 
-	void tell(message& msg)
+    template<typename T>
+	void tell(message<T>& msg)
 	{
 		tell_(msg);
 		//throw new wrong_actor_method("wrong tell method for network actor");
 	}
 
+    /*
 	message string_to_message(int message_type, std::string msg)
 	{
 		message message_object = message(network_actor_ref_, get_self(), msg, message_type);
@@ -34,19 +37,23 @@ protected:
 	void tell(int message_type, std::string msg = "")
 	{
 		message message_object = string_to_message(message_type, msg);
-		tell_(message_object); 
+		tell_(message_object);
 	}
 
-	message future(int message_type, int timeout_ms = 1000, std::string msg = "")
+	message future(message& msg, int timeout_ms = 1000)
 	{
-		message message_object = string_to_message(message_type, msg);
-		return future_(message_object, timeout_ms);
+		return future_(msg, timeout_ms);
 	}
+    */
 
 private:
 	boost::asio::ip::udp::endpoint remote_actor_endpoint_;
 	actor_ref network_actor_ref_;
 
-	void tell_(message& msg);
-	message future_(message& msg, int timeout_ms);
+    template<typename T>
+	void tell_(message<T>& msg);
+    /*
+    template<typename T>
+	boost::any future_(message<T>& msg, int timeout_ms);
+    */
 };

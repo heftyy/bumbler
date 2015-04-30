@@ -37,7 +37,8 @@ public:
 	packet_data(const std::string& d) : data(d) {}
 	packet_data(const std::vector<char>& d) : data(d.begin(), d.end()) {}
 	packet_data(char *data, size_t length) : data(std::string(data, data + sizeof(char)*length)) {}
-	packet_data(message& msg)
+    template<typename T>
+	packet_data(message<T>& msg)
 	{
 		std::ostringstream archive_stream;
 		boost::archive::text_oarchive archive(archive_stream);

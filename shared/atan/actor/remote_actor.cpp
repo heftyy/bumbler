@@ -7,7 +7,8 @@ actor_ref remote_actor::init()
     return this->get_self();
 }
 
-void remote_actor::tell_(message& msg)
+template<typename T>
+void remote_actor::tell_(message<T>& msg)
 {
 	if (!actor_system_.lock()->get_server()) atan_error(ATAN_SERVER_DOESNT_EXIST, "server doesn't exist");
 
@@ -16,7 +17,9 @@ void remote_actor::tell_(message& msg)
 	actor_system_.lock()->get_server()->do_send(p.get_raw_packet(), remote_actor_endpoint_);
 }
 
-message remote_actor::future_(message& msg, int timeout_ms)
+/*
+template<typename T>
+boost::any remote_actor::future_(message<T>& msg, int timeout_ms)
 {
 	if (!actor_system_.lock()->get_server()) atan_error(ATAN_SERVER_DOESNT_EXIST, "server doesn't exist");
 
@@ -25,9 +28,10 @@ message remote_actor::future_(message& msg, int timeout_ms)
 	std::unique_ptr<packet> received_packet = actor_system_.lock()->get_server()->future(p.get_raw_packet(), remote_actor_endpoint_, timeout_ms);
 	if (received_packet)
 	{
-		message received_message;
+		message<std::string> received_message;
 		message::restore_message(received_message, received_packet->data.data);
-		return received_message;
+		return received_message.get_data();
 	}
-	return message();
+	return "";
 }
+*/

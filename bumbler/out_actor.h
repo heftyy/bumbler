@@ -19,13 +19,13 @@ public:
 
 private:
 
-	void on_receive(message msg)
+    template<typename T>
+	void on_receive(T data) override
 	{
         BOOST_LOG_TRIVIAL(debug) << "[OUT_ACTOR] on_receive thread id = " << std::this_thread::get_id();
-        BOOST_LOG_TRIVIAL(debug) << "[OUT_ACTOR] received message from " << msg.sender.actor_name;
-        BOOST_LOG_TRIVIAL(debug) << "[OUT_ACTOR] message was " << std::string(msg.data.begin(), msg.data.end());
+        BOOST_LOG_TRIVIAL(debug) << "[OUT_ACTOR] received message from " << get_sender().actor_name;
+        BOOST_LOG_TRIVIAL(debug) << "[OUT_ACTOR] message was " << data;
 
-		std::string msg_string = std::string(msg.data.begin(), msg.data.end());
 		//reply(msg_string, msg.sender);
 	}
 };
