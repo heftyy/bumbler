@@ -11,10 +11,8 @@ namespace keywords = boost::log::keywords;
 namespace attrs = boost::log::attributes;
 namespace expr = boost::log::expressions;
 
-class logger
-{
-    static void init()
-    {
+class logger {
+    static void init() {
         /*
         logging::add_common_attributes();
         logging::core::get()->add_global_attribute("Scope", attrs::named_scope());

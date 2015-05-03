@@ -2,10 +2,14 @@
 
 #include <stdexcept>
 
-enum
-{
-	ATAN_ACTOR_NOT_FOUND = 1000, ATAN_ACTOR_ALREADY_EXISTS, ATAN_SERVER_DOESNT_EXIST, ATAN_WRONG_ACTOR_SYSTEM, ATAN_WRONG_ACTOR_METHOD, ACTOR_SYSTEM_STOPPED,
-	ACTOR_SYSTEM_DOESNT_EXIST
+enum {
+    ATAN_ACTOR_NOT_FOUND = 1000,
+    ATAN_ACTOR_ALREADY_EXISTS,
+    ATAN_SERVER_DOESNT_EXIST,
+    ATAN_WRONG_ACTOR_SYSTEM,
+    ATAN_WRONG_ACTOR_METHOD,
+    ACTOR_SYSTEM_STOPPED,
+    ACTOR_SYSTEM_DOESNT_EXIST
 };
 
 /*
@@ -35,32 +39,30 @@ public:
 };
 */
 
-static int atan_error(int error_code, const std::string& msg)
-{
-	std::string error_name = "UNKNOWN ERROR";
-	switch (error_code)
-	{
-		case ATAN_ACTOR_NOT_FOUND:
-			error_name = "ATAN_ACTOR_NOT_FOUND";
-			break;
-		case ATAN_ACTOR_ALREADY_EXISTS:
-			error_name = "ATAN_ACTOR_ALREADY_EXISTS";
-			break;
-		case ATAN_SERVER_DOESNT_EXIST:
-			error_name = "ATAN_SERVER_DOESNT_EXIST";
-			break;
-		case ATAN_WRONG_ACTOR_SYSTEM:
-			error_name = "ATAN_WRONG_ACTOR_SYSTEM";
-			break;
-		case ATAN_WRONG_ACTOR_METHOD:
-			error_name = "ATAN_WRONG_ACTOR_METHOD";
-			break;
-		case ACTOR_SYSTEM_STOPPED:
-			error_name = "ACTOR_SYSTEM_STOPPED";
-			break;
-		case ACTOR_SYSTEM_DOESNT_EXIST:
-			error_name = "ACTOR_SYSTEM_DOESNT_EXIST";
-	}
+static int atan_error(int error_code, const std::string& msg) {
+    std::string error_name = "UNKNOWN ERROR";
+    switch (error_code) {
+        case ATAN_ACTOR_NOT_FOUND:
+            error_name = "ATAN_ACTOR_NOT_FOUND";
+            break;
+        case ATAN_ACTOR_ALREADY_EXISTS:
+            error_name = "ATAN_ACTOR_ALREADY_EXISTS";
+            break;
+        case ATAN_SERVER_DOESNT_EXIST:
+            error_name = "ATAN_SERVER_DOESNT_EXIST";
+            break;
+        case ATAN_WRONG_ACTOR_SYSTEM:
+            error_name = "ATAN_WRONG_ACTOR_SYSTEM";
+            break;
+        case ATAN_WRONG_ACTOR_METHOD:
+            error_name = "ATAN_WRONG_ACTOR_METHOD";
+            break;
+        case ACTOR_SYSTEM_STOPPED:
+            error_name = "ACTOR_SYSTEM_STOPPED";
+            break;
+        case ACTOR_SYSTEM_DOESNT_EXIST:
+            error_name = "ACTOR_SYSTEM_DOESNT_EXIST";
+    }
     BOOST_LOG_TRIVIAL(error) << error_code << ":" << error_name << " " << msg;
-	return error_code;
+    return error_code;
 }

@@ -1,20 +1,18 @@
 #include "local_actor.h"
 #include "../actor_system/actor_system.h"
 
-actor_ref local_actor::init()
-{
+actor_ref local_actor::init() {
     queue_thread_ = std::unique_ptr<interruptible_thread>(new interruptible_thread());
     queue_thread_->start([this]() {
 
         bool isPopped = false;
 
-        while(true)
-        {
+        while (true) {
             this->read_messages();
 
             std::unique_lock<std::mutex> lock(this->mutex_);
 
-            this->cv.wait(lock, [this, &isPopped](){
+            this->cv.wait(lock, [this, &isPopped]() {
                 isPopped = !this->message_queue_.empty();
                 if (isPopped) {
                     this->read_messages();
@@ -31,8 +29,6 @@ actor_ref local_actor::init()
     return this->get_self();
 }
 
-template<typename T>
-void local_actor::tell(message<T>& msg)
-{
-    add_message<T>(msg);
+void local_actor::tell(std::shared_ptr<message>& msg) {
+    add_message(msg);
 }

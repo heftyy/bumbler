@@ -4,8 +4,8 @@
 #include <iostream>
 #include <sstream>
 
-namespace utility
-{
+namespace utility {
     std::string get_current_time();
+
     std::string format_time(boost::posix_time::ptime time);
 }

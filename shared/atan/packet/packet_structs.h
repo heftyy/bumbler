@@ -7,47 +7,49 @@
 #include <boost/archive/text_iarchive.hpp>
 #include <boost/serialization/vector.hpp>
 
-#include "../message.h"
+#include "../typed_message.h"
 
-enum packet_type
-{
-	PACKET_CONNECT, PACKET_DISCONNECT, PACKET_COMMAND, PACKET_RESULT, PACKET_DATA
+enum packet_type {
+    PACKET_CONNECT, PACKET_DISCONNECT, PACKET_COMMAND, PACKET_RESULT, PACKET_DATA
 };
 
-class packet_header
-{
+class packet_header {
 public:
-	friend class boost::serialization::access;
-	packet_type type;
-	template<class Archive>
-	void serialize(Archive & ar, const unsigned int version)
-	{
-		ar & type;
-	}
+    friend class boost::serialization::access;
+
+    packet_type type;
+
+    template<class Archive>
+    void serialize(Archive& ar, const unsigned int version) {
+        ar& type;
+    }
 };
 
-class packet_data
-{
+class packet_data {
 public:
-	friend class boost::serialization::access;
-	//std::vector<char> data;
-	std::string data;
+    friend class boost::serialization::access;
 
-	packet_data() {}
-	packet_data(const std::string& d) : data(d) {}
-	packet_data(const std::vector<char>& d) : data(d.begin(), d.end()) {}
-	packet_data(char *data, size_t length) : data(std::string(data, data + sizeof(char)*length)) {}
+    //std::vector<char> data;
+    std::string data;
+
+    packet_data() { }
+
+    packet_data(const std::string& d) : data(d) { }
+
+    packet_data(const std::vector<char>& d) : data(d.begin(), d.end()) { }
+
+    packet_data(char *data, size_t length) : data(std::string(data, data + sizeof(char) * length)) { }
+
     template<typename T>
-	packet_data(message<T>& msg)
-	{
-		std::ostringstream archive_stream;
-		boost::archive::text_oarchive archive(archive_stream);
-		archive & msg;
-		data = archive_stream.str();
-	}
-	template<class Archive>
-	void serialize(Archive & ar, const unsigned int version)
-	{
-		ar & data;
-	}
+    packet_data(typed_message<T>& typed_msg) {
+        std::ostringstream archive_stream;
+        boost::archive::text_oarchive archive(archive_stream);
+        archive& typed_msg;
+        data = archive_stream.str();
+    }
+
+    template<class Archive>
+    void serialize(Archive& ar, const unsigned int version) {
+        ar& data;
+    }
 };

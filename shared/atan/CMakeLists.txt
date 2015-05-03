@@ -1,9 +1,7 @@
-cmake_minimum_required(VERSION 2.8.4)
+cmake_minimum_required(VERSION 3.2)
 project(atan)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-
-include_directories(../)
 
 set(ATAN_SOURCES
   actor/actor.cpp
@@ -22,7 +20,8 @@ set(ATAN_SOURCES
   scheduler/scheduler.h
   interruptible_thread.h
   message.h
+  typed_message.h
   )
 
-ADD_DEFINITIONS(-DBOOST_LOG_DYN_LINK)
-add_library(atan SHARED ${ATAN_SOURCES})
+add_definitions(-DBOOST_LOG_DYN_LINK)
+add_library(atan STATIC ${ATAN_SOURCES})

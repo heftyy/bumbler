@@ -1,6 +1,5 @@
 #pragma once
 
-enum
-{
-	SERVER_PING, SERVER_PONG, SERVER_STATUS
+enum {
+    SERVER_PING, SERVER_PONG, SERVER_STATUS
 };

@@ -6,6 +6,7 @@
 
 class MyApp : public wxApp {
 public:
-	virtual bool OnInit();
-	static MyFrame* frame_servers;
+    virtual bool OnInit();
+
+    static MyFrame *frame_servers;
 };

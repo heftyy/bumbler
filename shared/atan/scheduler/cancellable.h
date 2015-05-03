@@ -5,34 +5,30 @@
 
 class scheduler;
 
-class cancellable
-{
+class cancellable {
 public:
     friend class scheduler;
 
     std::atomic<std::thread::id> thread_id;
 
-    cancellable() : cancel_(false), cancelled_(false) {}
-    cancellable(std::thread::id thread_id) : thread_id(thread_id), cancel_(false), cancelled_(false) {}
+    cancellable() : cancel_(false), cancelled_(false) { }
 
-    void cancel()
-    {
+    cancellable(std::thread::id thread_id) : thread_id(thread_id), cancel_(false), cancelled_(false) { }
+
+    void cancel() {
         cancel_ = true;
     }
 
-    bool is_cancelled()
-    {
+    bool is_cancelled() {
         return cancelled_;
     }
 
 protected:
-    bool check_cancel()
-    {
+    bool check_cancel() {
         return cancel_;
     }
 
-    void cancelled()
-    {
+    void cancelled() {
         cancelled_ = true;
     }
 

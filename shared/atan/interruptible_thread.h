@@ -1,4 +1,5 @@
 #pragma once
+
 #include <chrono>
 #include <mutex>
 #include <condition_variable>
@@ -15,10 +16,9 @@ public:
 };
 
 
-class cancellation_point
-{
+class cancellation_point {
 public:
-    cancellation_point(): stop_(false) {}
+    cancellation_point() : stop_(false) { }
 
     void cancel() {
         std::unique_lock<std::mutex> lock(mutex_);
@@ -26,7 +26,7 @@ public:
         cond_.notify_all();
     }
 
-    template <typename P>
+    template<typename P>
     void wait(const P& period) {
         std::unique_lock<std::mutex> lock(mutex_);
         if (stop_ || cond_.wait_for(lock, period) == std::cv_status::no_timeout) {
@@ -34,6 +34,7 @@ public:
             throw interrupt_thread_error("thread stopped");
         }
     }
+
 private:
     bool stop_;
     std::mutex mutex_;
@@ -41,23 +42,20 @@ private:
 };
 
 
-class interruptible_thread
-{
+class interruptible_thread {
 public:
-    interruptible_thread() {}
-    ~interruptible_thread()
-    {
+    interruptible_thread() { }
+
+    ~interruptible_thread() {
         stop();
     }
 
-    template <typename Function>
-    void start(Function&& fun, long initial_delay = 0, long period = 0)
-    {
+    template<typename Function>
+    void start(Function&& fun, long initial_delay = 0, long period = 0) {
         thread_ = std::unique_ptr<std::thread>(
                 new std::thread(
                         [fun, period, initial_delay, this]() {
-                            if(initial_delay > 0)
-                            {
+                            if (initial_delay > 0) {
                                 std::chrono::milliseconds sleep_duration(initial_delay);
                                 std::this_thread::sleep_for(sleep_duration);
                             }
@@ -67,24 +65,20 @@ public:
         );
     }
 
-    void stop()
-    {
+    void stop() {
         cpoint_.cancel();
-        if(thread_ && thread_->joinable())
-        {
+        if (thread_ && thread_->joinable()) {
             thread_->join();
         }
     }
 
 private:
-    template <typename Function>
-    void run(Function&& fun, long period)
-    {
+    template<typename Function>
+    void run(Function&& fun, long period) {
         try {
             while (true) {
                 fun();
-                if(period == 0)
-                {
+                if (period == 0) {
                     return;
                 }
                 cpoint_.wait(std::chrono::milliseconds(period));

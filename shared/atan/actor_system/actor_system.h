@@ -7,29 +7,25 @@
 #include "udp_server.h"
 #include "actor_system_errors.h"
 #include "actor_system_storage.h"
-#include "../message.h"
+#include "../typed_message.h"
 #include "../actor/actor.h"
 #include "../packet/packet.h"
 #include "../scheduler/scheduler.h"
 #include "../scheduler/cancellable.h"
 
-class actor_system : public std::enable_shared_from_this<actor_system>
-{
+class actor_system : public std::enable_shared_from_this<actor_system> {
 public:
     friend class actor;
 
-    actor_system(const std::string &name, int port, int thread_pool_size = 5) : system_name_(name), port_(port)
-    {
+    actor_system(const std::string& name, int port, int thread_pool_size = 5) : system_name_(name), port_(port) {
         scheduler_ = std::shared_ptr<scheduler>(new scheduler(thread_pool_size));
     }
 
-    ~actor_system()
-    {
+    ~actor_system() {
         stop();
     }
 
-    void init()
-    {
+    void init() {
         actor_system_storage::instance().add_system(shared_from_this());
 
         stopped_.store(false);
@@ -37,26 +33,25 @@ public:
 
         server_ = std::shared_ptr<udp_server>(new udp_server(io_service_, port_));
         server_->send_completed_function = [&]() { send_completed(); };
-        server_->receive_function = [&](std::unique_ptr<packet> packet, boost::asio::ip::udp::endpoint sender_endpoint) {
+        server_->receive_function = [&](std::unique_ptr<packet> packet,
+                                        boost::asio::ip::udp::endpoint sender_endpoint) {
             receive(std::move(packet), sender_endpoint);
         };
 
         io_service_thread_ = std::unique_ptr<std::thread>(new std::thread([this]() {
-                BOOST_LOG_TRIVIAL(debug) << "[ACTOR_SYSTEM] STARTED ON PORT " << port_;
-                io_service_.run();
-            })
+            BOOST_LOG_TRIVIAL(debug) << "[ACTOR_SYSTEM] STARTED ON PORT " << port_;
+            io_service_.run();
+        })
         );
     }
 
     /**
      * stop the actor system, if wait is true system is going to wait for actors to finish all their tasks in the queue
      */
-    void stop(bool wait = false)
-    {
+    void stop(bool wait = false) {
         if (stopped_.load()) return;
 
-        for (auto iter = actors_.begin(); iter != actors_.end();)
-        {
+        for (auto iter = actors_.begin(); iter != actors_.end();) {
             iter->second->stop_actor(wait);
             actors_.erase(iter++);
         }
@@ -73,13 +68,11 @@ public:
     }
 
     template<class actor_type>
-    int add_actor(std::shared_ptr<actor_type> actor)
-    {
+    int add_actor(std::shared_ptr<actor_type> actor) {
         if (stopped_) return atan_error(ACTOR_SYSTEM_STOPPED, system_name_);
         std::lock_guard<std::mutex> guard(actors_mutex_);
         auto search = actors_.find(actor->actor_name());
-        if (search != actors_.end())
-        {
+        if (search != actors_.end()) {
             return atan_error(ATAN_ACTOR_ALREADY_EXISTS, actor->actor_name());
         }
 
@@ -87,88 +80,73 @@ public:
         return 0;
     }
 
-    int remove_actor(std::shared_ptr<actor> actor)
-    {
+    int remove_actor(std::shared_ptr<actor> actor) {
         if (stopped_) return atan_error(ACTOR_SYSTEM_STOPPED, system_name_);
         std::lock_guard<std::mutex> guard(actors_mutex_);
 
         auto search = actors_.find(actor->actor_name());
-        if (search != actors_.end())
-        {
+        if (search != actors_.end()) {
             actors_.erase(search);
         }
-        else
-        {
+        else {
             return atan_error(ATAN_ACTOR_NOT_FOUND, actor->actor_name());
         }
         //throw new actor_not_found(actor->actor_name());
     }
 
-    template<typename T>
-    int tell_actor(message<T>& msg)
-    {
+    int tell_actor(std::shared_ptr<message>& msg) {
         if (stopped_.load()) return atan_error(ACTOR_SYSTEM_STOPPED, system_name_);
 
-        if (msg.target.system_name.compare(system_name_) != 0)
+        if (msg->get_target().system_name.compare(system_name_) != 0)
             return atan_error(ATAN_WRONG_ACTOR_SYSTEM, system_name_);
 
         std::lock_guard<std::mutex> guard(actors_mutex_);
 
-        std::string actor_name = msg.target.actor_name;
+        std::string actor_name = msg->get_target().actor_name;
 
         auto search = actors_.find(actor_name);
-        if (search != actors_.end())
-        {
-            actors_[actor_name]->tell<T>(msg);
+        if (search != actors_.end()) {
+            actors_[actor_name]->tell(msg);
             return 0;
         }
-        else
-        {
-            return atan_error(ATAN_ACTOR_NOT_FOUND, msg.target.actor_name);
+        else {
+            return atan_error(ATAN_ACTOR_NOT_FOUND, msg->get_target().actor_name);
         }
         //throw new actor_not_found(message.target.actor_name);
     }
 
-    actor_ref get_actor(std::string actor_name)
-    {
+    actor_ref get_actor(std::string actor_name) {
         if (stopped_) nullptr;
         std::lock_guard<std::mutex> guard(actors_mutex_);
 
         auto search = actors_.find(actor_name);
-        if (search != actors_.end())
-        {
+        if (search != actors_.end()) {
             return actors_[actor_name]->get_self();
         }
-        else
-        {
+        else {
             return actor_ref::none();
         }
     }
 
     template<typename T>
-    std::shared_ptr<cancellable> schedule(message<T> msg, long initial_delay_ms, long interval_ms)
-    {
+    std::shared_ptr<cancellable> schedule(typed_message<T>& msg, long initial_delay_ms, long interval_ms) {
         scheduler_->schedule(msg, initial_delay_ms, interval_ms);
     }
 
     template<typename T>
-    std::shared_ptr<cancellable> schedule_once(message<T>& msg, long initial_delay_ms)
-    {
+    std::shared_ptr<cancellable> schedule_once(typed_message<T>& msg, long initial_delay_ms) {
         scheduler_->schedule_once(msg, initial_delay_ms);
     }
 
-    std::shared_ptr<udp_server> get_server()
-    {
+    std::shared_ptr<udp_server> get_server() {
         return server_;
     }
 
-    std::shared_ptr<scheduler> get_scheduler()
-    {
+    std::shared_ptr<scheduler> get_scheduler() {
         return scheduler_;
     }
 
-    std::string system_name()
-    {
+    std::string system_name() {
         return system_name_;
     }
 
@@ -183,26 +161,22 @@ private:
     boost::asio::io_service io_service_;
     std::shared_ptr<scheduler> scheduler_;
 
-    void send_completed()
-    {
-        //std::cout << "SEND COMPLETED" << std::endl;
-    }
+    void send_completed() { }
 
-    void receive(std::unique_ptr<packet> packet, boost::asio::ip::udp::endpoint &sender_endpoint)
-    {
-        message<std::string> msg;
-        message<std::string>::restore_message(msg, packet->data.data);
-        msg.sender.ip = sender_endpoint.address().to_string();
-        msg.sender.port = sender_endpoint.port();
+    void receive(std::unique_ptr<packet> packet, boost::asio::ip::udp::endpoint& sender_endpoint) {
+        typed_message<std::string> typed_msg;
+        typed_message<std::string>::restore_message(typed_msg, packet->data.data);
+        actor_ref sender;
+        sender.ip = sender_endpoint.address().to_string();
+        sender.port = sender_endpoint.port();
+        typed_msg.sender = std::make_shared<actor_ref>(sender);
 
-        if (msg.target.exists())
-        {
-            try
-            {
+        if (typed_msg.target->exists()) {
+            try {
+                std::shared_ptr<message> msg = std::make_shared<typed_message<std::string>>(typed_msg);
                 tell_actor(msg);
             }
-            catch (std::runtime_error &e)
-            {
+            catch (std::runtime_error& e) {
                 BOOST_LOG_TRIVIAL(error) << "actor_system receive error: " << e.what();
             }
         }

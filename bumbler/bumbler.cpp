@@ -1,14 +1,14 @@
+#include <boost/log/trivial.hpp>
 #include <atan/actor_system/actor_system.h>
+
 #include "out_actor.h"
 
-int main(int argc, char* argv[])
-{
-//    system_a s;
+int main(int argc, char *argv[]) {
 
     std::shared_ptr<actor_system> system = std::shared_ptr<actor_system>(new actor_system("bumbler_system", 4444));
     system->init();
 
-	actor_ref local_actor = actor::create_actor<out_actor>("out_actor", system);
+    actor_ref local_actor = actor::create_actor<out_actor>("out_actor", system);
 
     std::string msg = "message";
     local_actor.tell(int(5));
@@ -25,7 +25,7 @@ int main(int argc, char* argv[])
 
     BOOST_LOG_TRIVIAL(info) << "EXIT";
 
-	return 0;
+    return 0;
 
     /*
 	wxApp::SetInstance(new MyApp());
