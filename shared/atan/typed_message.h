@@ -13,8 +13,6 @@ class actor_ref;
 template<typename T>
 class typed_message : public message {
 public:
-    friend class boost::serialization::access;
-
     std::shared_ptr<actor_ref> target;
     std::shared_ptr<actor_ref> sender;
     T data;
@@ -43,6 +41,14 @@ public:
 
     actor_ref& get_target() {
         return *target.get();
+    }
+
+    void set_sender(actor_ref& sender) {
+        this->sender = std::make_shared<actor_ref>(sender);
+    }
+
+    void set_target(actor_ref& target) {
+        this->target = std::make_shared<actor_ref>(target);
     }
 
     static void restore_message(typed_message<T>& msg, std::string& received_data) {

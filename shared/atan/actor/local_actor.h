@@ -9,8 +9,9 @@ public:
     actor_ref init();
 
 protected:
-    local_actor(const std::string& name, std::shared_ptr<actor_system> actor_system)
-            : actor(name, actor_system) { }
+    local_actor(const std::string& name, std::shared_ptr<actor_system>& actor_system)
+            : actor(name, actor_system) {
+    }
 
-    void tell(std::shared_ptr<message>& msg);
+    void tell(std::unique_ptr<message> msg);
 };

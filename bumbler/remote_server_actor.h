@@ -2,16 +2,16 @@
 
 #include <iostream>
 #include <atomic>
-#include <atan/actor/local_actor.h>
+#include <atan/actor/remote_actor.h>
 #include <atan/actor_system/actor_system.h>
 #include <communication/message_settings.h>
 
-class out_actor : public local_actor {
+class remote_server_actor : public remote_actor {
 public:
-    out_actor(std::string name, std::shared_ptr<actor_system> actor_system)
-            : local_actor(name, actor_system) { }
+    remote_server_actor(std::string name, std::string remote_actor_ref, std::shared_ptr<actor_system> actor_system)
+            : remote_actor(name, actor_system, actor_ref(remote_actor_ref)) { }
 
-    ~out_actor() {
+    ~remote_server_actor() {
         BOOST_LOG_TRIVIAL(debug) << "[OUT_ACTOR] destructor";
     }
 

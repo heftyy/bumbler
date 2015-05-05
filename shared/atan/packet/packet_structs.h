@@ -40,11 +40,10 @@ public:
 
     packet_data(char *data, size_t length) : data(std::string(data, data + sizeof(char) * length)) { }
 
-    template<typename T>
-    packet_data(typed_message<T>& typed_msg) {
+    packet_data(std::unique_ptr<message> msg) {
         std::ostringstream archive_stream;
         boost::archive::text_oarchive archive(archive_stream);
-        archive& typed_msg;
+        archive& *msg;
         data = archive_stream.str();
     }
 

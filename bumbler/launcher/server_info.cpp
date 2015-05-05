@@ -10,7 +10,6 @@ server_info::server_info(std::string ip, int port, std::shared_ptr<actor_system>
             "SERVER_CONNECTION_ACTOR_" + uuid_string,
             rpi_actor_ref, actor_system,
             [this](std::string ip) {
-                MyApp::frame_servers->UpdateServer(ip,
-                                                   to_string());
+                MyApp::frame_servers->UpdateServer(ip, to_string());
             });
 }

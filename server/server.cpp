@@ -5,36 +5,30 @@
 #include <logger/logger.h>
 #include "src/server_actor.h"
 
-int main(int argc, char* argv[])
-{
-	try
-	{
-		actor_system actor_system("bumbler_server", 8556);
-        actor_system.init();
-		auto actor = std::shared_ptr<server_actor>(new server_actor(actor_system));
-		actor_system.add_actor(actor);
+int main(int argc, char *argv[]) {
+    try {
+        std::shared_ptr<actor_system> system = std::shared_ptr<actor_system>(new actor_system("server_system", 4445));
+        system->init();
 
-		std::string input;
-		while (1)
-		{
-			std::cin >> input;
-			if (input.compare("quit") == 0)
-			{
-				break;
-			}
-		}
+        actor_ref local_actor = actor::create_actor<server_actor>("server_actor", system);
 
-		actor_system.stop();
-	}
-	catch (std::runtime_error &e)
-	{
-		std::cerr << "Exception: " << e.what() << "\n";
-	}
-	catch (std::exception& e)
-	{
-		std::cerr << "Exception: " << e.what() << "\n";
-	}
+        std::string input;
+        while (1) {
+            std::cin >> input;
+            if (input.compare("quit") == 0) {
+                break;
+            }
+        }
 
-	return 0;
+        system->stop(true);
+    }
+    catch (std::runtime_error& e) {
+        std::cerr << "Exception: " << e.what() << "\n";
+    }
+    catch (std::exception& e) {
+        std::cerr << "Exception: " << e.what() << "\n";
+    }
+
+    return 0;
 }
 

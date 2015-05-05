@@ -63,8 +63,10 @@ public:
         if (!io_service_.stopped()) io_service_.stop();
         if (io_service_thread_->joinable()) io_service_thread_->join();
 
-        //std::this_thread::sleep_for(std::chrono::milliseconds(500));
-        //server_.reset();
+        //workaround for windows
+        //wait for the udp server to properly shutdown, otherwise it SIGSEGVs
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        server_.reset();
     }
 
     template<class actor_type>
@@ -94,7 +96,7 @@ public:
         //throw new actor_not_found(actor->actor_name());
     }
 
-    int tell_actor(std::shared_ptr<message>& msg) {
+    int tell_actor(std::unique_ptr<message> msg) {
         if (stopped_.load()) return atan_error(ACTOR_SYSTEM_STOPPED, system_name_);
 
         if (msg->get_target().system_name.compare(system_name_) != 0)
@@ -106,7 +108,7 @@ public:
 
         auto search = actors_.find(actor_name);
         if (search != actors_.end()) {
-            actors_[actor_name]->tell(msg);
+            actors_[actor_name]->tell(std::move(msg));
             return 0;
         }
         else {
@@ -164,6 +166,7 @@ private:
     void send_completed() { }
 
     void receive(std::unique_ptr<packet> packet, boost::asio::ip::udp::endpoint& sender_endpoint) {
+        auto msg = std::unique_ptr<typed_message<std::string>>(new typed_message<std::string>());
         typed_message<std::string> typed_msg;
         typed_message<std::string>::restore_message(typed_msg, packet->data.data);
         actor_ref sender;
@@ -173,8 +176,7 @@ private:
 
         if (typed_msg.target->exists()) {
             try {
-                std::shared_ptr<message> msg = std::make_shared<typed_message<std::string>>(typed_msg);
-                tell_actor(msg);
+                tell_actor(std::move(msg));
             }
             catch (std::runtime_error& e) {
                 BOOST_LOG_TRIVIAL(error) << "actor_system receive error: " << e.what();

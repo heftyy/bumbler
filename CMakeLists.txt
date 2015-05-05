@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.2)
 project(bumbler)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -lws2_32")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 set(BUMBLER_SOURCE_FILES
 #    bumbler/launcher/frame_servers.cpp
@@ -21,12 +21,15 @@ set(SERVER_SOURCE_FILES
     server/server.cpp
 )
 
+set(CMAKE_BUILD_TYPE Debug)
+
 if(${WIN32})
     #windows
     include_directories(F:/github/boost_1_58_0)
     include_directories(shared)
     add_subdirectory(shared/atan)
 
+    add_definitions()
     add_definitions(-DBOOST_LOG_DYN_LINK)
     add_definitions(-D_WIN32_WINNT=0x0501)
     set(BOOST_ROOT F:/github/boost_1_58_0)
@@ -34,6 +37,7 @@ if(${WIN32})
     set(Boost_USE_MULTITHREADED ON)
 
     find_package(Boost 1.58 COMPONENTS system date_time regex filesystem log log_setup serialization REQUIRED)
+    find_library(ws2_32_LIBRARY_PATH ws2_32)
 
 #    set(wxWidgets_ROOT_DIR "F:/github/wxWidgets")
 #    set(wxWidgets_LIB_DIR "F:/github/wxWidgets/lib/gcc_dll")
@@ -61,8 +65,10 @@ add_executable(server ${SERVER_SOURCE_FILES})
 #target_link_libraries(bumbler ${wxWidgets_LIBRARIES})
 target_link_libraries(bumbler ${Boost_LIBRARIES})
 target_link_libraries(bumbler atan)
+target_link_libraries(bumbler ${ws2_32_LIBRARY_PATH})
 
 target_link_libraries(server ${Boost_LIBRARIES})
 target_link_libraries(server atan)
+target_link_libraries(server ${ws2_32_LIBRARY_PATH})
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY F:/github/bumbler/bin)

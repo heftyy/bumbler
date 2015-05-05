@@ -8,9 +8,11 @@
 #include <memory>
 #include <logger/logger.h>
 #include "actor_ref.h"
+#include "../actor_system/actor_system_errors.h"
 #include "../message.h"
 #include "../interruptible_thread.h"
 #include "../packet/packet.h"
+#include "../../utility.h"
 
 class actor_system;
 
@@ -42,43 +44,48 @@ protected:
 
     ~actor();
 
-    virtual void tell(std::shared_ptr<message> msg) { };
+    virtual void tell(std::unique_ptr<message> msg) {
+        atan_error(ATAN_WRONG_ACTOR_METHOD, "virtual tell called, should never happen");
+    }
 
-    template<class T>
-    void on_receive(T data) { };
+    virtual void on_receive(boost::any data) {
+        atan_error(ATAN_WRONG_ACTOR_METHOD, "virtual on_receive called, should never happen");
+    };
 
     std::string actor_name();
 
     std::string system_name();
 
+    void read_messages() {
+        while (message_queue_.size() > 0) {
+            std::shared_ptr<message> msg = message_queue_.front();
+            run_task(msg);
+            message_queue_.pop();
+        }
+    }
+
     template<typename T>
-    void reply(T data, actor_ref sender = actor_ref::none()) {
+    void reply(T data) {
         if (stop_flag_.load()) return;
         BOOST_LOG_TRIVIAL(debug) << "reply NOT IMPLEMENTED";
-        /*
-        message<T> message;
-        message.type = 1;
-        message.data = data;
-        message.sender = get_self();
-        message.target = get_sender();
-        if (actor_system_.lock()->tell_actor(message) != 0 && message.target.valid_address())
-        {
-            BOOST_LOG_TRIVIAL(debug) << "[ACTOR] replied to " << message.target.to_string();
-            packet p = message_to_packet(message);
-            auto remote_actor_endpoint = boost::asio::ip::udp::endpoint(
-                    boost::asio::ip::address().from_string(message.target.ip), message.target.port
-            );
-            actor_system_.lock()->get_server()->do_send(p.get_raw_packet(), remote_actor_endpoint);
-        }
-        */
+        typed_message<T> typed_msg;
+        typed_msg.data = data;
+
+        actor_ref& self = get_self();
+        actor_ref& sender = get_sender();
+
+        typed_msg.set_sender(self);
+        typed_msg.set_target(sender);
+
+        send_reply_message(typed_msg);
     }
 
     bool is_busy() { return busy_; }
 
-    void add_message(std::shared_ptr<message>& msg) {
+    void add_message(std::unique_ptr<message> msg) {
         BOOST_LOG_TRIVIAL(debug) << "[ACTOR] queueing new task";
         std::unique_lock<std::mutex> lock(this->mutex_);
-        message_queue_.push(msg);
+        message_queue_.push(std::shared_ptr<message>{std::move(msg)});
         cv.notify_all();
     }
 
@@ -94,34 +101,24 @@ protected:
         return sender;
     }
 
-    void read_messages() {
-        while (message_queue_.size() > 0) {
-            std::shared_ptr<message> msg = message_queue_.front();
-            run_task(msg);
-            message_queue_.pop();
+    template<typename T>
+    T cast_message(boost::any& data) {
+        if(data.type() == typeid(T)) {
+            return boost::any_cast<T>(data);
         }
     }
 
-    void run_task(std::shared_ptr<message> msg) {
-        busy_.store(true);
-        BOOST_LOG_TRIVIAL(debug) << "[ACTOR] starting new task";
-        this->sender = msg->get_sender();
-        on_receive(msg);
-        this->sender = actor_ref::none();
-        busy_.store(false);
-    }
-
-    template<typename T>
-    packet message_to_packet(typed_message<T>& typed_msg) {
+    packet message_to_packet(std::unique_ptr<message> msg) {
         packet_header header;
         header.type = PACKET_DATA;
 
-        packet_data data(typed_msg);
+        packet_data data(std::move(msg));
         packet p(header, data);
 
         return p;
     }
 
+private:
     void clear_queue() {
         std::unique_lock<std::mutex> lock(this->mutex_);
         while (!this->message_queue_.empty())
@@ -143,4 +140,16 @@ protected:
             BOOST_LOG_TRIVIAL(debug) << "[ACTOR] stopped";
         }
     }
+
+    void run_task(std::shared_ptr<message> msg) {
+        busy_.store(true);
+        BOOST_LOG_TRIVIAL(debug) << "[ACTOR] starting new task";
+        this->sender = msg->get_sender();
+        on_receive(msg->get_data());
+        this->sender = actor_ref::none();
+        busy_.store(false);
+    }
+
+    void send_reply_message(std::unique_ptr<message> msg);
+
 };

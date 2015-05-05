@@ -20,11 +20,11 @@ public:
     actor_ref(const std::string& actor_name, const std::string& system_name, const std::string& ip, const int port)
             : actor_name(actor_name), system_name(system_name), ip(ip), port(port) { }
 
-    actor_ref(const std::string& actor_ref) /**[actor]$[system_name]@[ip]:[port]*/
+    actor_ref(const std::string& actor_ref) /** [actor]$[system_name]@[ip]:[port] */
     {
-        int system_name_start = actor_ref.find('$');
-        int ip_start = actor_ref.find('@');
-        int port_start = actor_ref.find(':');
+        unsigned long long int system_name_start = actor_ref.find('$');
+        unsigned long long int ip_start = actor_ref.find('@');
+        unsigned long long int port_start = actor_ref.find(':');
         actor_name = actor_ref.substr(0, system_name_start);
         system_name = actor_ref.substr(system_name_start + 1, ip_start - system_name_start - 1);
         ip = actor_ref.substr(ip_start + 1, port_start - ip_start - 1);
@@ -43,8 +43,8 @@ public:
 
     template<typename T>
     void tell(T data, actor_ref sender = actor_ref::none()) {
-        std::shared_ptr<message> msg = std::make_shared<typed_message<T>>(typed_message<T>(*this, sender, data));
-        tell_(msg);
+        auto msg = std::unique_ptr<typed_message<T>>(new typed_message<T>(*this, sender, data));
+        tell_(std::move(msg));
     }
 
     bool exists() const {
@@ -64,6 +64,6 @@ public:
     }
 
 private:
-    void tell_(std::shared_ptr<message>& msg);
+    void tell_(std::unique_ptr<message> msg);
 
 };

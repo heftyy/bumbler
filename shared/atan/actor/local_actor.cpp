@@ -29,6 +29,6 @@ actor_ref local_actor::init() {
     return this->get_self();
 }
 
-void local_actor::tell(std::shared_ptr<message>& msg) {
-    add_message(msg);
+void local_actor::tell(std::unique_ptr<message> msg) {
+    add_message(std::move(msg));
 }
