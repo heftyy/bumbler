@@ -2,7 +2,6 @@
 //
 
 #include <atan/actor_system/actor_system.h>
-#include <logger/logger.h>
 #include "src/server_actor.h"
 
 int main(int argc, char *argv[]) {

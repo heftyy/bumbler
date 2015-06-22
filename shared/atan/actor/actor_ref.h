@@ -20,8 +20,7 @@ public:
     actor_ref(const std::string& actor_name, const std::string& system_name, const std::string& ip, const int port)
             : actor_name(actor_name), system_name(system_name), ip(ip), port(port) { }
 
-    actor_ref(const std::string& actor_ref) /** [actor]$[system_name]@[ip]:[port] */
-    {
+    actor_ref(const std::string actor_ref) /** [actor]$[system_name]@[ip]:[port] */ {
         unsigned long long int system_name_start = actor_ref.find('$');
         unsigned long long int ip_start = actor_ref.find('@');
         unsigned long long int port_start = actor_ref.find(':');
@@ -39,6 +38,12 @@ public:
 
     static actor_ref none() {
         return actor_ref();
+    }
+
+    //if a string literal is passed to tell i don't want to use them internally, i want to use strings
+    void tell(const char* data, actor_ref sender = actor_ref::none()) {
+        auto msg = std::unique_ptr<typed_message<std::string>>(new typed_message<std::string>(*this, sender, std::string(data)));
+        tell_(std::move(msg));
     }
 
     template<typename T>

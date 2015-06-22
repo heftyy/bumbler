@@ -68,16 +68,16 @@ protected:
     void reply(T data) {
         if (stop_flag_.load()) return;
         BOOST_LOG_TRIVIAL(debug) << "reply NOT IMPLEMENTED";
-        typed_message<T> typed_msg;
-        typed_msg.data = data;
+        std::unique_ptr<typed_message<T>> typed_msg = std::unique_ptr<typed_message<T>>(new typed_message<T>());
+        typed_msg->data = data;
 
-        actor_ref& self = get_self();
-        actor_ref& sender = get_sender();
+        actor_ref self = get_self();
+        actor_ref sender = get_sender();
 
-        typed_msg.set_sender(self);
-        typed_msg.set_target(sender);
+        typed_msg->set_sender(self);
+        typed_msg->set_target(sender);
 
-        send_reply_message(typed_msg);
+        send_reply_message(std::move(typed_msg));
     }
 
     bool is_busy() { return busy_; }
@@ -108,6 +108,14 @@ protected:
         }
     }
 
+    template<typename T>
+    bool is_type(boost::any& data) {
+        if(data.type() == typeid(T)) {
+            return true;
+        }
+        return false;
+    }
+
     packet message_to_packet(std::unique_ptr<message> msg) {
         packet_header header;
         header.type = PACKET_DATA;
@@ -125,8 +133,7 @@ private:
             this->message_queue_.pop();  // empty the queue
     }
 
-    /** synchronous wait for the actor to end all tasks and stop all thread
-    */
+    /** synchronous wait for the actor to end all tasks and stop all thread */
     void stop_actor(bool wait = false) {
         if (!wait)
             clear_queue();

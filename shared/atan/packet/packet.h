@@ -41,7 +41,7 @@ public:
 
     std::string get_raw_packet() {
         if (header.type == 0) {
-            throw new packet_structure_error("");
+            throw new packet_structure_error("packet had no type");
         }
         std::ostringstream archive_stream;
         boost::archive::text_oarchive out_archive(archive_stream);
@@ -56,8 +56,8 @@ public:
         std::istringstream is(received_data);
 
         boost::archive::text_iarchive in_archive(is);
-        packet *received_packet = new packet();
-        in_archive >> received_packet;
+        std::unique_ptr<packet> received_packet = std::unique_ptr<packet>(new packet);
+        in_archive >> *received_packet;
         header = received_packet->header;
         data = received_packet->data;
     }

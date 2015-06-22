@@ -21,6 +21,7 @@ set(ATAN_SOURCES
   interruptible_thread.h
   message.h
   typed_message.h
+  typed_message.cpp
   )
 
 add_definitions(-DBOOST_LOG_DYN_LINK)

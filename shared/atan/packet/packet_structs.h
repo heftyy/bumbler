@@ -43,7 +43,7 @@ public:
     packet_data(std::unique_ptr<message> msg) {
         std::ostringstream archive_stream;
         boost::archive::text_oarchive archive(archive_stream);
-        archive& *msg;
+        archive << *msg;
         data = archive_stream.str();
     }
 

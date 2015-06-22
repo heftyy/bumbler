@@ -12,28 +12,23 @@ int main(int argc, char *argv[]) {
 	actor_ref l_actor = actor::create_actor<out_actor>("out_actor", system);
 
     std::string r_actor_name = "remote_server_actor";
-    std::string r_actor_location = "server_print_actor$server_system@localhost:4445";
+    std::string r_actor_location = "server_print_actor$server_system@127.0.0.1:4445";
 
-	actor_ref r_actor = actor::create_actor<remote_server_actor>(r_actor_name, r_actor_location, system);
+    actor_ref r_actor = actor::create_actor<remote_server_actor>(r_actor_name, r_actor_location, system);
 
-	std::string msg = "message";
-    l_actor.tell(5);
+    std::string msg = "message";
+//    l_actor.tell("foo");
 
-    r_actor.tell("foo");
+    r_actor.tell("bfsafafa1ar");
 
-	//    message<std::string> msg(local_actor, actor_ref::none(), "MESSAGE FROM SCHEDULER", 1);
-	//    std::shared_ptr<cancellable> cancellable = system->schedule(msg, 500, 200);
+    std::chrono::milliseconds sleep_duration(2000);
+    std::this_thread::sleep_for(sleep_duration);
 
-	std::chrono::milliseconds sleep_duration(1000000);
-	std::this_thread::sleep_for(sleep_duration);
+    system->stop(true);
 
-	//    cancellable->cancel();
+    BOOST_LOG_TRIVIAL(info) << "EXIT";
 
-	system->stop(true);
-
-	BOOST_LOG_TRIVIAL(info) << "EXIT";
-
-	return 0;
+    return 0;
 
 	/*
 	wxApp::SetInstance(new MyApp());
