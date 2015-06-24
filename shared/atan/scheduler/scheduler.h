@@ -23,13 +23,14 @@ public:
 
     ~scheduler() {
         BOOST_LOG_TRIVIAL(debug) << "[SCHEDULER] DESTROY";
-        thread_pool_.stop(true);
 
-        for (std::shared_ptr<cancellable> cancellable : cancellable_vector_) {
+        for (std::shared_ptr<cancellable>& cancellable : cancellable_vector_) {
             if (!cancellable->is_cancelled()) {
                 cancellable->cancel();
             }
         }
+
+        thread_pool_.stop(true);
     }
 
     void resize(int thread_pool_size) {
@@ -42,7 +43,7 @@ protected:
         std::shared_ptr<cancellable> ret_cancellable = std::make_shared<cancellable>();
         auto cancel_it = cancellable_vector_.insert(cancellable_vector_it_, ret_cancellable);
 
-        thread_pool_.push([this, &msg, initial_delay_ms, interval_ms, ret_cancellable, &cancel_it](int id) {
+        thread_pool_.push([this, &msg, initial_delay_ms, interval_ms, ret_cancellable, cancel_it](int id) {
             ret_cancellable->thread_id = std::this_thread::get_id();
 
             if (initial_delay_ms > 0) {

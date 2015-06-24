@@ -18,7 +18,7 @@ public:
     friend class actor;
 
     actor_system(const std::string& name, int port, int thread_pool_size = 5) : system_name_(name), port_(port) {
-        scheduler_ = std::shared_ptr<scheduler>(new scheduler(thread_pool_size));
+        scheduler_ = std::make_shared<scheduler>(thread_pool_size);
     }
 
     ~actor_system() {
@@ -153,12 +153,12 @@ public:
 
     template<typename T>
     std::shared_ptr<cancellable> schedule(typed_message<T>& msg, long initial_delay_ms, long interval_ms) {
-        scheduler_->schedule(msg, initial_delay_ms, interval_ms);
+        return scheduler_->schedule(msg, initial_delay_ms, interval_ms);
     }
 
     template<typename T>
     std::shared_ptr<cancellable> schedule_once(typed_message<T>& msg, long initial_delay_ms) {
-        scheduler_->schedule_once(msg, initial_delay_ms);
+        return scheduler_->schedule_once(msg, initial_delay_ms);
     }
 
     std::shared_ptr<udp_server> get_server() {

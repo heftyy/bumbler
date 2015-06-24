@@ -6,7 +6,6 @@
 #include "actor.h"
 #include "actor_ref.h"
 #include "../packet/packet.h"
-#include "../messages/serialization_utility.h"
 
 class remote_actor : public actor {
 protected:

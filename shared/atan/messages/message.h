@@ -3,7 +3,6 @@
 #include <memory>
 #include <stdexcept>
 #include <boost/any.hpp>
-#include "serialization_utility.h"
 
 class actor_ref;
 

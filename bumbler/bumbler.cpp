@@ -31,9 +31,9 @@ int main(int argc, char *argv[]) {
     tm.set_target(l_actor);
     tm.set_sender(r_actor);
     tm.data = "BLAM";
-    auto c = system->schedule_once(tm, 0);
+    system->schedule(tm, 500, 900);
 
-    std::chrono::milliseconds sleep_duration(5000);
+    std::chrono::milliseconds sleep_duration(2000);
     std::this_thread::sleep_for(sleep_duration);
 
     system->stop(true);

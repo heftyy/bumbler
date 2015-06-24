@@ -4,6 +4,7 @@
 #include <sstream>
 #include <boost/serialization/serialization.hpp>
 #include <boost/serialization/type_info_implementation.hpp>
+#include <boost/serialization/unique_ptr.hpp>
 #include <boost/serialization/shared_ptr.hpp>
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/export.hpp>
