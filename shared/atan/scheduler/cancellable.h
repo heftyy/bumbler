@@ -15,6 +15,11 @@ public:
 
     cancellable(std::thread::id thread_id) : thread_id(thread_id), cancel_(false), cancelled_(false) { }
 
+    ~cancellable() {
+        cancel_ = true;
+        cancelled_ = true;
+    }
+
     void cancel() {
         cancel_ = true;
     }

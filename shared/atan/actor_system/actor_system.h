@@ -7,7 +7,7 @@
 #include "udp_server.h"
 #include "actor_system_errors.h"
 #include "actor_system_storage.h"
-#include "../typed_message.h"
+#include "../messages/typed_message.h"
 #include "../actor/actor.h"
 #include "../packet/packet.h"
 #include "../scheduler/scheduler.h"
@@ -39,7 +39,7 @@ public:
         };
 
         io_service_thread_ = std::unique_ptr<std::thread>(new std::thread([this]() {
-            BOOST_LOG_TRIVIAL(debug) << "[ACTOR_SYSTEM] STARTED ON PORT " << port_;
+            BOOST_LOG_TRIVIAL(debug) << "[ACTOR_SYSTEM_SERVER] STARTED ON PORT " << port_;
             io_service_.run();
         })
         );
@@ -100,7 +100,7 @@ public:
         if (stopped_.load()) return atan_error(ACTOR_SYSTEM_STOPPED, system_name_);
 
         if (msg->get_target().system_name.compare(system_name_) != 0)
-            return atan_error(ATAN_WRONG_ACTOR_SYSTEM, system_name_);
+            return atan_error(ATAN_WRONG_ACTOR_SYSTEM, msg->get_target().system_name);
 
         std::lock_guard<std::mutex> guard(actors_mutex_);
 
@@ -109,6 +109,27 @@ public:
         auto search = actors_.find(actor_name);
         if (search != actors_.end()) {
             actors_[actor_name]->tell(std::move(msg));
+            return 0;
+        }
+        else {
+            return atan_error(ATAN_ACTOR_NOT_FOUND, msg->get_target().actor_name);
+        }
+        //throw new actor_not_found(message.target.actor_name);
+    }
+
+    int remote_tell_actor(std::unique_ptr<message> msg) {
+        if (stopped_.load()) return atan_error(ACTOR_SYSTEM_STOPPED, system_name_);
+
+        if (msg->get_target().system_name.compare(system_name_) != 0)
+            return atan_error(ATAN_WRONG_ACTOR_SYSTEM, msg->get_target().system_name);
+
+        std::lock_guard<std::mutex> guard(actors_mutex_);
+
+        std::string actor_name = msg->get_target().actor_name;
+
+        auto search = actors_.find(actor_name);
+        if (search != actors_.end()) {
+            actors_[actor_name]->tell(std::move(msg), true);
             return 0;
         }
         else {
@@ -166,17 +187,21 @@ private:
     void send_completed() { }
 
     void receive(std::unique_ptr<packet> packet, boost::asio::ip::udp::endpoint& sender_endpoint) {
-        auto msg = std::unique_ptr<typed_message<std::string>>(new typed_message<std::string>());
-        typed_message<std::string> typed_msg;
-        typed_message<std::string>::restore_message(typed_msg, packet->data.data);
-        actor_ref sender;
+        BOOST_LOG_TRIVIAL(debug) << "Received data: \n" << packet->data.data;
+        std::stringstream ss(packet->data.data);
+        boost::archive::text_iarchive ia(ss);
+
+        std::unique_ptr<message> msg;
+        ia >> msg;
+
+        actor_ref sender = msg->get_sender();
         sender.ip = sender_endpoint.address().to_string();
         sender.port = sender_endpoint.port();
-        typed_msg.sender = std::make_shared<actor_ref>(sender);
+        msg->set_sender(sender);
 
-        if (typed_msg.target->exists()) {
+        if (msg->get_target().exists()) {
             try {
-                tell_actor(std::move(msg));
+                remote_tell_actor(std::move(msg));
             }
             catch (std::runtime_error& e) {
                 BOOST_LOG_TRIVIAL(error) << "actor_system receive error: " << e.what();

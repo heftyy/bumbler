@@ -1,4 +1,4 @@
-#include "typed_message.h"
+#pragma once
 
 BOOST_CLASS_EXPORT(typed_message<std::string>)
 BOOST_CLASS_EXPORT(typed_message<double>)

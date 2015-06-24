@@ -12,8 +12,6 @@
 #include <boost/any.hpp>
 #include "message.h"
 
-class actor_ref;
-
 template<typename T>
 class typed_message : public message {
 public:
@@ -55,21 +53,14 @@ public:
         this->target = std::make_shared<actor_ref>(target);
     }
 
-    static void restore_message(typed_message<T>& msg, std::string& received_data) {
-        std::string serialized_data(received_data.begin(), received_data.end());
-        std::istringstream is(serialized_data);
-        boost::archive::text_iarchive in_archive(is);
-        in_archive >> msg;
-    }
-
 private:
     friend class boost::serialization::access;
     template<class Archive>
     void serialize(Archive& ar, const unsigned int version) {
         boost::serialization::void_cast_register<typed_message, message>();
 
-        ar & *sender;
-        ar & *target;
+        ar & sender;
+        ar & target;
         ar & data;
     }
 };

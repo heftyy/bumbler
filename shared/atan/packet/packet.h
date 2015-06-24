@@ -22,8 +22,8 @@ public:
 
     template<class Archive>
     void serialize(Archive& ar, const unsigned int version) {
-        ar& header;
-        ar& data;
+        ar & header;
+        ar & data;
     }
 
     packet(packet_header& h, packet_data& d) {
@@ -31,15 +31,7 @@ public:
         data = d;
     }
 
-    packet(const char *received_data) {
-        parse(std::string(received_data));
-    }
-
-    packet(const std::string& received_data) {
-        parse(received_data);
-    }
-
-    std::string get_raw_packet() {
+    std::string get_serialized() {
         if (header.type == 0) {
             throw new packet_structure_error("packet had no type");
         }
@@ -52,14 +44,13 @@ public:
         //return std::unique_ptr<std::vector<char>>(new std::vector<char>(serialized_data.begin(), serialized_data.end()));
     }
 
-    void parse(const std::string& received_data) {
+    static packet parse(const std::string& received_data) {
         std::istringstream is(received_data);
 
         boost::archive::text_iarchive in_archive(is);
-        std::unique_ptr<packet> received_packet = std::unique_ptr<packet>(new packet);
-        in_archive >> *received_packet;
-        header = received_packet->header;
-        data = received_packet->data;
+        packet received_packet;
+        in_archive >> received_packet;
+        return received_packet;
     }
 
 };

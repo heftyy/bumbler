@@ -1,5 +1,5 @@
 #include "actor_ref.h"
-#include "../message.h"
+#include "../messages/message.h"
 #include "../actor_system/actor_system.h"
 
 void actor_ref::tell_(std::unique_ptr<message> msg) {

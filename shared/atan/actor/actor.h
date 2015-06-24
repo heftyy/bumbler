@@ -9,7 +9,7 @@
 #include <logger/logger.h>
 #include "actor_ref.h"
 #include "../actor_system/actor_system_errors.h"
-#include "../message.h"
+#include "../messages/message.h"
 #include "../interruptible_thread.h"
 #include "../packet/packet.h"
 #include "../../utility.h"
@@ -27,8 +27,6 @@ public:
         return actor->get_self();
     }
 
-    virtual actor_ref init() = 0;
-
 protected:
     std::mutex mutex_;
     std::unique_ptr<interruptible_thread> queue_thread_;
@@ -38,13 +36,16 @@ protected:
     std::string actor_name_;
     std::weak_ptr<actor_system> actor_system_;
     std::condition_variable cv;
-    actor_ref sender;
+    actor_ref sender_;
+    actor_ref self_;
 
     actor(const std::string name, std::weak_ptr<actor_system> actor_system);
 
     ~actor();
 
-    virtual void tell(std::unique_ptr<message> msg) {
+    actor_ref init();
+
+    virtual void tell(std::unique_ptr<message> msg, bool remote = false) {
         atan_error(ATAN_WRONG_ACTOR_METHOD, "virtual tell called, should never happen");
     }
 
@@ -64,18 +65,18 @@ protected:
         }
     }
 
+    void reply(const char* data) {
+        reply(std::string(data));
+    }
+
     template<typename T>
     void reply(T data) {
         if (stop_flag_.load()) return;
-        BOOST_LOG_TRIVIAL(debug) << "reply NOT IMPLEMENTED";
         std::unique_ptr<typed_message<T>> typed_msg = std::unique_ptr<typed_message<T>>(new typed_message<T>());
         typed_msg->data = data;
 
-        actor_ref self = get_self();
-        actor_ref sender = get_sender();
-
-        typed_msg->set_sender(self);
-        typed_msg->set_target(sender);
+        typed_msg->set_sender(get_self());
+        typed_msg->set_target(get_sender());
 
         send_reply_message(std::move(typed_msg));
     }
@@ -89,16 +90,25 @@ protected:
         cv.notify_all();
     }
 
+    void run_task(std::shared_ptr<message> msg) {
+        busy_.store(true);
+        BOOST_LOG_TRIVIAL(debug) << "[ACTOR] starting new task";
+        this->sender_ = msg->get_sender();
+        on_receive(msg->get_data());
+        this->sender_ = actor_ref::none();
+        busy_.store(false);
+    }
+
     bool compare(std::shared_ptr<actor> actor) {
         return this->actor_name().compare(actor->actor_name()) == 0;
     }
 
-    actor_ref get_self() {
-        return actor_ref(actor_name(), system_name());
+    actor_ref& get_self() {
+        return self_;
     }
 
-    actor_ref get_sender() {
-        return sender;
+    actor_ref& get_sender() {
+        return sender_;
     }
 
     template<typename T>
@@ -120,7 +130,8 @@ protected:
         packet_header header;
         header.type = PACKET_DATA;
 
-        packet_data data(std::move(msg));
+        packet_data data;
+        data.load(std::move(msg));
         packet p(header, data);
 
         return p;
@@ -146,15 +157,6 @@ private:
             queue_thread_.release();
             BOOST_LOG_TRIVIAL(debug) << "[ACTOR] stopped";
         }
-    }
-
-    void run_task(std::shared_ptr<message> msg) {
-        busy_.store(true);
-        BOOST_LOG_TRIVIAL(debug) << "[ACTOR] starting new task";
-        this->sender = msg->get_sender();
-        on_receive(msg->get_data());
-        this->sender = actor_ref::none();
-        busy_.store(false);
     }
 
     void send_reply_message(std::unique_ptr<message> msg);

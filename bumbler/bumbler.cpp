@@ -3,6 +3,7 @@
 
 #include "out_actor.h"
 #include "remote_server_actor.h"
+#include "../shared/communication/serializable_types.h"
 
 int main(int argc, char *argv[]) {
 
@@ -19,9 +20,20 @@ int main(int argc, char *argv[]) {
     std::string msg = "message";
 //    l_actor.tell("foo");
 
-    r_actor.tell("bfsafafa1ar");
+//    r_actor.tell(1);
+//    r_actor.tell("aaaaa");
 
-    std::chrono::milliseconds sleep_duration(2000);
+//    r_actor.tell(3.14f, l_actor);
+
+//    r_actor.tell(3.14f);
+
+    typed_message<std::string> tm;
+    tm.set_target(l_actor);
+    tm.set_sender(r_actor);
+    tm.data = "BLAM";
+    auto c = system->schedule_once(tm, 0);
+
+    std::chrono::milliseconds sleep_duration(5000);
     std::this_thread::sleep_for(sleep_duration);
 
     system->stop(true);

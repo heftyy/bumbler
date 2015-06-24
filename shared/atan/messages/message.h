@@ -3,6 +3,7 @@
 #include <memory>
 #include <stdexcept>
 #include <boost/any.hpp>
+#include "serialization_utility.h"
 
 class actor_ref;
 
@@ -14,6 +15,10 @@ public:
 
     virtual actor_ref& get_target() = 0;
 
+    virtual void set_sender(actor_ref& sender) = 0;
+
+    virtual void set_target(actor_ref& target) = 0;
+
     virtual ~message() {}
 
 private:
@@ -24,3 +29,5 @@ private:
     }
 
 };
+
+BOOST_SERIALIZATION_ASSUME_ABSTRACT(message)

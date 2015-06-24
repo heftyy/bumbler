@@ -6,12 +6,9 @@
 #include "actor.h"
 #include "actor_ref.h"
 #include "../packet/packet.h"
+#include "../messages/serialization_utility.h"
 
 class remote_actor : public actor {
-public:
-
-    actor_ref init();
-
 protected:
     remote_actor(const std::string& name, std::shared_ptr<actor_system>& actor_system, const actor_ref& network_actor_ref)
             : actor(name, actor_system), network_actor_ref_(network_actor_ref) {
@@ -19,33 +16,7 @@ protected:
                 boost::asio::ip::address().from_string(network_actor_ref.ip), network_actor_ref.port);
     }
 
-    void tell(std::unique_ptr<message> msg) {
-        packet p = message_to_packet(std::move(msg));
-
-        BOOST_LOG_TRIVIAL(debug) << p.data.data;
-
-        tell_(p);
-        //throw new wrong_actor_method("wrong tell method for network actor");
-    }
-
-    /*
-	message string_to_message(int message_type, std::string msg)
-	{
-		message message_object = message(network_actor_ref_, get_self(), msg, message_type);
-		return message_object;
-	}
-
-	void tell(int message_type, std::string msg = "")
-	{
-		message message_object = string_to_message(message_type, msg);
-		tell_(message_object);
-	}
-
-	message future(message& msg, int timeout_ms = 1000)
-	{
-		return future_(msg, timeout_ms);
-	}
-    */
+    void tell(std::unique_ptr<message> msg, bool remote = false);
 
 private:
     boost::asio::ip::udp::endpoint remote_actor_endpoint_;

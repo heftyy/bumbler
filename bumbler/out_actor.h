@@ -26,6 +26,12 @@ protected:
             BOOST_LOG_TRIVIAL(debug) << "[OUT_ACTOR] message was " << in;
         }
 
+        if(is_type<float>(data)) {
+            float in = cast_message<float>(data);
+            BOOST_LOG_TRIVIAL(debug) << "[OUT_ACTOR] message was " << in;
+            reply("1112321321");
+        }
+
         if(is_type<std::string>(data)) {
             std::string in = cast_message<std::string>(data);
             BOOST_LOG_TRIVIAL(debug) << "[OUT_ACTOR] message was " << in;
@@ -36,6 +42,6 @@ protected:
             BOOST_LOG_TRIVIAL(debug) << "[OUT_ACTOR] message was " << in;
         }
 
-        //reply(msg_string, msg.sender);
+        //reply(msg_string, msg.sender_);
     }
 };

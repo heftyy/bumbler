@@ -3,7 +3,7 @@
 #include <memory>
 #include <iostream>
 #include <sstream>
-#include "atan/typed_message.h"
+#include "atan/messages/typed_message.h"
 
 class actor_ref {
 public:
@@ -40,15 +40,21 @@ public:
         return actor_ref();
     }
 
-    //if a string literal is passed to tell i don't want to use them internally, i want to use strings
+    //if a string literal is passed to tell i change it to std::string
     void tell(const char* data, actor_ref sender = actor_ref::none()) {
-        auto msg = std::unique_ptr<typed_message<std::string>>(new typed_message<std::string>(*this, sender, std::string(data)));
+        std::unique_ptr<typed_message<std::string>> msg = std::unique_ptr<typed_message<std::string>>(new typed_message<std::string>(*this, sender, std::string(data)));
         tell_(std::move(msg));
     }
 
     template<typename T>
     void tell(T data, actor_ref sender = actor_ref::none()) {
-        auto msg = std::unique_ptr<typed_message<T>>(new typed_message<T>(*this, sender, data));
+        std::unique_ptr<typed_message<T>> msg = std::unique_ptr<typed_message<T>>(new typed_message<T>(*this, sender, data));
+        tell_(std::move(msg));
+    }
+
+    template<typename T>
+    void tell(typed_message<T>& message) {
+        std::unique_ptr<typed_message<T>> msg = std::unique_ptr<typed_message<T>>(new typed_message<T>(message));
         tell_(std::move(msg));
     }
 

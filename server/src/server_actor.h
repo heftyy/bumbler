@@ -20,11 +20,20 @@ private:
 
     void on_receive(boost::any data) {
 
-        std::string msg = cast_message<std::string>(data);
-
         BOOST_LOG_TRIVIAL(debug) << "[server_actor] on_receive thread id = " << std::this_thread::get_id();
         BOOST_LOG_TRIVIAL(debug) << "server_actor received message from " << get_sender().actor_name;
-        BOOST_LOG_TRIVIAL(debug) << "message was " << msg;
+
+        if(is_type<std::string>(data)) {
+            BOOST_LOG_TRIVIAL(debug) << "message was " << cast_message<std::string>(data);
+        }
+        else if(is_type<int>(data)) {
+            BOOST_LOG_TRIVIAL(debug) << "message was " << cast_message<int>(data);
+        }
+        else if(is_type<float>(data)) {
+            BOOST_LOG_TRIVIAL(debug) << "message was " << cast_message<float>(data);
+            reply("pi");
+        }
+
     }
 };
 

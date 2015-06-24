@@ -52,10 +52,10 @@ public:
 
     template<class Archive>
     void serialize(Archive& ar, const unsigned int version) {
-        ar& players_max;
-        ar& players_online;
-        ar& ping;
-        ar& name;
-        ar& motd;
+        ar & players_max;
+        ar & players_online;
+        ar & ping;
+        ar & name;
+        ar & motd;
     }
 };

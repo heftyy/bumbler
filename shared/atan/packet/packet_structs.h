@@ -7,7 +7,8 @@
 #include <boost/archive/text_iarchive.hpp>
 #include <boost/serialization/vector.hpp>
 
-#include "../typed_message.h"
+#include "../actor/actor_ref.h"
+#include "../messages/typed_message.h"
 
 enum packet_type {
     PACKET_CONNECT, PACKET_DISCONNECT, PACKET_COMMAND, PACKET_RESULT, PACKET_DATA
@@ -15,20 +16,19 @@ enum packet_type {
 
 class packet_header {
 public:
-    friend class boost::serialization::access;
-
     packet_type type;
+
+private:
+    friend class boost::serialization::access;
 
     template<class Archive>
     void serialize(Archive& ar, const unsigned int version) {
-        ar& type;
+        ar & type;
     }
 };
 
 class packet_data {
 public:
-    friend class boost::serialization::access;
-
     //std::vector<char> data;
     std::string data;
 
@@ -40,15 +40,14 @@ public:
 
     packet_data(char *data, size_t length) : data(std::string(data, data + sizeof(char) * length)) { }
 
-    packet_data(std::unique_ptr<message> msg) {
-        std::ostringstream archive_stream;
-        boost::archive::text_oarchive archive(archive_stream);
-        archive << *msg;
-        data = archive_stream.str();
-    }
+    void load(std::unique_ptr<message> msg);
+
+private:
+    friend class boost::serialization::access;
 
     template<class Archive>
     void serialize(Archive& ar, const unsigned int version) {
-        ar& data;
+        ar & data;
     }
 };
+
