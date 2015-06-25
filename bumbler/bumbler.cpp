@@ -18,7 +18,9 @@ int main(int argc, char *argv[]) {
     actor_ref r_actor = actor::create_actor<remote_server_actor>(r_actor_name, r_actor_location, system);
 
     std::string msg = "message";
-//    l_actor.tell("foo");
+//    for(int i = 0; i < 1000; i++) {
+//        l_actor.tell("foo");
+//    }
 
 //    r_actor.tell(1);
 //    r_actor.tell("aaaaa");

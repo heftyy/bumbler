@@ -14,10 +14,12 @@ set(BUMBLER_SOURCE_FILES
 #    bumbler/launcher/server_list.h
     bumbler/bumbler.cpp
     bumbler/out_actor.h
+    bumbler/remote_server_actor.h
     shared/utility.cpp
 )
 
 set(SERVER_SOURCE_FILES
+    server/src/server_actor.h
     server/server.cpp
 )
 
@@ -45,14 +47,14 @@ if(${WIN32})
 #    include( "${wxWidgets_USE_FILE}" )
 ELSE()
     #linux
-    include_directories(../boost_1_55_0)
+    include_directories(../boost_1_58_0)
     include_directories(shared)
     add_subdirectory(shared/atan)
 
     add_definitions(-DBOOST_LOG_DYN_LINK)
     set(Boost_USE_STATIC_LIBS  OFF)
     set(Boost_USE_MULTITHREADED ON)
-    set(BOOST_ROOT ../boost_1_55_0)
+    set(BOOST_ROOT ../boost_1_58_0)
     find_package(Boost COMPONENTS system date_time filesystem log log_setup serialization REQUIRED)
 
     find_package(wxWidgets COMPONENTS core base REQUIRED)

@@ -30,7 +30,7 @@ public:
 protected:
     std::mutex mutex_;
     std::unique_ptr<interruptible_thread> queue_thread_;
-    std::queue<std::shared_ptr<message>> message_queue_;
+    std::queue<std::unique_ptr<message>> message_queue_;
     std::atomic<bool> busy_;
     std::atomic<bool> stop_flag_;
     std::string actor_name_;
@@ -59,8 +59,8 @@ protected:
 
     void read_messages() {
         while (message_queue_.size() > 0) {
-            std::shared_ptr<message> msg = message_queue_.front();
-            run_task(msg);
+            std::unique_ptr<message> msg = std::move(message_queue_.front());
+            run_task(std::move(msg));
             message_queue_.pop();
         }
     }
@@ -86,11 +86,11 @@ protected:
     void add_message(std::unique_ptr<message> msg) {
         BOOST_LOG_TRIVIAL(debug) << "[ACTOR] queueing new task";
         std::unique_lock<std::mutex> lock(this->mutex_);
-        message_queue_.push(std::shared_ptr<message>{std::move(msg)});
+        message_queue_.push(std::move(msg));
         cv.notify_all();
     }
 
-    void run_task(std::shared_ptr<message> msg) {
+    void run_task(std::unique_ptr<message> msg) {
         busy_.store(true);
         BOOST_LOG_TRIVIAL(debug) << "[ACTOR] starting new task";
         this->sender_ = msg->get_sender();
@@ -120,10 +120,7 @@ protected:
 
     template<typename T>
     bool is_type(boost::any& data) {
-        if(data.type() == typeid(T)) {
-            return true;
-        }
-        return false;
+        return data.type() == typeid(T);
     }
 
     packet message_to_packet(std::unique_ptr<message> msg) {
