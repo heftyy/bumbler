@@ -39,11 +39,11 @@ public:
 
 protected:
     template<typename T>
-    std::shared_ptr<cancellable> schedule(typed_message<T>& msg, long initial_delay_ms, long interval_ms) {
+    std::shared_ptr<cancellable> schedule(const typed_message<T>& msg, long initial_delay_ms, long interval_ms) {
         std::shared_ptr<cancellable> ret_cancellable = std::make_shared<cancellable>();
         auto cancel_it = cancellable_vector_.insert(cancellable_vector_it_, ret_cancellable);
 
-        thread_pool_.push([this, &msg, initial_delay_ms, interval_ms, ret_cancellable, cancel_it](int id) {
+        thread_pool_.push([this, msg, initial_delay_ms, interval_ms, ret_cancellable, cancel_it](int id) {
             ret_cancellable->thread_id = std::this_thread::get_id();
 
             if (initial_delay_ms > 0) {
@@ -81,7 +81,7 @@ protected:
     }
 
     template<typename T>
-    std::shared_ptr<cancellable> schedule_once(typed_message<T>& msg, long initial_delay_ms) {
+    std::shared_ptr<cancellable> schedule_once(const typed_message<T>& msg, long initial_delay_ms) {
         return schedule<T>(msg, initial_delay_ms, 0);
     }
 

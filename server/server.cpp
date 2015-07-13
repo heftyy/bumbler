@@ -2,8 +2,8 @@
 //
 
 #include <atan/actor_system/actor_system.h>
+#include <communication/serializable_types.h>
 #include "src/server_actor.h"
-#include "../shared/communication/serializable_types.h"
 
 int main(int argc, char *argv[]) {
     try {

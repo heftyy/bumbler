@@ -2,8 +2,8 @@
 #include <atan/actor_system/actor_system.h>
 
 #include "out_actor.h"
+#include "out_router.h"
 #include "remote_server_actor.h"
-#include "../shared/communication/serializable_types.h"
 
 int main(int argc, char *argv[]) {
 
@@ -17,10 +17,24 @@ int main(int argc, char *argv[]) {
 
     actor_ref r_actor = actor::create_actor<remote_server_actor>(r_actor_name, r_actor_location, system);
 
-    std::string msg = "message";
-//    for(int i = 0; i < 1000; i++) {
-//        l_actor.tell("foo");
-//    }
+    std::string msg = "BLAM";
+
+    actor_ref l_router = actor::create_actor<out_router>("out_router", system);
+
+    for(int i = 0; i < 10; i++) {
+        l_router.tell(msg);
+    }
+
+    /*
+    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+    BOOST_LOG_TRIVIAL(debug) << "ROUTER DONE";
+
+    for(int i = 0; i < 1000; i++) {
+        l_actor.tell(msg);
+    }
+
+    BOOST_LOG_TRIVIAL(debug) << "ACTOR DONE";
+     */
 
 //    r_actor.tell(1);
 //    r_actor.tell("aaaaa");
@@ -28,12 +42,7 @@ int main(int argc, char *argv[]) {
 //    r_actor.tell(3.14f, l_actor);
 
 //    r_actor.tell(3.14f);
-
-    typed_message<std::string> tm;
-    tm.set_target(l_actor);
-    tm.set_sender(r_actor);
-    tm.data = "BLAM";
-    system->schedule(tm, 500, 900);
+//    system->schedule(msg, l_actor, r_actor, 500, 900);
 
     std::chrono::milliseconds sleep_duration(2000);
     std::this_thread::sleep_for(sleep_duration);

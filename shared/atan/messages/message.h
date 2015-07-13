@@ -8,15 +8,15 @@ class actor_ref;
 
 class message {
 public:
-    virtual boost::any get_data() = 0;
+    virtual boost::any get_data() const = 0;
 
-    virtual actor_ref& get_sender() = 0;
+    virtual actor_ref& get_sender() const = 0;
 
-    virtual actor_ref& get_target() = 0;
+    virtual actor_ref& get_target() const = 0;
 
-    virtual void set_sender(actor_ref& sender) = 0;
+    virtual void set_sender(const actor_ref& sender) = 0;
 
-    virtual void set_target(actor_ref& target) = 0;
+    virtual void set_target(const actor_ref& target) = 0;
 
     virtual ~message() {}
 

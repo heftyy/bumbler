@@ -12,6 +12,7 @@ set(BUMBLER_SOURCE_FILES
 #    bumbler/launcher/server_info.cpp
 #    bumbler/launcher/server_info.h
 #    bumbler/launcher/server_list.h
+    bumbler/out_router.h
     bumbler/bumbler.cpp
     bumbler/out_actor.h
     bumbler/remote_server_actor.h

@@ -29,7 +29,6 @@ protected:
         if(is_type<float>(data)) {
             float in = cast_message<float>(data);
             BOOST_LOG_TRIVIAL(debug) << "[OUT_ACTOR] message was " << in;
-            reply("1112321321");
         }
 
         if(is_type<std::string>(data)) {
@@ -41,6 +40,8 @@ protected:
             char* in = cast_message<char*>(data);
             BOOST_LOG_TRIVIAL(debug) << "[OUT_ACTOR] message was " << in;
         }
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
         //reply(msg_string, msg.sender_);
     }

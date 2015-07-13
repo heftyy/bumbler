@@ -17,6 +17,9 @@ set(ATAN_SOURCES
   actor_system/actor_system.h
   actor_system/actor_system_errors.h
   actor_system/udp_server.h
+  actor/router/router.h
+  actor/router/random_router.cpp
+  actor/router/random_router.h
   packet/packet.h
   packet/packet_exceptions.h
   packet/packet_structs.h

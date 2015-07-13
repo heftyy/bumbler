@@ -22,9 +22,9 @@ public:
 
     typed_message() { }
 
-    typed_message(actor_ref& target, actor_ref& sender, T data) {
-        this->target = std::make_shared<actor_ref>(target);
-        this->sender = std::make_shared<actor_ref>(sender);
+    typed_message(const actor_ref& target, const actor_ref& sender, T data) {
+        this->set_target(target);
+        this->set_sender(sender);
         this->data = data;
     }
 
@@ -34,23 +34,23 @@ public:
         this->data = data;
     }
 
-    boost::any get_data() {
+    boost::any get_data() const {
         return data;
     }
 
-    actor_ref& get_sender() {
+    actor_ref& get_sender() const {
         return *sender.get();
     }
 
-    actor_ref& get_target() {
+    actor_ref& get_target() const {
         return *target.get();
     }
 
-    void set_sender(actor_ref& sender) {
+    void set_sender(const actor_ref& sender) {
         this->sender = std::make_shared<actor_ref>(sender);
     }
 
-    void set_target(actor_ref& target) {
+    void set_target(const actor_ref& target) {
         this->target = std::make_shared<actor_ref>(target);
     }
 

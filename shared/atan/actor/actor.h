@@ -43,7 +43,7 @@ protected:
 
     ~actor();
 
-    actor_ref init();
+    virtual actor_ref init();
 
     virtual void tell(std::unique_ptr<message> msg, bool remote = false) {
         atan_error(ATAN_WRONG_ACTOR_METHOD, "virtual tell called, should never happen");
