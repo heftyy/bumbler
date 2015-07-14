@@ -19,7 +19,7 @@ int main(int argc, char *argv[]) {
 
     std::string msg = "BLAM";
 
-    actor_ref l_router = actor::create_actor<out_router>("out_router", system);
+    actor_ref l_router = actor::create_router<out_router>("out_router", system);
 
     for(int i = 0; i < 10; i++) {
         l_router.tell(msg);

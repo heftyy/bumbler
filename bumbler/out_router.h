@@ -2,15 +2,15 @@
 
 #include <iostream>
 #include <atomic>
-#include <atan/actor/router/random_router.h>
+#include <atan/actor/router/round_robin_router.h>
 #include <atan/actor_system/actor_system.h>
 #include <communication/message_settings.h>
 
-class out_router : public random_router
+class out_router : public round_robin_router
 {
 public:
     out_router(std::string name, std::shared_ptr<actor_system> actor_system)
-            : random_router(name, actor_system, 3) { }
+            : round_robin_router(name, actor_system, 3), messages_(0) { }
 
     ~out_router() {
         BOOST_LOG_TRIVIAL(debug) << "[OUT_ROUTER] destructor";
@@ -19,8 +19,10 @@ public:
 protected:
 
     void on_receive(boost::any data) {
+        messages_++;
+
         BOOST_LOG_TRIVIAL(debug) << "[OUT_ROUTER] on_receive thread id = " << std::this_thread::get_id();
-        BOOST_LOG_TRIVIAL(debug) << "[OUT_ROUTER] received message from " << get_sender().actor_name;
+        BOOST_LOG_TRIVIAL(debug) << "[OUT_ROUTER] received message from " << get_sender().actor_name << " message count = " << messages_;
 
         if(is_type<int>(data)) {
             int in = cast_message<int>(data);
@@ -46,4 +48,7 @@ protected:
 
         //reply(msg_string, msg.sender_);
     }
+
+private:
+    int messages_;
 };

@@ -19,6 +19,8 @@ class actor_system;
 class actor : public std::enable_shared_from_this<actor> {
 public:
     friend class actor_system;
+    friend class random_router;
+    friend class round_robin_router;
 
     template<class T, typename ...Args>
     static actor_ref create_actor(Args&& ...args) {
@@ -26,6 +28,16 @@ public:
         actor->init();
         return actor->get_self();
     }
+
+    template<class T, typename ...Args>
+    static actor_ref create_router(Args&& ...args) {
+        std::shared_ptr<T> router = std::shared_ptr<T>(new T(args...));
+        router->init();
+        router->template create_actors<T>();
+        return router->get_self();
+    }
+
+    ~actor();
 
 protected:
     std::mutex mutex_;
@@ -40,8 +52,6 @@ protected:
     actor_ref self_;
 
     actor(const std::string name, std::weak_ptr<actor_system> actor_system);
-
-    ~actor();
 
     virtual actor_ref init();
 
