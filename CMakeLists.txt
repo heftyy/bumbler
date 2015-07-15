@@ -20,7 +20,7 @@ set(BUMBLER_SOURCE_FILES
 )
 
 set(SERVER_SOURCE_FILES
-    server/src/server_actor.h
+    server/server_actor.h
     server/server.cpp
 )
 
@@ -42,6 +42,8 @@ if(${WIN32})
     find_package(Boost 1.58 COMPONENTS system date_time regex filesystem log log_setup serialization REQUIRED)
     find_library(ws2_32_LIBRARY_PATH ws2_32)
 
+    #set(CMAKE_RUNTIME_OUTPUT_DIRECTORY F:/github/bumbler/bin)
+
 #    set(wxWidgets_ROOT_DIR "F:/github/wxWidgets")
 #    set(wxWidgets_LIB_DIR "F:/github/wxWidgets/lib/gcc_dll")
 #    find_package(wxWidgets COMPONENTS REQUIRED core base)
@@ -60,6 +62,8 @@ ELSE()
 
     find_package(wxWidgets COMPONENTS core base REQUIRED)
     include( "${wxWidgets_USE_FILE}" )
+
+    #set(CMAKE_RUNTIME_OUTPUT_DIRECTORY /home/szymon/workspaces/workspaceC++/bumbler/build)
 ENDIF()
 
 add_executable(bumbler ${BUMBLER_SOURCE_FILES})
@@ -73,5 +77,3 @@ target_link_libraries(bumbler ${ws2_32_LIBRARY_PATH})
 target_link_libraries(server ${Boost_LIBRARIES})
 target_link_libraries(server atan)
 target_link_libraries(server ${ws2_32_LIBRARY_PATH})
-
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY F:/github/bumbler/bin)

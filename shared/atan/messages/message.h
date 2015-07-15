@@ -24,6 +24,14 @@ public:
         return false;
     }
 
+    virtual bool is_stop_actor() const {
+        return false;
+    }
+
+    virtual bool is_kill_actor() const {
+        return false;
+    }
+
 private:
     friend class boost::serialization::access;
     template<class Archive>

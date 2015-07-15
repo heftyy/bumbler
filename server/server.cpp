@@ -3,14 +3,14 @@
 
 #include <atan/actor_system/actor_system.h>
 #include <communication/serializable_types.h>
-#include "src/server_actor.h"
+#include "out_router.h"
 
 int main(int argc, char *argv[]) {
     try {
         std::shared_ptr<actor_system> system = std::shared_ptr<actor_system>(new actor_system("server_system", 4445));
         system->init();
 
-        actor_ref local_actor = actor::create_actor<server_actor>("server_print_actor", system);
+        actor_ref l_router = actor::create_router<out_router>("out_router", system);
 
         std::string input;
         while (1) {

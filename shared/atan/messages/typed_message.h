@@ -60,8 +60,8 @@ private:
     void serialize(Archive& ar, const unsigned int version) {
         boost::serialization::void_cast_register<typed_message, message>();
 
-        ar & sender;
-        ar & target;
-        ar & data;
+        ar & this->sender;
+        ar & this->target;
+        ar & this->data;
     }
 };
