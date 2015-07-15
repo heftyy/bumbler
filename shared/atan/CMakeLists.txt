@@ -35,4 +35,4 @@ set(ATAN_SOURCES
   )
 
 add_definitions(-DBOOST_LOG_DYN_LINK)
-add_library(atan STATIC ${ATAN_SOURCES} messages/broadcast.h)
+add_library(atan STATIC ${ATAN_SOURCES})

@@ -38,11 +38,12 @@ public:
             receive(std::move(packet), sender_endpoint);
         };
 
-        io_service_thread_ = std::unique_ptr<std::thread>(new std::thread([this]() {
-            BOOST_LOG_TRIVIAL(debug) << "[ACTOR_SYSTEM_SERVER] STARTED ON PORT " << port_;
-            io_service_.run();
-        })
-        );
+        io_service_thread_ = std::unique_ptr<std::thread>(new std::thread(
+                [this]() {
+                    BOOST_LOG_TRIVIAL(debug) << "[ACTOR_SYSTEM_SERVER] STARTED ON PORT " << port_;
+                    io_service_.run();
+                }
+        ));
     }
 
     /**
@@ -82,18 +83,18 @@ public:
         return 0;
     }
 
-    int remove_actor(std::shared_ptr<actor> actor) {
+    int stop_actor(std::string actor_name, bool wait = false) {
         if (stopped_) return atan_error(ACTOR_SYSTEM_STOPPED, system_name_);
         std::lock_guard<std::mutex> guard(actors_mutex_);
 
-        auto search = actors_.find(actor->actor_name());
+        auto search = actors_.find(actor_name);
         if (search != actors_.end()) {
+            actors_[actor_name]->stop_actor(wait);
             actors_.erase(search);
         }
         else {
-            return atan_error(ATAN_ACTOR_NOT_FOUND, actor->actor_name());
+            return atan_error(ATAN_ACTOR_NOT_FOUND, actor_name);
         }
-        //throw new actor_not_found(actor->actor_name());
     }
 
     int tell_actor(std::unique_ptr<message> msg) {

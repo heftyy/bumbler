@@ -15,16 +15,21 @@ int main(int argc, char *argv[]) {
     std::string r_actor_name = "remote_server_actor";
     std::string r_actor_location = "server_print_actor$server_system@127.0.0.1:4445";
 
-    actor_ref r_actor = actor::create_actor<remote_server_actor>(r_actor_name, r_actor_location, system);
+//    actor_ref r_actor = actor::create_actor<remote_server_actor>(r_actor_name, r_actor_location, system);
 
     std::string msg = "BLAM";
 
-//    l_actor.tell(msg);
+    l_actor.tell(msg);
+    l_actor.kill();
 
     actor_ref l_router = actor::create_router<out_router>("out_router", system);
     actor_ref sender = actor_ref::none();
 
-    l_router.tell(broadcast<std::string>(l_router, sender, msg));
+//    l_router.tell(broadcast<std::string>(l_router, sender, msg));
+
+    l_router.kill();
+
+    BOOST_LOG_TRIVIAL(debug) << "router exists = " << l_router.exists();
 
     /*
     std::this_thread::sleep_for(std::chrono::milliseconds(2000));

@@ -33,5 +33,13 @@ protected:
     actor& get_actor(int i) {
         return *this->actors[i];
     }
+
+private:
+
+    void stop_actor(bool wait = false) {
+        actor::stop_actor(wait);
+        this->thread_pool.stop(wait);
+    }
+
 };
 

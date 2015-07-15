@@ -169,7 +169,7 @@ private:
     }
 
     /** synchronous wait for the actor to end all tasks and stop all thread */
-    void stop_actor(bool wait = false) {
+    virtual void stop_actor(bool wait = false) {
         if (!wait)
             clear_queue();
 

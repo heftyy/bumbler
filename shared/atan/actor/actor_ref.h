@@ -65,6 +65,16 @@ public:
         tell_(std::move(msg));
     }
 
+    /*
+     * Stops the actor after all the received message are read.
+     */
+    void stop();
+
+    /*
+     * Discards all waiting messages and stops the actor as soon as possible.
+     */
+    void kill();
+
     bool exists() const {
         return actor_name.length() > 0 && system_name.length() > 0;
     }
@@ -82,6 +92,13 @@ public:
     }
 
 private:
+    void reset() {
+        this->actor_name = "";
+        this->system_name = "";
+        this->ip = "";
+        this->port = 0;
+    }
+
     void tell_(std::unique_ptr<message> msg) const;
 
 };

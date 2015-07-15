@@ -20,7 +20,9 @@ public:
 
     virtual ~message() {}
 
-    virtual bool is_broadcast() const = 0;
+    virtual bool is_broadcast() const {
+        return false;
+    }
 
 private:
     friend class boost::serialization::access;
