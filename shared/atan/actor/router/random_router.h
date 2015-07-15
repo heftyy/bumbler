@@ -15,7 +15,7 @@ protected:
         this->distribution_ = std::uniform_int_distribution<>(0, this->size-1);
     }
 
-    void tell(std::unique_ptr<message> msg, bool remote = false);
+    void tell_actor(std::unique_ptr<message> msg);
 
 private:
     std::random_device rd_;

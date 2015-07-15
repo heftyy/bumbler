@@ -4,6 +4,7 @@
 #include <iostream>
 #include <sstream>
 #include "atan/messages/typed_message.h"
+#include "atan/messages/broadcast.h"
 
 class actor_ref {
 public:
@@ -53,8 +54,14 @@ public:
     }
 
     template<typename T>
-    void tell(typed_message<T>& message) const {
+    void tell(typed_message<T> message) const {
         std::unique_ptr<typed_message<T>> msg = std::unique_ptr<typed_message<T>>(new typed_message<T>(message));
+        tell_(std::move(msg));
+    }
+
+    template<typename T>
+    void tell(broadcast<T> message) const {
+        std::unique_ptr<broadcast<T>> msg = std::unique_ptr<broadcast<T>>(new broadcast<T>(message));
         tell_(std::move(msg));
     }
 

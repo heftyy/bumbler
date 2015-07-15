@@ -20,6 +20,8 @@ public:
 
     virtual ~message() {}
 
+    virtual bool is_broadcast() const = 0;
+
 private:
     friend class boost::serialization::access;
     template<class Archive>

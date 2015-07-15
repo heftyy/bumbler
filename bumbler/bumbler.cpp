@@ -19,11 +19,12 @@ int main(int argc, char *argv[]) {
 
     std::string msg = "BLAM";
 
-    actor_ref l_router = actor::create_router<out_router>("out_router", system);
+//    l_actor.tell(msg);
 
-    for(int i = 0; i < 10; i++) {
-        l_router.tell(msg);
-    }
+    actor_ref l_router = actor::create_router<out_router>("out_router", system);
+    actor_ref sender = actor_ref::none();
+
+    l_router.tell(broadcast<std::string>(l_router, sender, msg));
 
     /*
     std::this_thread::sleep_for(std::chrono::milliseconds(2000));

@@ -54,6 +54,10 @@ public:
         this->target = std::make_shared<actor_ref>(target);
     }
 
+    bool is_broadcast() const {
+        return false;
+    }
+
 private:
     friend class boost::serialization::access;
     template<class Archive>

@@ -1,7 +1,6 @@
 #include "round_robin_router.h"
 
-void round_robin_router::tell(std::unique_ptr<message> msg, bool remote) {
-
+void round_robin_router::tell_actor(std::unique_ptr<message> msg) {
     this->thread_pool.push(
             std::bind(
                     [this] (std::unique_ptr<message>& m, int actor_id) {
@@ -14,5 +13,4 @@ void round_robin_router::tell(std::unique_ptr<message> msg, bool remote) {
     if(this->current_actor_to_message >= this->size) {
         this->current_actor_to_message = 0;
     }
-
 }

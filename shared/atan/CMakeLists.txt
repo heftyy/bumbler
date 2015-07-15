@@ -7,6 +7,7 @@ set(ATAN_SOURCES
   messages/message.h
   messages/typed_message.h
   messages/serialization_utility.h
+  messages/broadcast.h
   actor/actor.cpp
   actor/remote_actor.cpp
   actor/local_actor.cpp
@@ -34,4 +35,4 @@ set(ATAN_SOURCES
   )
 
 add_definitions(-DBOOST_LOG_DYN_LINK)
-add_library(atan STATIC ${ATAN_SOURCES})
+add_library(atan STATIC ${ATAN_SOURCES} messages/broadcast.h)

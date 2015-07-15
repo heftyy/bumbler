@@ -17,6 +17,9 @@ protected:
     }
 
     actor_ref init();
+    virtual void tell_actor(std::unique_ptr<message> msg) = 0;
+    virtual void tell(std::unique_ptr<message> msg, bool remote = false);
+    void tell_all(std::unique_ptr<message> msg);
 
     template<typename T>
     void create_actors() {
@@ -30,7 +33,5 @@ protected:
     actor& get_actor(int i) {
         return *this->actors[i];
     }
-
-    virtual void tell(std::unique_ptr<message> msg, bool remote = false) = 0;
 };
 

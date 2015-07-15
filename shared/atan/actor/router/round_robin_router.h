@@ -13,7 +13,7 @@ public:
         this->current_actor_to_message = 0;
     }
 
-    void tell(std::unique_ptr<message> msg, bool remote = false);
+    void tell_actor(std::unique_ptr<message> msg);
 
 private:
     std::atomic<int> current_actor_to_message;

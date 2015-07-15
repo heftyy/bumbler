@@ -6,7 +6,9 @@
 #include <queue>
 #include <thread>
 #include <memory>
+#include <type_traits>
 #include <logger/logger.h>
+#include <boost/static_assert.hpp>
 #include "actor_ref.h"
 #include "../actor_system/actor_system_errors.h"
 #include "../messages/message.h"
@@ -15,15 +17,22 @@
 #include "../../utility.h"
 
 class actor_system;
+class router;
 
 class actor : public std::enable_shared_from_this<actor> {
 public:
     friend class actor_system;
+    friend class router;
     friend class random_router;
     friend class round_robin_router;
 
     template<class T, typename ...Args>
     static actor_ref create_actor(Args&& ...args) {
+        BOOST_STATIC_ASSERT_MSG(
+                !(std::is_base_of<router, T>::value),
+                "T cannot be a descendant of router"
+        );
+
         std::shared_ptr<T> actor = std::shared_ptr<T>(new T(args...));
         actor->init();
         return actor->get_self();
@@ -31,6 +40,11 @@ public:
 
     template<class T, typename ...Args>
     static actor_ref create_router(Args&& ...args) {
+        BOOST_STATIC_ASSERT_MSG(
+                (std::is_base_of<router, T>::value),
+                "T has be a descendant of router"
+        );
+
         std::shared_ptr<T> router = std::shared_ptr<T>(new T(args...));
         router->init();
         router->template create_actors<T>();
@@ -123,14 +137,17 @@ protected:
 
     template<typename T>
     T cast_message(boost::any& data) {
-        if(data.type() == typeid(T)) {
+        if(data.type().hash_code() == typeid(T).hash_code()) {
             return boost::any_cast<T>(data);
+        }
+        else {
+            throw std::runtime_error("Types mismatch in cast_message");
         }
     }
 
     template<typename T>
     bool is_type(boost::any& data) {
-        return data.type() == typeid(T);
+        return data.type().hash_code() == typeid(T).hash_code();
     }
 
     packet message_to_packet(std::unique_ptr<message> msg) {
