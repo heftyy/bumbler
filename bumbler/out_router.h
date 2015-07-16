@@ -25,7 +25,7 @@ protected:
         BOOST_LOG_TRIVIAL(debug) << "[OUT_ROUTER] received message from " << get_sender().actor_name << " message count = " << messages_;
 
         if(is_type<int>(data)) {
-            int in = cast_message<float>(data);
+            int in = cast_message<int>(data);
             BOOST_LOG_TRIVIAL(debug) << "[OUT_ROUTER] message was " << in;
         }
 
