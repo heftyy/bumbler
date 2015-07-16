@@ -8,6 +8,8 @@ set(ATAN_SOURCES
   messages/typed_message.h
   messages/serialization_utility.h
   messages/broadcast.h
+  messages/stop_actor.h
+  messages/kill_actor.h
   actor/actor.cpp
   actor/remote_actor.cpp
   actor/local_actor.cpp

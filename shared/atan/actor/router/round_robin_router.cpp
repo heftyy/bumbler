@@ -5,7 +5,7 @@ void round_robin_router::tell_one(std::unique_ptr<message> msg) {
             std::bind(
                     [this] (std::unique_ptr<message>& m, int actor_id) {
                         BOOST_LOG_TRIVIAL(debug) << "CURRENT ACTOR IS = " << actor_id;
-                        this->actors[actor_id]->on_receive(m->get_data());
+                        this->actors[actor_id]->run_task(m->get_sender(), m->get_data());
                     }, std::move(msg), this->current_actor_to_message++
             )
     );

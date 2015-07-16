@@ -25,7 +25,7 @@ void router::tell_all(std::unique_ptr<message> msg) {
                 std::bind(
                         [this] (std::shared_ptr<message>& m, int actor_id) {
                             BOOST_LOG_TRIVIAL(debug) << "CURRENT ACTOR IS = " << actor_id;
-                            this->actors[actor_id]->on_receive(m->get_data());
+                            this->actors[actor_id]->run_task(m->get_sender(), m->get_data());
                         }, shared_message, i
                 )
         );

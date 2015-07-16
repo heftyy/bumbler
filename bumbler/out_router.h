@@ -25,7 +25,7 @@ protected:
         BOOST_LOG_TRIVIAL(debug) << "[OUT_ROUTER] received message from " << get_sender().actor_name << " message count = " << messages_;
 
         if(is_type<int>(data)) {
-            int in = cast_message<int>(data);
+            int in = cast_message<float>(data);
             BOOST_LOG_TRIVIAL(debug) << "[OUT_ROUTER] message was " << in;
         }
 
@@ -47,6 +47,10 @@ protected:
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
         //reply(msg_string, msg.sender_);
+    }
+
+    void on_error(boost::any data, std::exception ex) {
+        BOOST_LOG_TRIVIAL(error) << "error happend: " << ex.what();
     }
 
 private:

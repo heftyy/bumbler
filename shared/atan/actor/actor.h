@@ -77,6 +77,10 @@ protected:
         atan_error(ATAN_WRONG_ACTOR_METHOD, "virtual on_receive called, should never happen");
     };
 
+    virtual void on_error(boost::any data, std::exception ex) {
+        atan_error(ATAN_WRONG_ACTOR_METHOD, "virtual on_error called, override if needed");
+    };
+
     std::string actor_name();
 
     std::string system_name();
@@ -84,7 +88,7 @@ protected:
     void read_messages() {
         while (message_queue_.size() > 0) {
             std::unique_ptr<message> msg = std::move(message_queue_.front());
-            run_task(std::move(msg));
+            run_task(msg->get_sender(), msg->get_data());
             message_queue_.pop();
         }
     }
@@ -114,11 +118,18 @@ protected:
         cv.notify_all();
     }
 
-    void run_task(std::unique_ptr<message> msg) {
+    void run_task(actor_ref& sender, boost::any data) {
         busy_.store(true);
         BOOST_LOG_TRIVIAL(debug) << "[ACTOR] starting new task";
-        this->sender_ = msg->get_sender();
-        on_receive(msg->get_data());
+        this->sender_ = sender;
+
+        try {
+            on_receive(data);
+        }
+        catch(std::exception ex) {
+            on_error(data, ex);
+        }
+
         this->sender_ = actor_ref::none();
         busy_.store(false);
     }
@@ -170,6 +181,10 @@ private:
 
     /** synchronous wait for the actor to end all tasks and stop all thread */
     virtual void stop_actor(bool wait = false) {
+        if(stop_flag_) {
+            return;
+        }
+
         if (!wait)
             clear_queue();
 

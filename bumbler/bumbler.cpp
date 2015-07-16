@@ -32,9 +32,9 @@ int main(int argc, char *argv[]) {
 
 //    l_router.tell(broadcast<std::string>(l_router, sender, msg));
 
-    l_router.tell(stop_actor(l_router, sender));
+    l_router.tell(3);
 
-//    l_router.stop();
+    l_router.stop();
 
     BOOST_LOG_TRIVIAL(debug) << "router exists = " << l_router.exists();
 
