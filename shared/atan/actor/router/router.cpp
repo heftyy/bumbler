@@ -13,7 +13,7 @@ void router::tell(std::unique_ptr<message> msg, bool remote) {
         this->tell_all(std::move(msg));
     }
     else {
-        this->tell_actor(std::move(msg));
+        this->tell_one(std::move(msg));
     }
 }
 

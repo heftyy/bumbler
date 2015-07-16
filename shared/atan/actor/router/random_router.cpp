@@ -1,6 +1,6 @@
 #include "random_router.h"
 
-void random_router::tell_actor(std::unique_ptr<message> msg) {
+void random_router::tell_one(std::unique_ptr<message> msg) {
 
     this->thread_pool.push(
             std::bind(

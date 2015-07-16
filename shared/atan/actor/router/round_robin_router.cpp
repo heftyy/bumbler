@@ -1,6 +1,6 @@
 #include "round_robin_router.h"
 
-void round_robin_router::tell_actor(std::unique_ptr<message> msg) {
+void round_robin_router::tell_one(std::unique_ptr<message> msg) {
     this->thread_pool.push(
             std::bind(
                     [this] (std::unique_ptr<message>& m, int actor_id) {

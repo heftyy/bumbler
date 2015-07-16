@@ -13,28 +13,30 @@ int main(int argc, char *argv[]) {
 	std::shared_ptr<actor_system> system = std::shared_ptr<actor_system>(new actor_system("bumbler_system", 4444));
 	system->init();
 
-//	actor_ref l_actor = actor::create_actor<out_actor>("out_actor", system);
+	actor_ref l_actor = actor::create_actor<out_actor>("out_actor", system);
 
     std::string r_actor_name = "remote_server_actor";
     std::string r_actor_location = "out_router$server_system@127.0.0.1:4445";
 
     std::string msg = "BLAM";
 
-    actor_ref r_actor = actor::create_actor<remote_server_actor>(r_actor_name, r_actor_location, system);
+//    actor_ref r_actor = actor::create_actor<remote_server_actor>(r_actor_name, r_actor_location, system);
 //    for(int i = 0; i < 20; i++) r_actor.tell(msg);
 
-    actor_ref sender = actor_ref::none();
-    r_actor.tell(broadcast<std::string>(r_actor, sender, msg));
-
-
-//    actor_ref l_router = actor::create_router<out_router>("out_router", system);
 //    actor_ref sender = actor_ref::none();
-//
+//    r_actor.tell(broadcast<std::string>(r_actor, sender, msg));
+
+
+    actor_ref l_router = actor::create_router<out_router>("out_router", system);
+    actor_ref sender = actor_ref::none();
+
 //    l_router.tell(broadcast<std::string>(l_router, sender, msg));
-//
+
+    l_router.tell(stop_actor(l_router, sender));
+
 //    l_router.stop();
-//
-//    BOOST_LOG_TRIVIAL(debug) << "router exists = " << l_router.exists();
+
+    BOOST_LOG_TRIVIAL(debug) << "router exists = " << l_router.exists();
 
     /*
     std::this_thread::sleep_for(std::chrono::milliseconds(2000));

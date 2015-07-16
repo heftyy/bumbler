@@ -104,7 +104,6 @@ public:
             return atan_error(ATAN_WRONG_ACTOR_SYSTEM, msg->get_target().system_name);
 
         std::lock_guard<std::mutex> guard(actors_mutex_);
-
         std::string actor_name = msg->get_target().actor_name;
 
         auto search = actors_.find(actor_name);
