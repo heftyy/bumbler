@@ -6,6 +6,7 @@ public:
     T data;
 
     kill_actor() {}
+    kill_actor(const char* data) : data(std::string(data)) {}
     kill_actor(T data) : data(data) {}
 
 private:

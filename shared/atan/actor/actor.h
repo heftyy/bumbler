@@ -12,6 +12,7 @@
 #include "actor_ref.h"
 #include "../actor_system/actor_system_errors.h"
 #include "../messages/message.h"
+#include "../messages/commands/commands.h"
 #include "../interruptible_thread.h"
 #include "../packet/packet.h"
 #include "../../utility.h"
@@ -104,13 +105,33 @@ protected:
     template<typename T>
     void reply(T data) {
         if (stop_flag_.load()) return;
-        std::unique_ptr<typed_message<T>> typed_msg = std::unique_ptr<typed_message<T>>(new typed_message<T>());
-        typed_msg->data = data;
-
-        typed_msg->set_sender(get_self());
-        typed_msg->set_target(get_sender());
+        auto typed_msg = construct_reply_message(data);
 
         send_reply_message(std::move(typed_msg));
+    }
+
+    template<typename T>
+    std::unique_ptr<typed_message<T>> construct_reply_message(T data) {
+        auto typed_msg = std::unique_ptr<typed_message<T>>(new typed_message<T>(get_sender(), get_self(), data));
+        return std::move(typed_msg);
+    }
+
+    template<typename T>
+    std::unique_ptr<typed_message<T>> construct_reply_message(broadcast<T> broadcast) {
+        auto typed_msg = std::unique_ptr<typed_message<T>>(new typed_message<T>(get_sender(), get_self(), broadcast));
+        return std::move(typed_msg);
+    }
+
+    template<typename T>
+    std::unique_ptr<typed_message<T>> construct_reply_message(stop_actor<T> stop_actor) {
+        auto typed_msg = std::unique_ptr<typed_message<T>>(new typed_message<T>(get_sender(), get_self(), stop_actor));
+        return std::move(typed_msg);
+    }
+
+    template<typename T>
+    std::unique_ptr<typed_message<T>> construct_reply_message(kill_actor<T> kill_actor) {
+        auto typed_msg = std::unique_ptr<typed_message<T>>(new typed_message<T>(get_sender(), get_self(), kill_actor));
+        return std::move(typed_msg);
     }
 
     bool is_busy() { return busy_; }

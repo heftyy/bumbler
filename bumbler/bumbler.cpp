@@ -32,12 +32,14 @@ int main(int argc, char *argv[]) {
 
 //    l_router.tell(broadcast<std::string>(l_router, r_actor, msg));
 
-    l_router.tell(broadcast<std::string>("Aaaaa"));
-    l_router.tell(stop_actor<std::string>("DIE"));
+    l_actor.tell("KAPOW", l_router);
 
-    r_actor.tell(broadcast<std::string>("BRRRR"));
+//    l_router.tell(broadcast<std::string>("Aaaaa"));
+//    l_router.tell(stop_actor<std::string>("DIE"));
 
-    BOOST_LOG_TRIVIAL(debug) << "router is valid = " << l_router.is_none();
+//    r_actor.tell(broadcast<std::string>("BRRRR"), l_router);
+
+    BOOST_LOG_TRIVIAL(debug) << "BEFORE SLEEP";
 
     std::chrono::milliseconds sleep_duration(2000);
     std::this_thread::sleep_for(sleep_duration);

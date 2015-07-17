@@ -6,6 +6,7 @@ public:
     T data;
 
     broadcast() { }
+    broadcast(const char* data) : data(std::string(data)) {}
     broadcast(T data) : data(data) {}
 
 private:

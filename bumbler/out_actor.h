@@ -4,6 +4,7 @@
 #include <atomic>
 #include <atan/actor/local_actor.h>
 #include <atan/actor_system/actor_system.h>
+#include <atan/messages/commands/commands.h>
 #include <communication/message_settings.h>
 
 class out_actor : public local_actor {
@@ -33,6 +34,7 @@ protected:
         if(is_type<std::string>(data)) {
             std::string in = cast_message<std::string>(data);
             BOOST_LOG_TRIVIAL(debug) << "[OUT_ACTOR] message was " << in;
+            reply(::stop_actor<std::string>("HAH!"));
         }
 
         if(is_type<char*>(data)) {

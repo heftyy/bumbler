@@ -6,6 +6,7 @@ public:
     T data;
 
     stop_actor() {}
+    stop_actor(const char* data) : data(std::string(data)) {}
     stop_actor(T data) : data(data) {}
 
 private:
