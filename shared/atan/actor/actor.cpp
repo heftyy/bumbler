@@ -54,7 +54,7 @@ void actor::send_reply_message(std::unique_ptr<message> msg) {
     //actor is local
     if(ac != nullptr) {
         actor_ref actor_from_system = ac->get_actor(msg->get_target().actor_name);
-        if(actor_from_system.exists()) {
+        if(actor_from_system.is_none()) {
             ac->tell_actor(std::move(msg));
             return;
         }
@@ -80,4 +80,21 @@ void actor::send_reply_message(std::unique_ptr<message> msg) {
             BOOST_LOG_TRIVIAL(error) << "[ACTOR] reply has failed: " << e.what();
         }
     }
+}
+
+void actor::pass_message(std::unique_ptr<message> msg, bool remote) {
+    if(msg->is_kill_actor()) {
+        this->actor_system_.lock()->stop_actor(this->actor_name_, false);
+    }
+    else if(msg->is_stop_actor()) {
+        this->actor_system_.lock()->stop_actor(this->actor_name_, true);
+    }
+    else {
+        this->tell(std::move(msg), remote);
+    }
+}
+
+bool actor::compare(std::shared_ptr<actor> actor) {
+    return this->actor_name().compare(actor->actor_name()) == 0 &&
+           this->actor_system_.lock()->system_name_.compare(actor->actor_system_.lock()->system_name_) == 0;
 }

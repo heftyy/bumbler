@@ -16,7 +16,6 @@ public:
     }
 
 protected:
-
     void on_receive(boost::any data) {
         BOOST_LOG_TRIVIAL(debug) << "[OUT_ACTOR] on_receive thread id = " << std::this_thread::get_id();
         BOOST_LOG_TRIVIAL(debug) << "[OUT_ACTOR] received message from " << get_sender().actor_name;

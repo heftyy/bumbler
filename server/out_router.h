@@ -17,6 +17,7 @@ public:
     }
 
 protected:
+
     void on_receive(boost::any data) {
         messages_++;
 
@@ -46,10 +47,6 @@ protected:
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
         //reply(msg_string, msg.sender_);
-    }
-
-    void on_error(boost::any data, std::exception ex) {
-        BOOST_LOG_TRIVIAL(error) << "error happend: " << ex.what();
     }
 
 private:

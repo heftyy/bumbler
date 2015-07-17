@@ -8,18 +8,21 @@ void actor_ref::tell_(std::unique_ptr<message> msg) const {
     }
 }
 
-void actor_ref::stop() {
-    int result = actor_system_storage::instance().get_system(system_name)->stop_actor(actor_name, true);
-    if (result == ACTOR_SYSTEM_STOPPED) {
-        BOOST_LOG_TRIVIAL(warning) << "[ACTOR_REF] actor system doesn't exist";
+/*
+bool actor_ref::exists() const {
+    std::shared_ptr<actor_system> system = actor_system_storage::instance().get_system(system_name);
+    if(system != nullptr) {
+        actor_ref ref = system->get_actor(actor_name);
+        return !ref.is_none();
     }
-    reset();
+    return false;
+}
+*/
+
+void actor_ref::stop() {
+    this->tell(stop_actor<int>(0));
 }
 
 void actor_ref::kill() {
-    int result = actor_system_storage::instance().get_system(system_name)->stop_actor(actor_name, false);
-    if (result == ACTOR_SYSTEM_STOPPED) {
-        BOOST_LOG_TRIVIAL(warning) << "[ACTOR_REF] actor system doesn't exist";
-    }
-    reset();
+    this->tell(kill_actor<int>(0));
 }

@@ -10,7 +10,7 @@ void remote_actor::tell(std::unique_ptr<message> msg, bool remote) {
 
     //replace the target with the remote one
     msg->set_target(this->network_actor_ref_);
-    if(!msg->get_sender().exists()) {
+    if(!msg->get_sender().is_none()) {
         msg->set_sender(get_self());
     }
 
@@ -22,8 +22,6 @@ void remote_actor::tell_(packet& p) {
     if (!actor_system_.lock()->get_server()) atan_error(ATAN_SERVER_DOESNT_EXIST, "server doesn't exist");
 
     std::string serialized_packet = p.get_serialized();
-
-    BOOST_LOG_TRIVIAL(debug) << "Serialized packet: \n" << serialized_packet;
 
     actor_system_.lock()->get_server()->do_send(serialized_packet, remote_actor_endpoint_);
 }

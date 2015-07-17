@@ -4,7 +4,7 @@
 #include <iostream>
 #include <sstream>
 #include "atan/messages/typed_message.h"
-#include "atan/messages/broadcast.h"
+#include "atan/messages/commands/commands.h"
 
 class actor_ref {
 public:
@@ -54,14 +54,26 @@ public:
     }
 
     template<typename T>
-    void tell(typed_message<T> message) const {
-        std::unique_ptr<typed_message<T>> msg = std::unique_ptr<typed_message<T>>(new typed_message<T>(message));
+    void tell(broadcast<T> broadcast, actor_ref sender = actor_ref::none()) const {
+        std::unique_ptr<typed_message<T>> msg = std::unique_ptr<typed_message<T>>(new typed_message<T>(*this, sender, broadcast));
         tell_(std::move(msg));
     }
 
     template<typename T>
-    void tell(broadcast<T> message) const {
-        std::unique_ptr<broadcast<T>> msg = std::unique_ptr<broadcast<T>>(new broadcast<T>(message));
+    void tell(stop_actor<T> stop_actor, actor_ref sender = actor_ref::none()) const {
+        std::unique_ptr<typed_message<T>> msg = std::unique_ptr<typed_message<T>>(new typed_message<T>(*this, sender, stop_actor));
+        tell_(std::move(msg));
+    }
+
+    template<typename T>
+    void tell(kill_actor<T> kill_actor, actor_ref sender = actor_ref::none()) const {
+        std::unique_ptr<typed_message<T>> msg = std::unique_ptr<typed_message<T>>(new typed_message<T>(*this, sender, kill_actor));
+        tell_(std::move(msg));
+    }
+
+    template<typename T>
+    void tell(typed_message<T> message) const {
+        std::unique_ptr<typed_message<T>> msg = std::unique_ptr<typed_message<T>>(new typed_message<T>(message));
         tell_(std::move(msg));
     }
 
@@ -75,7 +87,7 @@ public:
      */
     void kill();
 
-    bool exists() const {
+    bool is_none() const {
         return actor_name.length() > 0 && system_name.length() > 0;
     }
 

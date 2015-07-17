@@ -5,7 +5,7 @@
 #include "out_actor.h"
 #include "out_router.h"
 #include "remote_server_actor.h"
-#include <atan/messages/stop_actor.h>
+#include <atan/messages/commands/commands.h>
 
 
 int main(int argc, char *argv[]) {
@@ -20,42 +20,24 @@ int main(int argc, char *argv[]) {
 
     std::string msg = "BLAM";
 
-//    actor_ref r_actor = actor::create_actor<remote_server_actor>(r_actor_name, r_actor_location, system);
+    actor_ref r_actor = actor::create_actor<remote_server_actor>(r_actor_name, r_actor_location, system);
 //    for(int i = 0; i < 20; i++) r_actor.tell(msg);
 
 //    actor_ref sender = actor_ref::none();
 //    r_actor.tell(broadcast<std::string>(r_actor, sender, msg));
 
-
     actor_ref l_router = actor::create_router<out_router>("out_router", system);
     actor_ref sender = actor_ref::none();
+//    typed_message<std::string> tm(l_router, sender, broadcast<std::string>("BLAM"));
 
-//    l_router.tell(broadcast<std::string>(l_router, sender, msg));
+//    l_router.tell(broadcast<std::string>(l_router, r_actor, msg));
 
-    l_router.tell(3);
+    l_router.tell(broadcast<std::string>("Aaaaa"));
+    l_router.tell(stop_actor<std::string>("DIE"));
 
-    l_router.stop();
+    r_actor.tell(broadcast<std::string>("BRRRR"));
 
-    BOOST_LOG_TRIVIAL(debug) << "router exists = " << l_router.exists();
-
-    /*
-    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
-    BOOST_LOG_TRIVIAL(debug) << "ROUTER DONE";
-
-    for(int i = 0; i < 1000; i++) {
-        l_actor.tell(msg);
-    }
-
-    BOOST_LOG_TRIVIAL(debug) << "ACTOR DONE";
-     */
-
-//    r_actor.tell(1);
-//    r_actor.tell("aaaaa");
-
-//    r_actor.tell(3.14f, l_actor);
-
-//    r_actor.tell(3.14f);
-//    system->schedule(msg, l_actor, r_actor, 500, 900);
+    BOOST_LOG_TRIVIAL(debug) << "router is valid = " << l_router.is_none();
 
     std::chrono::milliseconds sleep_duration(2000);
     std::this_thread::sleep_for(sleep_duration);

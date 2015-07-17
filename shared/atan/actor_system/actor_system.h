@@ -108,7 +108,7 @@ public:
 
         auto search = actors_.find(actor_name);
         if (search != actors_.end()) {
-            actors_[actor_name]->tell(std::move(msg));
+            actors_[actor_name]->pass_message(std::move(msg));
             return 0;
         }
         else {
@@ -129,7 +129,7 @@ public:
 
         auto search = actors_.find(actor_name);
         if (search != actors_.end()) {
-            actors_[actor_name]->tell(std::move(msg), true);
+            actors_[actor_name]->pass_message(std::move(msg), true);
             return 0;
         }
         else {
@@ -202,7 +202,7 @@ private:
     void send_completed() { }
 
     void receive(std::unique_ptr<packet> packet, boost::asio::ip::udp::endpoint& sender_endpoint) {
-        BOOST_LOG_TRIVIAL(debug) << "Received data: \n" << packet->data.data;
+//        BOOST_LOG_TRIVIAL(debug) << "Received data: \n" << packet->data.data;
         std::stringstream ss(packet->data.data);
         boost::archive::text_iarchive ia(ss);
 
@@ -214,7 +214,7 @@ private:
         sender.port = sender_endpoint.port();
         msg->set_sender(sender);
 
-        if (msg->get_target().exists()) {
+        if (msg->get_target().is_none()) {
             try {
                 remote_tell_actor(std::move(msg));
             }

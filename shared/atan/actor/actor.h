@@ -85,6 +85,10 @@ protected:
 
     std::string system_name();
 
+    bool compare(std::shared_ptr<actor> actor);
+
+    void pass_message(std::unique_ptr<message> msg, bool remote = false);
+
     void read_messages() {
         while (message_queue_.size() > 0) {
             std::unique_ptr<message> msg = std::move(message_queue_.front());
@@ -132,10 +136,6 @@ protected:
 
         this->sender_ = actor_ref::none();
         busy_.store(false);
-    }
-
-    bool compare(std::shared_ptr<actor> actor) {
-        return this->actor_name().compare(actor->actor_name()) == 0;
     }
 
     actor_ref& get_self() {
