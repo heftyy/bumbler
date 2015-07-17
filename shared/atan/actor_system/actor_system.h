@@ -73,7 +73,7 @@ public:
     template<class actor_type>
     int add_actor(std::shared_ptr<actor_type> actor) {
         if (stopped_) return atan_error(ACTOR_SYSTEM_STOPPED, system_name_);
-        std::lock_guard<std::mutex> guard(actors_mutex_);
+        std::lock_guard<std::mutex> guard(actors_write_mutex_);
         auto search = actors_.find(actor->actor_name());
         if (search != actors_.end()) {
             return atan_error(ATAN_ACTOR_ALREADY_EXISTS, actor->actor_name());
@@ -85,7 +85,7 @@ public:
 
     int stop_actor(std::string actor_name, bool wait = false) {
         if (stopped_) return atan_error(ACTOR_SYSTEM_STOPPED, system_name_);
-        std::lock_guard<std::mutex> guard(actors_mutex_);
+        std::lock_guard<std::mutex> guard(actors_write_mutex_);
 
         auto search = actors_.find(actor_name);
         if (search != actors_.end()) {
@@ -103,7 +103,7 @@ public:
         if (msg->get_target().system_name.compare(system_name_) != 0)
             return atan_error(ATAN_WRONG_ACTOR_SYSTEM, msg->get_target().system_name);
 
-        std::lock_guard<std::mutex> guard(actors_mutex_);
+        std::lock_guard<std::mutex> guard(actors_read_mutex_);
         std::string actor_name = msg->get_target().actor_name;
 
         auto search = actors_.find(actor_name);
@@ -123,7 +123,7 @@ public:
         if (msg->get_target().system_name.compare(system_name_) != 0)
             return atan_error(ATAN_WRONG_ACTOR_SYSTEM, msg->get_target().system_name);
 
-        std::lock_guard<std::mutex> guard(actors_mutex_);
+        std::lock_guard<std::mutex> guard(actors_read_mutex_);
 
         std::string actor_name = msg->get_target().actor_name;
 
@@ -140,7 +140,7 @@ public:
 
     actor_ref get_actor(std::string actor_name) {
         if (stopped_) nullptr;
-        std::lock_guard<std::mutex> guard(actors_mutex_);
+        std::lock_guard<std::mutex> guard(actors_read_mutex_);
 
         auto search = actors_.find(actor_name);
         if (search != actors_.end()) {
@@ -192,7 +192,8 @@ private:
     std::atomic<bool> stopped_;
     std::string system_name_;
     std::map<std::string, std::shared_ptr<actor>> actors_;
-    std::mutex actors_mutex_;
+    std::mutex actors_write_mutex_;
+    std::mutex actors_read_mutex_;
     std::shared_ptr<udp_server> server_;
     std::unique_ptr<std::thread> io_service_thread_;
     boost::asio::io_service io_service_;
