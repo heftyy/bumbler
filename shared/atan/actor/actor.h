@@ -5,6 +5,7 @@
 #include <mutex>
 #include <queue>
 #include <thread>
+#include <future>
 #include <memory>
 #include <type_traits>
 #include <logger/logger.h>
@@ -22,11 +23,6 @@ class router;
 
 class actor : public std::enable_shared_from_this<actor> {
 public:
-    friend class actor_system;
-    friend class router;
-    friend class random_router;
-    friend class round_robin_router;
-
     template<class T, typename ...Args>
     static actor_ref create_actor(Args&& ...args) {
         BOOST_STATIC_ASSERT_MSG(
@@ -34,7 +30,7 @@ public:
                 "T cannot be a descendant of router"
         );
 
-        std::shared_ptr<T> actor = std::shared_ptr<T>(new T(args...));
+        std::shared_ptr<T> actor = std::make_shared<T>(args...);
         actor->init();
         return actor->get_self();
     }
@@ -46,10 +42,58 @@ public:
                 "T has be a descendant of router"
         );
 
-        std::shared_ptr<T> router = std::shared_ptr<T>(new T(args...));
+        std::shared_ptr<T> router = std::make_shared<T>(args...);
         router->init();
         router->template create_actors<T>();
         return router->get_self();
+    }
+
+    /** synchronous wait for the actor to end all tasks and stop all thread */
+    virtual void stop_actor(bool wait = false) {
+        if(stop_flag_) {
+            return;
+        }
+
+        if (!wait)
+            clear_queue();
+
+        if (queue_thread_) {
+            BOOST_LOG_TRIVIAL(debug) << "[ACTOR] stopping";
+            stop_flag_.store(true);
+            cv.notify_all();
+            queue_thread_->stop();
+            queue_thread_.release();
+            BOOST_LOG_TRIVIAL(debug) << "[ACTOR] stopped";
+        }
+    }
+
+    void run_task(actor_ref& sender, boost::any data) {
+        busy_.store(true);
+        BOOST_LOG_TRIVIAL(debug) << "[ACTOR] starting new task";
+        this->sender_ = sender;
+
+        try {
+            on_receive(data);
+        }
+        catch(std::exception ex) {
+            on_error(data, ex);
+        }
+
+        this->sender_ = actor_ref::none();
+        busy_.store(false);
+    }
+
+    void pass_message(std::unique_ptr<message> msg, bool remote = false);
+
+    std::string actor_name();
+    std::string system_name();
+
+    actor_ref& get_self() {
+        return self_;
+    }
+
+    actor_ref& get_sender() {
+        return sender_;
     }
 
     ~actor();
@@ -82,13 +126,9 @@ protected:
         atan_error(ATAN_WRONG_ACTOR_METHOD, "virtual on_error called, override if needed");
     };
 
-    std::string actor_name();
-
-    std::string system_name();
+    void create_internal_queue_thread();
 
     bool compare(std::shared_ptr<actor> actor);
-
-    void pass_message(std::unique_ptr<message> msg, bool remote = false);
 
     void read_messages() {
         while (message_queue_.size() > 0) {
@@ -117,20 +157,20 @@ protected:
     }
 
     template<typename T>
-    std::unique_ptr<typed_message<T>> construct_reply_message(broadcast<T> broadcast) {
-        auto typed_msg = std::unique_ptr<typed_message<T>>(new typed_message<T>(get_sender(), get_self(), broadcast));
+    std::unique_ptr<typed_message<T>> construct_reply_message(::broadcast<T> msg) {
+        auto typed_msg = std::unique_ptr<typed_message<T>>(new typed_message<T>(get_sender(), get_self(), msg));
         return std::move(typed_msg);
     }
 
     template<typename T>
-    std::unique_ptr<typed_message<T>> construct_reply_message(stop_actor<T> stop_actor) {
-        auto typed_msg = std::unique_ptr<typed_message<T>>(new typed_message<T>(get_sender(), get_self(), stop_actor));
+    std::unique_ptr<typed_message<T>> construct_reply_message(::stop_actor<T> msg) {
+        auto typed_msg = std::unique_ptr<typed_message<T>>(new typed_message<T>(get_sender(), get_self(), msg));
         return std::move(typed_msg);
     }
 
     template<typename T>
-    std::unique_ptr<typed_message<T>> construct_reply_message(kill_actor<T> kill_actor) {
-        auto typed_msg = std::unique_ptr<typed_message<T>>(new typed_message<T>(get_sender(), get_self(), kill_actor));
+    std::unique_ptr<typed_message<T>> construct_reply_message(::kill_actor<T> msg) {
+        auto typed_msg = std::unique_ptr<typed_message<T>>(new typed_message<T>(get_sender(), get_self(), msg));
         return std::move(typed_msg);
     }
 
@@ -141,30 +181,6 @@ protected:
         std::unique_lock<std::mutex> lock(this->mutex_);
         message_queue_.push(std::move(msg));
         cv.notify_all();
-    }
-
-    void run_task(actor_ref& sender, boost::any data) {
-        busy_.store(true);
-        BOOST_LOG_TRIVIAL(debug) << "[ACTOR] starting new task";
-        this->sender_ = sender;
-
-        try {
-            on_receive(data);
-        }
-        catch(std::exception ex) {
-            on_error(data, ex);
-        }
-
-        this->sender_ = actor_ref::none();
-        busy_.store(false);
-    }
-
-    actor_ref& get_self() {
-        return self_;
-    }
-
-    actor_ref& get_sender() {
-        return sender_;
     }
 
     template<typename T>
@@ -198,25 +214,6 @@ private:
         std::unique_lock<std::mutex> lock(this->mutex_);
         while (!this->message_queue_.empty())
             this->message_queue_.pop();  // empty the queue
-    }
-
-    /** synchronous wait for the actor to end all tasks and stop all thread */
-    virtual void stop_actor(bool wait = false) {
-        if(stop_flag_) {
-            return;
-        }
-
-        if (!wait)
-            clear_queue();
-
-        if (queue_thread_) {
-            BOOST_LOG_TRIVIAL(debug) << "[ACTOR] stopping";
-            stop_flag_.store(true);
-            cv.notify_all();
-            queue_thread_->stop();
-            queue_thread_.release();
-            BOOST_LOG_TRIVIAL(debug) << "[ACTOR] stopped";
-        }
     }
 
     void send_reply_message(std::unique_ptr<message> msg);

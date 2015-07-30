@@ -13,6 +13,11 @@ actor::~actor() {
 }
 
 actor_ref actor::init() {
+    this->actor_system_.lock()->add_actor(shared_from_this());
+    return this->get_self();
+}
+
+void actor::create_internal_queue_thread() {
     queue_thread_ = std::unique_ptr<interruptible_thread>(new interruptible_thread());
     queue_thread_->start([this]() {
 
@@ -35,9 +40,6 @@ actor_ref actor::init() {
                 return;  // if the queue is empty and this->stop_flag_ is set to true
         }
     });
-
-    this->actor_system_.lock()->add_actor(shared_from_this());
-    return this->get_self();
 }
 
 std::string actor::actor_name() {

@@ -10,16 +10,19 @@ set(ATAN_SOURCES
   messages/commands/broadcast.h
   messages/commands/stop_actor.h
   messages/commands/kill_actor.h
-  actor/actor.cpp
-  actor/remote_actor.cpp
-  actor/local_actor.cpp
-  actor/actor_ref.cpp
-  actor_system/actor_system_storage.cpp
+  messages/commands/commands.h
   actor/actor_ref.h
+  actor/actor_ref.cpp
+  actor/remote_actor.cpp
   actor/local_actor.h
+  actor/local_actor.cpp
+  actor/promise_actor.h
+  actor/promise_actor.cpp
+  actor/actor.cpp
   actor_system/actor_system.h
   actor_system/actor_system_errors.h
   actor_system/udp_server.h
+  actor_system/actor_system_storage.cpp
   actor/router/router.cpp
   actor/router/router.h
   actor/router/random_router.cpp
@@ -37,4 +40,4 @@ set(ATAN_SOURCES
   )
 
 add_definitions(-DBOOST_LOG_DYN_LINK)
-add_library(atan STATIC ${ATAN_SOURCES} messages/commands/commands.h)
+add_library(atan STATIC ${ATAN_SOURCES})

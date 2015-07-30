@@ -3,6 +3,8 @@
 #include <memory>
 #include <iostream>
 #include <sstream>
+#include <future>
+#include <logger/logger.h>
 #include "atan/messages/typed_message.h"
 #include "atan/messages/commands/commands.h"
 
@@ -43,38 +45,69 @@ public:
 
     //if a string literal is passed to tell i change it to std::string
     void tell(const char* data, actor_ref sender = actor_ref::none()) {
-         std::unique_ptr<typed_message<std::string>> msg = std::unique_ptr<typed_message<std::string>>(new typed_message<std::string>(*this, sender, std::string(data)));
-        tell_(std::move(msg));
+        tell(std::string(data), sender);
     }
 
     template<typename T>
     void tell(T data, actor_ref sender = actor_ref::none()) const {
-        std::unique_ptr<typed_message<T>> msg = std::unique_ptr<typed_message<T>>(new typed_message<T>(*this, sender, data));
-        tell_(std::move(msg));
+        std::unique_ptr<typed_message<T>> msg_ptr = std::unique_ptr<typed_message<T>>(new typed_message<T>(*this, sender, data));
+        actor_tell(std::move(msg_ptr));
     }
 
     template<typename T>
-    void tell(broadcast<T> broadcast, actor_ref sender = actor_ref::none()) const {
-        std::unique_ptr<typed_message<T>> msg = std::unique_ptr<typed_message<T>>(new typed_message<T>(*this, sender, broadcast));
-        tell_(std::move(msg));
+    void tell(broadcast<T> msg, actor_ref sender = actor_ref::none()) const {
+        std::unique_ptr<typed_message<T>> msg_ptr = std::unique_ptr<typed_message<T>>(new typed_message<T>(*this, sender, msg));
+        actor_tell(std::move(msg_ptr));
     }
 
     template<typename T>
-    void tell(stop_actor<T> stop_actor, actor_ref sender = actor_ref::none()) const {
-        std::unique_ptr<typed_message<T>> msg = std::unique_ptr<typed_message<T>>(new typed_message<T>(*this, sender, stop_actor));
-        tell_(std::move(msg));
+    void tell(stop_actor<T> msg, actor_ref sender = actor_ref::none()) const {
+        std::unique_ptr<typed_message<T>> msg_ptr = std::unique_ptr<typed_message<T>>(new typed_message<T>(*this, sender, msg));
+        actor_tell(std::move(msg_ptr));
     }
 
     template<typename T>
-    void tell(kill_actor<T> kill_actor, actor_ref sender = actor_ref::none()) const {
-        std::unique_ptr<typed_message<T>> msg = std::unique_ptr<typed_message<T>>(new typed_message<T>(*this, sender, kill_actor));
-        tell_(std::move(msg));
+    void tell(kill_actor<T> msg, actor_ref sender = actor_ref::none()) const {
+        std::unique_ptr<typed_message<T>> msg_ptr = std::unique_ptr<typed_message<T>>(new typed_message<T>(*this, sender, msg));
+        actor_tell(std::move(msg_ptr));
     }
 
     template<typename T>
-    void tell(typed_message<T> message) const {
-        std::unique_ptr<typed_message<T>> msg = std::unique_ptr<typed_message<T>>(new typed_message<T>(message));
-        tell_(std::move(msg));
+    void tell(typed_message<T> msg) const {
+        std::unique_ptr<typed_message<T>> msg_ptr = std::unique_ptr<typed_message<T>>(new typed_message<T>(msg));
+        actor_tell(std::move(msg_ptr));
+    }
+
+    template<typename F>
+    std::future<F> future(const char* data) const {
+        return future<F>(std::string(data));
+    }
+
+    template<typename F, typename T>
+    std::future<F> future(T data) const {
+        auto promise_ptr = std::make_shared<std::promise<F>>();
+        std::future<F> f = promise_ptr->get_future();
+
+        size_t future_type_hashcode = typeid(F).hash_code();
+
+        auto fn = [=](std::shared_ptr<std::promise<F>>& promise, boost::any response) {
+            if(response.type().hash_code() == future_type_hashcode) {
+                F value = boost::any_cast<F>(response);
+                promise->set_value(value);
+            }
+            else {
+                BOOST_LOG_TRIVIAL(error) << "[FUTURE] expected type for the future didn't match the replied type";
+                promise->set_value(F());
+            }
+        };
+
+        std::function<void(boost::any)> bound_fn = std::bind(fn, promise_ptr, std::placeholders::_1);
+
+        std::unique_ptr<typed_message<T>> msg_ptr = std::unique_ptr<typed_message<T>>(new typed_message<T>(*this, none(), data));
+
+        actor_future_tell(std::move(msg_ptr), bound_fn);
+
+        return f;
     }
 
     /*
@@ -97,10 +130,10 @@ public:
 
     template<class Archive>
     void serialize(Archive& ar, const unsigned int version) {
-        ar& actor_name;
-        ar& system_name;
-        ar& ip;
-        ar& port;
+        ar & actor_name;
+        ar & system_name;
+        ar & ip;
+        ar & port;
     }
 
 private:
@@ -111,6 +144,7 @@ private:
         this->port = 0;
     }
 
-    void tell_(std::unique_ptr<message> msg) const;
+    void actor_future_tell(std::unique_ptr<message> msg, std::function<void(boost::any)>& response_fn) const;
+    void actor_tell(std::unique_ptr<message> msg) const;
 
 };

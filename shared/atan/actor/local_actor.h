@@ -5,9 +5,13 @@
 
 class local_actor : public actor {
 protected:
+    friend class actor;
+
     local_actor(const std::string& name, std::shared_ptr<actor_system>& actor_system)
             : actor(name, actor_system) {
     }
 
-    void tell(std::unique_ptr<message> msg, bool remote = false);
+    actor_ref init() override;
+
+    void tell(std::unique_ptr<message> msg, bool remote = false) override;
 };

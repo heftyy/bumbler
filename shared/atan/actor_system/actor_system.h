@@ -9,6 +9,7 @@
 #include "actor_system_storage.h"
 #include "../messages/typed_message.h"
 #include "../actor/actor.h"
+#include "../actor/promise_actor.h"
 #include "../packet/packet.h"
 #include "../scheduler/scheduler.h"
 #include "../scheduler/cancellable.h"
@@ -97,7 +98,7 @@ public:
         }
     }
 
-    int tell_actor(std::unique_ptr<message> msg) {
+    int tell_actor(std::unique_ptr<message> msg, bool from_remote = false) {
         if (stopped_.load()) return atan_error(ACTOR_SYSTEM_STOPPED, system_name_);
 
         if (msg->get_target().system_name.compare(system_name_) != 0)
@@ -108,7 +109,7 @@ public:
 
         auto search = actors_.find(actor_name);
         if (search != actors_.end()) {
-            actors_[actor_name]->pass_message(std::move(msg));
+            actors_[actor_name]->pass_message(std::move(msg), from_remote);
             return 0;
         }
         else {
@@ -117,7 +118,7 @@ public:
         //throw new actor_not_found(message.target.actor_name);
     }
 
-    int remote_tell_actor(std::unique_ptr<message> msg) {
+    int future_tell_actor(std::unique_ptr<message> msg, std::function<void(boost::any)>& response_fn) {
         if (stopped_.load()) return atan_error(ACTOR_SYSTEM_STOPPED, system_name_);
 
         if (msg->get_target().system_name.compare(system_name_) != 0)
@@ -126,6 +127,9 @@ public:
         std::lock_guard<std::mutex> guard(actors_read_mutex_);
 
         std::string actor_name = msg->get_target().actor_name;
+
+        actor_ref p_actor = actor::create_actor<promise_actor>(get_next_temporary_actor_name(), shared_from_this(), response_fn);
+        msg->set_sender(p_actor);
 
         auto search = actors_.find(actor_name);
         if (search != actors_.end()) {
@@ -216,13 +220,27 @@ private:
 
         if (msg->get_target().is_none()) {
             try {
-                remote_tell_actor(std::move(msg));
+                tell_actor(std::move(msg), true);
             }
             catch (std::runtime_error& e) {
                 BOOST_LOG_TRIVIAL(error) << "actor_system receive error: " << e.what();
             }
         }
         return;
+    }
 
+    std::string get_next_temporary_actor_name() const {
+        std::string temp_name = "temp/a";
+
+        while(actors_.find(temp_name) != actors_.end()) {
+            if(temp_name[temp_name.length() - 1] == 'z') {
+                temp_name += 'a';
+            }
+            else {
+                temp_name[temp_name.length() - 1]++;
+            }
+        }
+
+        return temp_name;
     }
 };

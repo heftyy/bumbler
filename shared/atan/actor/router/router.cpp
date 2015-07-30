@@ -3,9 +3,7 @@
 
 actor_ref router::init() {
     this->thread_pool.resize(size);
-
-    this->actor_system_.lock()->add_actor(shared_from_this());
-    return this->get_self();
+    return actor::init();
 }
 
 void router::tell(std::unique_ptr<message> msg, bool remote) {

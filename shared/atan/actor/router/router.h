@@ -7,6 +7,12 @@
 
 class router : public actor
 {
+public:
+    void stop_actor(bool wait = false) override {
+        actor::stop_actor(wait);
+        this->thread_pool.stop(wait);
+    }
+
 protected:
     int size;
     ctpl::thread_pool thread_pool;
@@ -20,8 +26,8 @@ protected:
         this->thread_pool.stop();
     }
 
-    actor_ref init();
-    virtual void tell(std::unique_ptr<message> msg, bool remote = false);
+    actor_ref init() override;
+    virtual void tell(std::unique_ptr<message> msg, bool remote = false) override;
     virtual void tell_one(std::unique_ptr<message> msg) = 0;
     void tell_all(std::unique_ptr<message> msg);
 
@@ -38,12 +44,6 @@ protected:
         return *this->actors[i];
     }
 
-private:
-
-    void stop_actor(bool wait = false) {
-        actor::stop_actor(wait);
-        this->thread_pool.stop(wait);
-    }
 
 };
 

@@ -24,6 +24,7 @@ protected:
         if(is_type<int>(data)) {
             int in = cast_message<int>(data);
             BOOST_LOG_TRIVIAL(debug) << "[OUT_ACTOR] message was " << in;
+            reply("BLAM");
         }
 
         if(is_type<float>(data)) {
