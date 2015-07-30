@@ -69,6 +69,8 @@ public:
         //wait for the udp server to properly shutdown, otherwise it SIGSEGVs
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
         server_.reset();
+
+        actor_system_storage::instance().remove_system(system_name_);
     }
 
     template<class actor_type>
@@ -133,7 +135,7 @@ public:
 
         auto search = actors_.find(actor_name);
         if (search != actors_.end()) {
-            actors_[actor_name]->pass_message(std::move(msg), true);
+            actors_[actor_name]->pass_message(std::move(msg), false);
             return 0;
         }
         else {
@@ -218,7 +220,7 @@ private:
         sender.port = sender_endpoint.port();
         msg->set_sender(sender);
 
-        if (msg->get_target().is_none()) {
+        if (!msg->get_target().is_none()) {
             try {
                 tell_actor(std::move(msg), true);
             }

@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <atomic>
+#include <boost/format.hpp>
 #include <atan/actor/router/round_robin_router.h>
 #include <atan/actor_system/actor_system.h>
 #include <communication/message_settings.h>
@@ -27,6 +28,7 @@ protected:
         if(is_type<int>(data)) {
             int in = cast_message<int>(data);
             BOOST_LOG_TRIVIAL(debug) << "[OUT_ROUTER] message was " << in;
+            reply(boost::str(boost::format("SERVER SAYS BLAM (%1%)") % in));
         }
 
         if(is_type<float>(data)) {

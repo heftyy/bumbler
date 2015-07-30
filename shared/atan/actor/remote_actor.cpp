@@ -15,7 +15,7 @@ void remote_actor::tell(std::unique_ptr<message> msg, bool remote) {
 
     //replace the target with the remote one
     msg->set_target(this->network_actor_ref_);
-    if(!msg->get_sender().is_none()) {
+    if(msg->get_sender().is_none()) {
         msg->set_sender(get_self());
     }
 

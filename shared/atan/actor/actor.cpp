@@ -51,19 +51,20 @@ std::string actor::system_name() {
 }
 
 void actor::send_reply_message(std::unique_ptr<message> msg) {
-    auto ac = actor_system_storage::instance().get_system(msg->get_target().system_name);
+    //actor is not none and local
+    if(!msg->get_target().is_none() && !msg->get_target().is_remote()) {
+        auto ac = actor_system_storage::instance().get_system(msg->get_target().system_name);
 
-    //actor is local
-    if(ac != nullptr) {
-        actor_ref actor_from_system = ac->get_actor(msg->get_target().actor_name);
-        if(actor_from_system.is_none()) {
-            ac->tell_actor(std::move(msg));
-            return;
+        if(ac != nullptr) {
+            actor_ref actor_from_system = ac->get_actor(msg->get_target().actor_name);
+            if(!actor_from_system.is_none()) {
+                ac->tell_actor(std::move(msg));
+                return;
+            }
         }
     }
-
     //actor is remote
-    if(msg->get_target().valid_address()) {
+    else if(msg->get_target().is_remote()) {
         try {
             std::string ip = msg->get_target().ip;
             int port = msg->get_target().port;
@@ -75,7 +76,6 @@ void actor::send_reply_message(std::unique_ptr<message> msg) {
                     boost::asio::ip::address().from_string(ip), port
             );
 
-            BOOST_LOG_TRIVIAL(debug) << "[ACTOR] reply message: " << p.get_serialized();
             actor_system_.lock()->get_server()->do_send(p.get_serialized(), remote_actor_endpoint);
         }
         catch(std::exception e) {

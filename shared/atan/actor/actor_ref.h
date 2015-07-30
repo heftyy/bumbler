@@ -121,10 +121,10 @@ public:
     void kill();
 
     bool is_none() const {
-        return actor_name.length() > 0 && system_name.length() > 0;
+        return actor_name.length() == 0 || system_name.length() == 0;
     }
 
-    bool valid_address() const {
+    bool is_remote() const {
         return actor_name.length() > 0 && system_name.length() > 0 && ip.length() > 0 && port > 0;
     }
 
