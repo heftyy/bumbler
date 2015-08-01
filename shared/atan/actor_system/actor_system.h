@@ -94,6 +94,7 @@ public:
         if (search != actors_.end()) {
             actors_[actor_name]->stop_actor(wait);
             actors_.erase(search);
+			return 0;
         }
         else {
             return atan_error(ATAN_ACTOR_NOT_FOUND, actor_name);

@@ -18,7 +18,7 @@ actor_ref actor::init() {
 }
 
 void actor::create_internal_queue_thread() {
-    queue_thread_ = std::unique_ptr<interruptible_thread>(new interruptible_thread());
+    queue_thread_ = std::make_unique<interruptible_thread>();
     queue_thread_->start([this]() {
 
         bool isPopped = false;

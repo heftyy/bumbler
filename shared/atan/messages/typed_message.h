@@ -78,23 +78,23 @@ public:
         this->type_ = KILL_ACTOR;
     }
 
-    boost::any get_data() const {
+    boost::any get_data() const override {
         return data;
     }
 
-    actor_ref& get_sender() const {
+    actor_ref& get_sender() const override {
         return *sender.get();
     }
 
-    actor_ref& get_target() const {
+    actor_ref& get_target() const override {
         return *target.get();
     }
 
-    void set_sender(const actor_ref& sender) {
+    void set_sender(const actor_ref& sender) override {
         this->sender = std::make_shared<actor_ref>(sender);
     }
 
-    void set_target(const actor_ref& target) {
+    void set_target(const actor_ref& target) override {
         this->target = std::make_shared<actor_ref>(target);
     }
 

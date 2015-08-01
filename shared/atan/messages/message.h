@@ -4,6 +4,7 @@
 #include <memory>
 #include <stdexcept>
 #include <boost/any.hpp>
+#include <boost/serialization/access.hpp>
 
 class actor_ref;
 

@@ -39,5 +39,9 @@ set(ATAN_SOURCES
   interruptible_thread.h
   )
 
-add_definitions(-DBOOST_LOG_DYN_LINK)
+if(${WIN32})
+  add_definitions(-D_WIN32_WINNT=0x0501)
+ELSE()
+  add_definitions(-DBOOST_LOG_DYN_LINK)
+ENDIF()
 add_library(atan STATIC ${ATAN_SOURCES})

@@ -96,7 +96,7 @@ public:
         return sender_;
     }
 
-    ~actor();
+    virtual ~actor();
 
 protected:
     std::mutex mutex_;

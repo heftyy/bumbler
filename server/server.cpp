@@ -7,7 +7,7 @@
 
 int main(int argc, char *argv[]) {
     try {
-        std::shared_ptr<actor_system> system = std::shared_ptr<actor_system>(new actor_system("server_system", 4445));
+        std::shared_ptr<actor_system> system = std::make_shared<actor_system>("server_system", 4445);
         system->init();
 
         actor_ref l_router = actor::create_router<out_router>("out_router", system);

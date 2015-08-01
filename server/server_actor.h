@@ -5,6 +5,7 @@
 #include <atan/interruptible_thread.h>
 #include <atan/actor/local_actor.h>
 #include <atan/actor_system/actor_system.h>
+#include <boost/any.hpp>
 
 class server_actor : public local_actor {
 public:
@@ -18,7 +19,7 @@ public:
 
 private:
 
-    void on_receive(boost::any data) {
+    void on_receive(boost::any data) override {
 
         BOOST_LOG_TRIVIAL(debug) << "[server_actor] on_receive thread id = " << std::this_thread::get_id();
         BOOST_LOG_TRIVIAL(debug) << "server_actor received message from " << get_sender().actor_name;

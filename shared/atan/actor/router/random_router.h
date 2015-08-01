@@ -1,6 +1,8 @@
 #pragma once
 
 #include <random>
+#include <functional>
+#include <boost/log/trivial.hpp>
 #include "router.h"
 
 class random_router : public router
@@ -15,7 +17,7 @@ protected:
         this->distribution_ = std::uniform_int_distribution<>(0, this->size-1);
     }
 
-    void tell_one(std::unique_ptr<message> msg);
+    void tell_one(std::unique_ptr<message> msg) override;
 
 private:
     std::random_device rd_;

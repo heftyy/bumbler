@@ -7,7 +7,7 @@
 
 int main(int argc, char *argv[]) {
 
-	std::shared_ptr<actor_system> system = std::shared_ptr<actor_system>(new actor_system("bumbler_system", 4444));
+	std::shared_ptr<actor_system> system = std::make_shared<actor_system>("bumbler_system", 4444);
 	system->init();
 
 	actor_ref l_actor = actor::create_actor<out_actor>("out_actor", system);
