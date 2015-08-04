@@ -2,6 +2,7 @@
 
 #include <list>
 #include <memory>
+#include <functional>
 #include "../actor.h"
 #include "../../thread_pool/ctpl_stl.h"
 
@@ -18,7 +19,7 @@ protected:
     ctpl::thread_pool thread_pool;
     std::vector<std::unique_ptr<actor>> actors;
 
-    router(const std::string& name, std::shared_ptr<actor_system>& actor_system, int size)
+    router(const std::string& name, const std::shared_ptr<actor_system>& actor_system, int size)
             : actor(name, actor_system), size(size) {
     }
 
@@ -34,9 +35,8 @@ protected:
     template<typename T>
     void create_actors() {
         for(int i = 0; i < size; i++) {
-            this->actors.emplace_back(
-                    std::unique_ptr<T>(new T(this->actor_name_, this->actor_system_.lock()))
-            );
+            std::unique_ptr<T> a = std::unique_ptr<T>(new T(this->actor_name_, this->actor_system_.lock()));
+            this->actors.push_back(std::move(a));
         }
     }
 

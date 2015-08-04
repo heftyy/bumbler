@@ -7,7 +7,7 @@ class local_actor : public actor {
 protected:
     friend class actor;
 
-    local_actor(const std::string& name, std::shared_ptr<actor_system>& actor_system)
+    local_actor(const std::string& name, const std::shared_ptr<actor_system>& actor_system)
             : actor(name, actor_system) {
     }
 

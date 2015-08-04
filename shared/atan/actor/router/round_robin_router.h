@@ -8,7 +8,7 @@ class round_robin_router : public router
 public:
     friend class actor;
 
-    round_robin_router(const std::string& name, std::shared_ptr<actor_system>& actor_system, int size)
+    round_robin_router(const std::string& name, const std::shared_ptr<actor_system>& actor_system, int size)
             : router(name, actor_system, size) {
         this->current_actor_to_message = 0;
     }

@@ -9,6 +9,7 @@
 #include <memory>
 #include <type_traits>
 #include <logger/logger.h>
+#include <utility.h>
 #include <boost/static_assert.hpp>
 #include "actor_ref.h"
 #include "../actor_system/actor_system_errors.h"
@@ -16,7 +17,6 @@
 #include "../messages/commands/commands.h"
 #include "../interruptible_thread.h"
 #include "../packet/packet.h"
-#include "../../utility.h"
 
 class actor_system;
 class router;
@@ -30,9 +30,12 @@ public:
                 "T cannot be a descendant of router"
         );
 
-        std::shared_ptr<T> actor = std::make_shared<T>(args...);
+        std::unique_ptr<T> actor = utility::make_unique<T>(args...);
         actor->init();
-        return actor->get_self();
+        actor_ref& ar = actor->get_self();
+        std::shared_ptr<actor_system> system = actor->actor_system_.lock();
+        actor::add_to_actor_system(system, std::move(actor));
+        return ar;
     }
 
     template<class T, typename ...Args>
@@ -42,30 +45,16 @@ public:
                 "T has be a descendant of router"
         );
 
-        std::shared_ptr<T> router = std::make_shared<T>(args...);
+        std::unique_ptr<T> router = utility::make_unique<T>(args...);
         router->init();
         router->template create_actors<T>();
-        return router->get_self();
+        actor_ref& ar = router->get_self();
+        std::shared_ptr<actor_system> system = router->actor_system_.lock();
+        actor::add_to_actor_system(system, std::move(router));
+        return ar;
     }
 
-    /** synchronous wait for the actor to end all tasks and stop all thread */
-    virtual void stop_actor(bool wait = false) {
-        if(stop_flag_) {
-            return;
-        }
-
-        if (!wait)
-            clear_queue();
-
-        if (queue_thread_) {
-            BOOST_LOG_TRIVIAL(debug) << "[ACTOR] stopping";
-            stop_flag_.store(true);
-            cv.notify_all();
-            queue_thread_->stop();
-            queue_thread_.release();
-            BOOST_LOG_TRIVIAL(debug) << "[ACTOR] stopped";
-        }
-    }
+    virtual void stop_actor(bool wait = false);
 
     void run_task(actor_ref& sender, boost::any data) {
         busy_.store(true);
@@ -85,6 +74,30 @@ public:
 
     void pass_message(std::unique_ptr<message> msg, bool remote = false);
 
+    void read_messages() {
+        while (message_queue_.size() > 0 && !stop_flag_) {
+            std::unique_lock<std::mutex> lock(this->message_queue_mutex_);
+
+            std::unique_ptr<message> msg = std::move(message_queue_.front());
+            message_queue_.pop();
+
+            lock.unlock();
+
+            if(msg == nullptr) return;
+
+            run_task(msg->get_sender(), msg->get_data());
+        }
+    }
+
+    void add_message(std::unique_ptr<message> msg) {
+        BOOST_LOG_TRIVIAL(debug) << "[ACTOR] queueing new task";
+        std::unique_lock<std::mutex> lock(this->message_queue_mutex_);
+        message_queue_.push(std::move(msg));
+        cv.notify_one();
+    }
+
+    bool is_busy() { return busy_; }
+
     std::string actor_name();
     std::string system_name();
 
@@ -99,7 +112,8 @@ public:
     virtual ~actor();
 
 protected:
-    std::mutex mutex_;
+    std::mutex message_queue_mutex_;
+    std::mutex actor_thread_mutex_;
     std::unique_ptr<interruptible_thread> queue_thread_;
     std::queue<std::unique_ptr<message>> message_queue_;
     std::atomic<bool> busy_;
@@ -127,16 +141,6 @@ protected:
     };
 
     void create_internal_queue_thread();
-
-    bool compare(std::shared_ptr<actor> actor);
-
-    void read_messages() {
-        while (message_queue_.size() > 0) {
-            std::unique_ptr<message> msg = std::move(message_queue_.front());
-            run_task(msg->get_sender(), msg->get_data());
-            message_queue_.pop();
-        }
-    }
 
     void reply(const char* data) {
         reply(std::string(data));
@@ -174,15 +178,6 @@ protected:
         return std::move(typed_msg);
     }
 
-    bool is_busy() { return busy_; }
-
-    void add_message(std::unique_ptr<message> msg) {
-        BOOST_LOG_TRIVIAL(debug) << "[ACTOR] queueing new task";
-        std::unique_lock<std::mutex> lock(this->mutex_);
-        message_queue_.push(std::move(msg));
-        cv.notify_all();
-    }
-
     template<typename T>
     T cast_message(boost::any& data) {
         if(data.type().hash_code() == typeid(T).hash_code()) {
@@ -210,8 +205,10 @@ protected:
     }
 
 private:
+    static void add_to_actor_system(const std::shared_ptr<actor_system>& system, std::unique_ptr<actor> actor_ptr);
+
     void clear_queue() {
-        std::unique_lock<std::mutex> lock(this->mutex_);
+        std::unique_lock<std::mutex> lock(this->message_queue_mutex_);
         while (!this->message_queue_.empty())
             this->message_queue_.pop();  // empty the queue
     }

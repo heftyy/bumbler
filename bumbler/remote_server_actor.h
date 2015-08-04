@@ -3,7 +3,6 @@
 #include <iostream>
 #include <atomic>
 #include <atan/actor/remote_actor.h>
-#include <atan/actor_system/actor_system.h>
 #include <communication/message_settings.h>
 
 class remote_server_actor : public remote_actor {

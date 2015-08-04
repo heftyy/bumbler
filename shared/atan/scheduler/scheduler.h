@@ -14,8 +14,6 @@ class actor_system;
 
 class scheduler {
 public:
-    friend class actor_system;
-
     scheduler(int thread_pool_size) {
         resize(thread_pool_size);
         cancellable_vector_it_ = cancellable_vector_.begin();
@@ -37,7 +35,6 @@ public:
         thread_pool_.resize(thread_pool_size);
     }
 
-protected:
     template<typename T>
     std::shared_ptr<cancellable> schedule(const typed_message<T>& msg, long initial_delay_ms, long interval_ms) {
         std::shared_ptr<cancellable> ret_cancellable = std::make_shared<cancellable>();

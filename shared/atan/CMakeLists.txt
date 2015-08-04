@@ -20,6 +20,7 @@ set(ATAN_SOURCES
   actor/promise_actor.cpp
   actor/actor.cpp
   actor_system/actor_system.h
+  actor_system/actor_system.cpp
   actor_system/actor_system_errors.h
   actor_system/udp_server.h
   actor_system/actor_system_storage.cpp
@@ -39,9 +40,12 @@ set(ATAN_SOURCES
   interruptible_thread.h
   )
 
+include_directories(../)
+
 if(${WIN32})
   add_definitions(-D_WIN32_WINNT=0x0501)
 ELSE()
   add_definitions(-DBOOST_LOG_DYN_LINK)
 ENDIF()
+
 add_library(atan STATIC ${ATAN_SOURCES})

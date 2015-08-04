@@ -13,20 +13,21 @@ actor::~actor() {
 }
 
 actor_ref actor::init() {
-    this->actor_system_.lock()->add_actor(shared_from_this());
     return this->get_self();
 }
 
 void actor::create_internal_queue_thread() {
-    queue_thread_ = std::make_unique<interruptible_thread>();
+    queue_thread_ = utility::make_unique<interruptible_thread>();
     queue_thread_->start([this]() {
 
         bool isPopped = false;
 
         while (true) {
+            BOOST_LOG_TRIVIAL(debug) << "internal thread loop start";
+
             this->read_messages();
 
-            std::unique_lock<std::mutex> lock(this->mutex_);
+            std::unique_lock<std::mutex> lock(this->actor_thread_mutex_);
 
             this->cv.wait(lock, [this, &isPopped]() {
                 isPopped = !this->message_queue_.empty();
@@ -47,7 +48,7 @@ std::string actor::actor_name() {
 }
 
 std::string actor::system_name() {
-    return actor_system_.lock()->system_name_;
+    return actor_system_.lock()->system_name();
 }
 
 void actor::send_reply_message(std::unique_ptr<message> msg) {
@@ -96,7 +97,22 @@ void actor::pass_message(std::unique_ptr<message> msg, bool remote) {
     }
 }
 
-bool actor::compare(std::shared_ptr<actor> actor) {
-    return this->actor_name().compare(actor->actor_name()) == 0 &&
-           this->actor_system_.lock()->system_name_.compare(actor->actor_system_.lock()->system_name_) == 0;
+void actor::add_to_actor_system(const std::shared_ptr<actor_system>& system, std::unique_ptr<actor> actor_ptr) {
+    system->add_actor(std::move(actor_ptr));
+}
+
+void actor::stop_actor(bool wait) {
+    if(stop_flag_) return;
+
+    stop_flag_ = true;
+
+    if (!wait) clear_queue();
+
+    if (queue_thread_) {
+        BOOST_LOG_TRIVIAL(debug) << "[ACTOR] stopping";
+        cv.notify_one();
+        queue_thread_->stop();
+        queue_thread_.release();
+        BOOST_LOG_TRIVIAL(debug) << "[ACTOR] stopped";
+    }
 }
