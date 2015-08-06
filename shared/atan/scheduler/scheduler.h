@@ -4,6 +4,7 @@
 #include <mutex>
 #include <memory>
 #include <iostream>
+#include <atan/dispatcher/dispatcher.h>
 #include "cancellable.h"
 #include "../thread_pool/ctpl_stl.h"
 #include "../actor/actor_ref.h"
@@ -14,8 +15,7 @@ class actor_system;
 
 class scheduler {
 public:
-    scheduler(int thread_pool_size) {
-        resize(thread_pool_size);
+    scheduler(std::shared_ptr<dispatcher> dispatcher) {
         cancellable_vector_it_ = cancellable_vector_.begin();
     }
 
@@ -27,12 +27,6 @@ public:
                 cancellable->cancel();
             }
         }
-
-        thread_pool_.stop(true);
-    }
-
-    void resize(int thread_pool_size) {
-        thread_pool_.resize(thread_pool_size);
     }
 
     template<typename T>
@@ -40,7 +34,7 @@ public:
         std::shared_ptr<cancellable> ret_cancellable = std::make_shared<cancellable>();
         auto cancel_it = cancellable_vector_.insert(cancellable_vector_it_, ret_cancellable);
 
-        thread_pool_.push([this, msg, initial_delay_ms, interval_ms, ret_cancellable, cancel_it](int id) {
+        dispatcher_->push([this, msg, initial_delay_ms, interval_ms, ret_cancellable, cancel_it](int id) {
             ret_cancellable->thread_id = std::this_thread::get_id();
 
             if (initial_delay_ms > 0) {
@@ -83,7 +77,7 @@ public:
     }
 
 private:
-    ctpl::thread_pool thread_pool_;
+    std::shared_ptr<dispatcher> dispatcher_;
     std::vector<std::shared_ptr<cancellable>> cancellable_vector_;
     std::vector<std::shared_ptr<cancellable>>::iterator cancellable_vector_it_;
 

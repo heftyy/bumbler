@@ -98,6 +98,16 @@ public:
         this->target = std::make_shared<actor_ref>(target);
     }
 
+    std::unique_ptr<message> clone() const override {
+        std::unique_ptr<typed_message<T>> result = std::unique_ptr<typed_message<T>>(new typed_message<T>());
+        result->set_target(this->get_target());
+        result->set_sender(this->get_sender());
+        result->type_.store(this->type_.load());
+        result->data = this->data;
+
+        return std::move(result);
+    }
+
 private:
     friend class boost::serialization::access;
     template<class Archive>

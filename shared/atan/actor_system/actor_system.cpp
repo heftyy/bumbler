@@ -40,6 +40,8 @@ void actor_system::init() {
 void actor_system::stop(bool wait) {
     if (stopped_) return;
 
+    dispatcher_->stop(wait);
+
     for (auto iter = actors_.begin(); iter != actors_.end();) {
         iter->second->stop_actor(wait);
         actors_.erase(iter++);

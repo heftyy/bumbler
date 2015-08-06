@@ -22,16 +22,25 @@ BOOST_AUTO_TEST_SUITE( router_test_suite )
     }
 
     BOOST_AUTO_TEST_CASE(RouterTellTest) {
+        test_router::message_count.store(0);
+
         auto system1 = actor_system::create_system("test_system1", 4555);
 
         const actor_ref r1 = actor::create_router<test_router>("test_router1", system1);
 
         r1.tell(6);
 
+        //wait for the message to get executed
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+
+        BOOST_CHECK_EQUAL(test_router::message_count.load(), 1);
+
         system1->stop(true);
     }
 
     BOOST_AUTO_TEST_CASE(RouterFutureTest) {
+        test_router::message_count.store(0);
+
         auto system1 = actor_system::create_system("test_system1", 4555);
 
         const actor_ref r1 = actor::create_router<test_router>("test_router1", system1);
@@ -43,15 +52,24 @@ BOOST_AUTO_TEST_SUITE( router_test_suite )
 
         BOOST_CHECK_EQUAL(f.get(), "BLAM");
 
+        BOOST_CHECK_EQUAL(test_router::message_count.load(), 1);
+
         system1->stop(true);
     }
 
     BOOST_AUTO_TEST_CASE(RouterTellAllTest) {
+        test_router::message_count.store(0);
+
         auto system1 = actor_system::create_system("test_system1", 4555);
 
         const actor_ref r1 = actor::create_router<test_router>("test_router1", system1);
 
         r1.tell(broadcast<int>(88));
+
+        //wait so the message don't get cleared instantly when the actor_system is shutdown
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+
+        BOOST_CHECK_EQUAL(test_router::message_count.load(), 2);
 
         system1->stop(true);
     }

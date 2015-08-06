@@ -36,6 +36,8 @@ set(ATAN_SOURCES
   packet/packet_structs.cpp
   scheduler/scheduler.h
   scheduler/cancellable.h
+  dispatcher/dispatcher.cpp
+  dispatcher/dispatcher.h
   thread_pool/ctpl_stl.h
   interruptible_thread.h
   )

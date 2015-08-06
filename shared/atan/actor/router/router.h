@@ -11,12 +11,10 @@ class router : public actor
 public:
     void stop_actor(bool wait = false) override {
         actor::stop_actor(wait);
-        this->thread_pool.stop(wait);
     }
 
 protected:
     int size;
-    ctpl::thread_pool thread_pool;
     std::vector<std::unique_ptr<actor>> actors;
 
     router(const std::string& name, const std::shared_ptr<actor_system>& actor_system, int size)
@@ -24,7 +22,6 @@ protected:
     }
 
     ~router() {
-        this->thread_pool.stop();
     }
 
     actor_ref init() override;
@@ -36,6 +33,7 @@ protected:
     void create_actors() {
         for(int i = 0; i < size; i++) {
             std::unique_ptr<T> a = std::unique_ptr<T>(new T(this->actor_name_, this->actor_system_.lock()));
+            a->create_internal_queue_thread();
             this->actors.push_back(std::move(a));
         }
     }

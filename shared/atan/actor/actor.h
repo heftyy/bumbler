@@ -56,7 +56,7 @@ public:
 
     virtual void stop_actor(bool wait = false);
 
-    void run_task(actor_ref& sender, boost::any data) {
+    void run_task(const actor_ref& sender, const boost::any& data) {
         busy_.store(true);
         BOOST_LOG_TRIVIAL(debug) << "[ACTOR] starting new task";
         this->sender_ = sender;
@@ -74,20 +74,7 @@ public:
 
     void pass_message(std::unique_ptr<message> msg, bool remote = false);
 
-    void read_messages() {
-        while (message_queue_.size() > 0 && !stop_flag_) {
-            std::unique_lock<std::mutex> lock(this->message_queue_mutex_);
-
-            std::unique_ptr<message> msg = std::move(message_queue_.front());
-            message_queue_.pop();
-
-            lock.unlock();
-
-            if(msg == nullptr) return;
-
-            run_task(msg->get_sender(), msg->get_data());
-        }
-    }
+    void read_messages();
 
     void add_message(std::unique_ptr<message> msg) {
         BOOST_LOG_TRIVIAL(debug) << "[ACTOR] queueing new task";

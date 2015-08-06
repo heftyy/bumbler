@@ -1,3 +1,4 @@
+#pragma once
 
 #include <iostream>
 #include <mutex>
@@ -14,6 +15,7 @@
 #include "../packet/packet.h"
 #include "../scheduler/scheduler.h"
 #include "../scheduler/cancellable.h"
+#include "../dispatcher/dispatcher.h"
 
 class actor_system : public std::enable_shared_from_this<actor_system> {
 public:
@@ -70,12 +72,16 @@ public:
         return scheduler_->schedule_once(msg, initial_delay_ms);
     }
 
-    const std::shared_ptr<udp_server> get_server() const {
+    const std::shared_ptr<udp_server>& get_server() const {
         return server_;
     }
 
-    const std::shared_ptr<scheduler> get_scheduler() const {
+    const std::shared_ptr<scheduler>& get_scheduler() const {
         return scheduler_;
+    }
+
+    const std::shared_ptr<dispatcher>& get_dispatcher() const {
+        return dispatcher_;
     }
 
     const std::string system_name() const {
@@ -92,7 +98,8 @@ public:
 
 protected:
     actor_system(const std::string& name, int port, int thread_pool_size = 5) : system_name_(name), port_(port) {
-        scheduler_ = std::make_shared<scheduler>(thread_pool_size);
+        dispatcher_ = std::make_shared<dispatcher>(thread_pool_size);
+        scheduler_ = std::make_shared<scheduler>(dispatcher_);
     }
 
 private:
@@ -107,6 +114,7 @@ private:
     std::unique_ptr<std::thread> io_service_thread_;
     boost::asio::io_service io_service_;
     std::shared_ptr<scheduler> scheduler_;
+    std::shared_ptr<dispatcher> dispatcher_;
 
     void init();
 

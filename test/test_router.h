@@ -8,6 +8,8 @@
 
 class test_router : public round_robin_router {
 public:
+    static std::atomic<int> message_count;
+
     test_router(const std::string& name, const std::shared_ptr<actor_system>& actor_system)
             : round_robin_router(name, actor_system, 2) { }
 
@@ -17,6 +19,8 @@ public:
 
 protected:
     void on_receive(boost::any data) {
+        message_count++;
+
         BOOST_LOG_TRIVIAL(debug) << "[OUT_ROUTER] on_receive thread id = " << std::this_thread::get_id();
         BOOST_LOG_TRIVIAL(debug) << "[OUT_ROUTER] received message from " << get_sender().actor_name;
 
@@ -47,3 +51,5 @@ protected:
         //reply(msg_string, msg.sender_);
     }
 };
+
+std::atomic<int> test_router::message_count(0);
