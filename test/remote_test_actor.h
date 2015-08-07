@@ -6,10 +6,9 @@
 #include <communication/message_settings.h>
 #include <atan/actor/remote_actor.h>
 
-class remote_test_actor : public remote_actor {
+class remote_test_actor : public untyped_actor {
 public:
-    remote_test_actor(const std::string& name, const std::shared_ptr<actor_system>& actor_system, const std::string& remote_ref)
-            : remote_actor(name, actor_system, actor_ref(remote_ref)) { }
+    remote_test_actor() {}
 
     ~remote_test_actor() {
         BOOST_LOG_TRIVIAL(debug) << "[OUT_ACTOR] destructor";

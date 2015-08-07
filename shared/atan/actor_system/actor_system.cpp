@@ -121,7 +121,7 @@ int actor_system::future_tell_actor(std::unique_ptr<message> msg, std::function<
 
     std::string actor_name = msg->get_target().actor_name;
 
-    actor_ref p_actor = actor::create_actor<promise_actor>(get_next_temporary_actor_name(), shared_from_this(), response_fn);
+    actor_ref p_actor = promise_actor::create(get_next_temporary_actor_name(), shared_from_this(), response_fn);
     msg->set_sender(p_actor);
 
     auto search = actors_.find(actor_name);

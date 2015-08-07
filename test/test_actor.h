@@ -6,10 +6,9 @@
 #include <atan/messages/commands/commands.h>
 #include <communication/message_settings.h>
 
-class test_actor : public local_actor {
+class test_actor : public untyped_actor {
 public:
-    test_actor(const std::string& name, const std::shared_ptr<actor_system>& actor_system)
-            : local_actor(name, actor_system) { }
+    test_actor() {}
 
     ~test_actor() {
         BOOST_LOG_TRIVIAL(debug) << "[OUT_ACTOR] destructor";

@@ -1,7 +1,7 @@
 #include "actor.h"
 #include "../actor_system/actor_system.h"
 
-actor::actor(const std::string name, std::weak_ptr<actor_system> actor_system)
+actor::actor(const std::string& name, const std::shared_ptr<actor_system>& actor_system)
         : actor_name_(name), actor_system_(actor_system) {
     stop_flag_.store(false);
     self_ = actor_ref(actor_name(), system_name());
@@ -12,8 +12,12 @@ actor::~actor() {
     this->stop_actor();
 }
 
-actor_ref actor::init() {
-    return this->get_self();
+void actor::init(std::unique_ptr<untyped_actor> u_actor) {
+    this->untyped_actor_ = std::move(u_actor);
+    this->untyped_actor_->set_self(this->get_self());
+    this->untyped_actor_->set_reply_message_function([this] (std::unique_ptr<message> msg) {
+        this->send_reply_message(std::move(msg));
+    });
 }
 
 void actor::create_internal_queue_thread() {
@@ -23,8 +27,6 @@ void actor::create_internal_queue_thread() {
         bool isPopped = false;
 
         while (true) {
-            BOOST_LOG_TRIVIAL(debug) << "internal thread loop start";
-
             this->read_messages();
 
             std::unique_lock<std::mutex> lock(this->actor_thread_mutex_);
@@ -52,6 +54,8 @@ std::string actor::system_name() {
 }
 
 void actor::send_reply_message(std::unique_ptr<message> msg) {
+    if (stop_flag_.load()) return;
+
     //actor is not none and local
     if(!msg->get_target().is_none() && !msg->get_target().is_remote()) {
         auto ac = actor_system_storage::instance().get_system(msg->get_target().system_name);

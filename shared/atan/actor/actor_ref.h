@@ -86,7 +86,7 @@ public:
     }
 
     template<typename F, typename T>
-    std::future<F> future(T data) const {
+    std::future<F> future(T&& data) const {
         auto promise_ptr = std::make_shared<std::promise<F>>();
         std::future<F> f = promise_ptr->get_future();
 

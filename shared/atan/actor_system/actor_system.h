@@ -49,12 +49,12 @@ public:
     const actor_ref get_actor(std::string actor_name);
 
     template<typename T>
-    std::shared_ptr<cancellable> schedule(T& data, actor_ref target, long initial_delay_ms, long interval_ms) {
+    std::shared_ptr<cancellable> schedule(T&& data, actor_ref target, long initial_delay_ms, long interval_ms) {
         this->schedule(data, target, actor_ref::none(), initial_delay_ms, interval_ms);
     }
 
     template<typename T>
-    std::shared_ptr<cancellable> schedule(T data, actor_ref target, actor_ref sender, long initial_delay_ms, long interval_ms) {
+    std::shared_ptr<cancellable> schedule(T&& data, actor_ref target, actor_ref sender, long initial_delay_ms, long interval_ms) {
         typed_message<T> tm;
         tm.set_target(target);
         tm.set_sender(sender);

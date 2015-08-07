@@ -8,6 +8,12 @@ class random_router : public router
 {
 public:
     friend class actor;
+
+    template<class T, typename ...Args>
+    static actor_ref create(const std::string& name, const std::shared_ptr<actor_system>& actor_system, int size, Args&& ...args) {
+        std::unique_ptr<random_router> router_ptr = std::unique_ptr<random_router>(new random_router(name, actor_system, size));
+        return router::create<T>(std::move(router_ptr), actor_system, args...);
+    }
 protected:
 
     random_router(const std::string& name, const std::shared_ptr<actor_system>& actor_system, int size)

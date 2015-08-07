@@ -6,6 +6,13 @@
 class round_robin_router : public router
 {
 public:
+    template<class T, typename ...Args>
+    static actor_ref create(const std::string& name, const std::shared_ptr<actor_system>& actor_system, int size, Args&& ...args) {
+        std::unique_ptr<round_robin_router> router_ptr = std::unique_ptr<round_robin_router>(new round_robin_router(name, actor_system, size));
+        return router::create<T>(std::move(router_ptr), actor_system, args...);
+    }
+
+protected:
     friend class actor;
 
     round_robin_router(const std::string& name, const std::shared_ptr<actor_system>& actor_system, int size)

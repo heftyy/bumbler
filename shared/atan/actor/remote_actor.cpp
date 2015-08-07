@@ -1,13 +1,13 @@
 #include "remote_actor.h"
 #include "../actor_system/actor_system.h"
 
-actor_ref remote_actor::init() {
+void remote_actor::init(std::unique_ptr<untyped_actor> u_actor) {
+    actor::init(std::move(u_actor));
     this->create_internal_queue_thread();
-    return actor::init();
 }
 
 void remote_actor::tell(std::unique_ptr<message> msg, bool remote) {
-    //if remote is true the message if from another application so we should just send it to on receive
+    //if remote is true the message if from another application so we should just send it to on_receive
     if(remote) {
         add_message(std::move(msg));
         return;

@@ -50,4 +50,4 @@ ELSE()
   add_definitions(-DBOOST_LOG_DYN_LINK)
 ENDIF()
 
-add_library(atan STATIC ${ATAN_SOURCES})
+add_library(atan STATIC ${ATAN_SOURCES} actor/untyped_actor.h)

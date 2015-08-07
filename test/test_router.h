@@ -4,14 +4,13 @@
 #include <atomic>
 #include <atan/messages/commands/commands.h>
 #include <communication/message_settings.h>
-#include <atan/actor/router/round_robin_router.h>
+#include <atan/actor/untyped_actor.h>
 
-class test_router : public round_robin_router {
+class test_router : public untyped_actor {
 public:
     static std::atomic<int> message_count;
 
-    test_router(const std::string& name, const std::shared_ptr<actor_system>& actor_system)
-            : round_robin_router(name, actor_system, 2) { }
+    test_router() {}
 
     ~test_router() {
         BOOST_LOG_TRIVIAL(debug) << "[OUT_ROUTER] destructor";
@@ -46,7 +45,7 @@ protected:
             BOOST_LOG_TRIVIAL(debug) << "[OUT_ROUTER] message was " << in;
         }
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 
         //reply(msg_string, msg.sender_);
     }

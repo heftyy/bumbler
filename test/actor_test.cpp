@@ -36,8 +36,8 @@ BOOST_AUTO_TEST_SUITE( actor_test_suite )
     BOOST_AUTO_TEST_CASE(ActorInitTest) {
         auto system1 = actor_system::create_system("test_system1", 4555);
 
-        const actor_ref la1 = actor::create_actor<test_actor>("test_actor1", system1);
-        const actor_ref ra1 = actor::create_actor<remote_test_actor>("remote_test_actor1", system1, "test_actor1$test_system1@localhost:4555");
+        const actor_ref la1 = local_actor::create<test_actor>("test_actor1", system1);
+        const actor_ref ra1 = remote_actor::create<remote_test_actor>("remote_test_actor1", system1, actor_ref("test_actor1$test_system1@localhost:4555"));
 
         actor_ref from_system1 = system1->get_actor("test_actor1");
         actor_ref from_system2 = system1->get_actor("remote_test_actor1");

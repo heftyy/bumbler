@@ -1,8 +1,8 @@
 #include "router.h"
 #include "../../actor_system/actor_system.h"
 
-actor_ref router::init() {
-    return actor::init();
+void router::init(std::unique_ptr<untyped_actor> u_actor) {
+    actor::init(std::move(u_actor));
 }
 
 void router::tell(std::unique_ptr<message> msg, bool remote) {

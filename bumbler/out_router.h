@@ -6,11 +6,10 @@
 #include <atan/actor_system/actor_system.h>
 #include <communication/message_settings.h>
 
-class out_router : public round_robin_router
+class out_router : public untyped_actor
 {
 public:
-    out_router(std::string name, std::shared_ptr<actor_system> actor_system)
-            : round_robin_router(name, actor_system, 3), messages_(0) { }
+    out_router() : messages_(0) { }
 
     ~out_router() {
         BOOST_LOG_TRIVIAL(debug) << "[OUT_ROUTER] destructor";

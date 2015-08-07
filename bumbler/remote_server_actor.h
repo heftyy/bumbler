@@ -5,10 +5,9 @@
 #include <atan/actor/remote_actor.h>
 #include <communication/message_settings.h>
 
-class remote_server_actor : public remote_actor {
+class remote_server_actor : public untyped_actor {
 public:
-    remote_server_actor(std::string name, std::string remote_actor_ref, std::shared_ptr<actor_system> actor_system)
-            : remote_actor(name, actor_system, actor_ref(remote_actor_ref)) { }
+    remote_server_actor() {}
 
     ~remote_server_actor() {
         BOOST_LOG_TRIVIAL(debug) << "[REMOTE_ACTOR] destructor";
