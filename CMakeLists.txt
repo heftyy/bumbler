@@ -39,7 +39,7 @@ if(${WIN32})
     SET(Boost_USE_MULTITHREADED    ON)
     SET(Boost_USE_STATIC_RUNTIME   OFF)
 
-    find_package(Boost COMPONENTS thread system date_time regex filesystem log log_setup serialization unit_test_framework REQUIRED)
+    find_package(Boost COMPONENTS thread chrono system date_time regex filesystem log log_setup serialization unit_test_framework REQUIRED)
     find_library(ws2_32_LIBRARY_PATH ws2_32)
 
     #set(CMAKE_RUNTIME_OUTPUT_DIRECTORY F:/github/bumbler/bin)
@@ -52,7 +52,7 @@ ELSE()
     #set(Boost_USE_STATIC_LIBS   ON)
     set(Boost_USE_MULTITHREADED ON)
     set(BOOST_ROOT ../boost_1_58_0)
-    find_package(Boost COMPONENTS thread system date_time regex filesystem log log_setup serialization unit_test_framework REQUIRED)
+    find_package(Boost COMPONENTS thread chrono system date_time regex filesystem log log_setup serialization unit_test_framework REQUIRED)
 ENDIF()
 
 include_directories(shared)

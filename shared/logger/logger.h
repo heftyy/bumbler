@@ -9,7 +9,6 @@
 #define INFO  BOOST_LOG_SEV(my_logger::get(), boost::log::trivial::info)
 #define DEBUG BOOST_LOG_SEV(my_logger::get(), boost::log::trivial::debug)
 #define WARN  BOOST_LOG_SEV(my_logger::get(), boost::log::trivial::warning)
-#define ERROR BOOST_LOG_SEV(my_logger::get(), boost::log::trivial::error)
 
 #define SYS_LOGFILE "my_log"
 

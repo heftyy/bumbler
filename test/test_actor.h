@@ -2,8 +2,6 @@
 
 #include <iostream>
 #include <atomic>
-#include <atan/actor/local_actor.h>
-#include <atan/messages/commands/commands.h>
 #include <communication/message_settings.h>
 
 class test_actor : public untyped_actor {

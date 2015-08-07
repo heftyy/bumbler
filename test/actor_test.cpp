@@ -29,9 +29,10 @@ BOOST_AUTO_TEST_SUITE( actor_test_suite )
         BOOST_CHECK_EQUAL(system1->started(), true);
 
         BOOST_CHECK_EQUAL(system1->stopped(), false);
-        system1->stop(true);
+		system1->stop(false);
         BOOST_CHECK_EQUAL(system1->stopped(), true);
     }
+
 
     BOOST_AUTO_TEST_CASE(ActorInitTest) {
         auto system1 = actor_system::create_system("test_system1", 4555);
@@ -45,7 +46,7 @@ BOOST_AUTO_TEST_SUITE( actor_test_suite )
         BOOST_CHECK_EQUAL(from_system1.to_string(), la1.to_string());
         BOOST_CHECK_EQUAL(from_system2.to_string(), ra1.to_string());
 
-        system1->stop(true);
+        system1->stop(false);
     }
 
 BOOST_AUTO_TEST_SUITE_END()

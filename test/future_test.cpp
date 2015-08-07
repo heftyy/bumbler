@@ -4,6 +4,7 @@
 #include <atan/actor/actor_ref.h>
 #include <atan/actor_system/actor_system.h>
 #include <communication/serializable_types.h>
+#include <atan/actor/local_actor.h>
 #include "test_actor.h"
 #include "remote_test_actor.h"
 

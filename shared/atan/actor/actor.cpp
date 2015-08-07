@@ -22,8 +22,7 @@ void actor::init(std::unique_ptr<untyped_actor> u_actor) {
 
 void actor::create_internal_queue_thread() {
     queue_thread_ = utility::make_unique<interruptible_thread>();
-    queue_thread_->start([this]() {
-
+    queue_thread_->start([this]() {	
         bool isPopped = false;
 
         while (true) {
@@ -41,7 +40,7 @@ void actor::create_internal_queue_thread() {
 
             if (!isPopped)
                 return;  // if the queue is empty and this->stop_flag_ is set to true
-        }
+        }		
     });
 }
 
@@ -116,7 +115,7 @@ void actor::stop_actor(bool wait) {
         BOOST_LOG_TRIVIAL(debug) << "[ACTOR] stopping";
         cv.notify_one();
         queue_thread_->stop();
-        queue_thread_.release();
+        queue_thread_.reset(nullptr);
         BOOST_LOG_TRIVIAL(debug) << "[ACTOR] stopped";
     }
 }

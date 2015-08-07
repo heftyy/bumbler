@@ -45,39 +45,38 @@ public:
         return actor_ref();
     }
 
-    //if a string literal is passed to tell i change it to std::string
+    //if a string literal is passed to tell change it to std::string
     void tell(const char* data, actor_ref sender = actor_ref::none()) {
         tell(std::string(data), sender);
     }
 
     template<typename T>
-    void tell(T data, actor_ref sender = actor_ref::none()) const {
+    void tell(const T& data, actor_ref sender = actor_ref::none()) const {
         std::unique_ptr<typed_message<T>> msg_ptr = std::unique_ptr<typed_message<T>>(new typed_message<T>(*this, sender, data));
         actor_tell(std::move(msg_ptr));
     }
 
     template<typename T>
-    void tell(broadcast<T> msg, actor_ref sender = actor_ref::none()) const {
+    void tell(const broadcast<T>& msg, actor_ref sender = actor_ref::none()) const {
         std::unique_ptr<typed_message<T>> msg_ptr = std::unique_ptr<typed_message<T>>(new typed_message<T>(*this, sender, msg));
         actor_tell(std::move(msg_ptr));
     }
 
     template<typename T>
-    void tell(stop_actor<T> msg, actor_ref sender = actor_ref::none()) const {
+    void tell(const stop_actor<T>& msg, actor_ref sender = actor_ref::none()) const {
         std::unique_ptr<typed_message<T>> msg_ptr = std::unique_ptr<typed_message<T>>(new typed_message<T>(*this, sender, msg));
         actor_tell(std::move(msg_ptr));
     }
 
     template<typename T>
-    void tell(kill_actor<T> msg, actor_ref sender = actor_ref::none()) const {
+    void tell(const kill_actor<T>& msg, actor_ref sender = actor_ref::none()) const {
         std::unique_ptr<typed_message<T>> msg_ptr = std::unique_ptr<typed_message<T>>(new typed_message<T>(*this, sender, msg));
         actor_tell(std::move(msg_ptr));
     }
 
     template<typename T>
-    void tell(typed_message<T> msg) const {
-        std::unique_ptr<typed_message<T>> msg_ptr = std::unique_ptr<typed_message<T>>(new typed_message<T>(msg));
-        actor_tell(std::move(msg_ptr));
+    void tell(const typed_message<T>& msg) const {
+        actor_tell(std::move(msg.clone()));
     }
 
     template<typename F>

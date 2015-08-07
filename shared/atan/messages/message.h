@@ -16,6 +16,10 @@ class message {
 public:
     message() : type_(-1) {}
 
+	message(const message& msg) {
+		this->type_.store(msg.type_);
+    }
+
     virtual boost::any get_data() const = 0;
 
     virtual actor_ref& get_sender() const = 0;

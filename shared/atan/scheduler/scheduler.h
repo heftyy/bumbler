@@ -15,7 +15,7 @@ class actor_system;
 
 class scheduler {
 public:
-    scheduler(std::shared_ptr<dispatcher> dispatcher) {
+    scheduler(const std::shared_ptr<dispatcher>& dispatcher) : dispatcher_(dispatcher) {
         cancellable_vector_it_ = cancellable_vector_.begin();
     }
 
@@ -34,7 +34,7 @@ public:
         std::shared_ptr<cancellable> ret_cancellable = std::make_shared<cancellable>();
         auto cancel_it = cancellable_vector_.insert(cancellable_vector_it_, ret_cancellable);
 
-        dispatcher_->push([this, msg, initial_delay_ms, interval_ms, ret_cancellable, cancel_it](int id) {
+        dispatcher_->push([this, msg, initial_delay_ms, interval_ms, ret_cancellable, cancel_it](int id) -> int {
             ret_cancellable->thread_id = std::this_thread::get_id();
 
             if (initial_delay_ms > 0) {
@@ -45,7 +45,7 @@ public:
             if (ret_cancellable->check_cancel()) {
                 ret_cancellable->cancelled();
                 cancellable_vector_.erase(cancel_it);
-                return;
+                return 1;
             }
 
             while (!ret_cancellable->check_cancel()) {
@@ -66,6 +66,8 @@ public:
 
             ret_cancellable->cancelled();
             cancellable_vector_.erase(cancel_it);
+
+			return 0;
         });
 
         return ret_cancellable;

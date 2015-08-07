@@ -24,58 +24,69 @@ public:
 
     typed_message() { }
 
-    typed_message(const actor_ref& target, const actor_ref& sender, const T data) {
+	typed_message(const typed_message<T>& msg) : message(msg) {
+		this->data = msg.data;
+		this->target = msg.target;
+		this->sender = msg.sender;;
+    };
+
+    typed_message(const actor_ref& target, const actor_ref& sender, const T& data) {
         this->set_target(target);
         this->set_sender(sender);
         this->data = data;
     }
 
-    typed_message(std::shared_ptr<actor_ref>& target, std::shared_ptr<actor_ref>& sender, T& data) {
+    typed_message(std::shared_ptr<actor_ref>& target, std::shared_ptr<actor_ref>& sender, const T& data) {
         this->target = target;
         this->sender = sender;
         this->data = data;
     }
 
-    typed_message(const actor_ref& target, const actor_ref& sender, const broadcast<T> broadcast) {
+    typed_message(const actor_ref& target, const actor_ref& sender, const broadcast<T>& broadcast) {
         this->set_target(target);
         this->set_sender(sender);
         this->data = broadcast.data;
         this->type_ = BROADCAST;
     }
 
-    typed_message(std::shared_ptr<actor_ref>& target, std::shared_ptr<actor_ref>& sender, broadcast<T>& broadcast) {
+    typed_message(std::shared_ptr<actor_ref>& target, std::shared_ptr<actor_ref>& sender, const broadcast<T>& broadcast) {
         this->target = target;
         this->sender = sender;
         this->data = broadcast.data;
         this->type_ = BROADCAST;
     }
 
-    typed_message(const actor_ref& target, const actor_ref& sender, const stop_actor<T> stop_actor) {
+    typed_message(const actor_ref& target, const actor_ref& sender, const stop_actor<T>& stop_actor) {
         this->set_target(target);
         this->set_sender(sender);
         this->data = stop_actor.data;
         this->type_ = STOP_ACTOR;
     }
 
-    typed_message(std::shared_ptr<actor_ref>& target, std::shared_ptr<actor_ref>& sender, stop_actor<T>& stop_actor) {
+    typed_message(std::shared_ptr<actor_ref>& target, std::shared_ptr<actor_ref>& sender, const stop_actor<T>& stop_actor) {
         this->target = target;
         this->sender = sender;
         this->data = stop_actor.data;
         this->type_ = STOP_ACTOR;
     }
 
-    typed_message(const actor_ref& target, const actor_ref& sender, const kill_actor<T> kill_actor) {
+    typed_message(const actor_ref& target, const actor_ref& sender, const kill_actor<T>& kill_actor) {
         this->set_target(target);
         this->set_sender(sender);
         this->data = kill_actor.data;
         this->type_ = KILL_ACTOR;
     }
 
-    typed_message(std::shared_ptr<actor_ref>& target, std::shared_ptr<actor_ref>& sender, kill_actor<T>& kill_actor) {
+    typed_message(std::shared_ptr<actor_ref>& target, std::shared_ptr<actor_ref>& sender, const kill_actor<T>& kill_actor) {
         this->target = target;
         this->sender = sender;
         this->data = kill_actor.data;
         this->type_ = KILL_ACTOR;
+    }
+
+	~typed_message() {
+		this->target.reset();
+		this->sender.reset();		
     }
 
     boost::any get_data() const override {

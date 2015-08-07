@@ -17,8 +17,8 @@ public:
     }
 
 protected:
-    void on_receive(boost::any data) {
-        message_count++;
+    void on_receive(boost::any data) override {
+	    ++message_count;
 
         BOOST_LOG_TRIVIAL(debug) << "[OUT_ROUTER] on_receive thread id = " << std::this_thread::get_id();
         BOOST_LOG_TRIVIAL(debug) << "[OUT_ROUTER] received message from " << get_sender().actor_name;
@@ -45,7 +45,7 @@ protected:
             BOOST_LOG_TRIVIAL(debug) << "[OUT_ROUTER] message was " << in;
         }
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
         //reply(msg_string, msg.sender_);
     }
