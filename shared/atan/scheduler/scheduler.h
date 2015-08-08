@@ -16,44 +16,49 @@ class actor_system;
 class scheduler {
 public:
     scheduler(const std::shared_ptr<dispatcher>& dispatcher) : dispatcher_(dispatcher) {
-        cancellable_vector_it_ = cancellable_vector_.begin();
+//        cancellable_vector_it_ = cancellable_vector_.begin();
     }
 
     ~scheduler() {
         BOOST_LOG_TRIVIAL(debug) << "[SCHEDULER] DESTROY";
 
+		/*
         for (std::shared_ptr<cancellable>& cancellable : cancellable_vector_) {
             if (!cancellable->is_cancelled()) {
                 cancellable->cancel();
             }
         }
+		*/
     }
 
     template<typename T>
     std::shared_ptr<cancellable> schedule(const typed_message<T>& msg, long initial_delay_ms, long interval_ms) {
         std::shared_ptr<cancellable> ret_cancellable = std::make_shared<cancellable>();
-        auto cancel_it = cancellable_vector_.insert(cancellable_vector_it_, ret_cancellable);
+		std::weak_ptr<cancellable> ret_cancellable_weak_ptr = ret_cancellable;
 
-        dispatcher_->push([this, msg, initial_delay_ms, interval_ms, ret_cancellable, cancel_it](int id) -> int {
-            ret_cancellable->thread_id = std::this_thread::get_id();
+        dispatcher_->push([this, initial_delay_ms, interval_ms](int id, const typed_message<T> msg_copy, std::weak_ptr<cancellable> cancellable) -> int {
+			if (cancellable.expired()) return 2;
+			else {
+				cancellable.lock()->thread_id = std::this_thread::get_id();
 
-            if (initial_delay_ms > 0) {
-                std::chrono::milliseconds initial_delay(initial_delay_ms);
-                std::this_thread::sleep_for(initial_delay);
-            }
+				if (initial_delay_ms > 0) {
+					std::chrono::milliseconds initial_delay(initial_delay_ms);
+					std::this_thread::sleep_for(initial_delay);
+				}
+			}            
 
-            if (ret_cancellable->check_cancel()) {
-                ret_cancellable->cancelled();
-                cancellable_vector_.erase(cancel_it);
-                return 1;
-            }
+			if (cancellable.expired()) return 2;
+			else if (cancellable.lock()->check_cancel()) {
+				cancellable.lock()->cancelled();
+				return 1;
+			};
 
-            while (!ret_cancellable->check_cancel()) {
+            while (!cancellable.expired() && cancellable.lock() != nullptr && !cancellable.lock()->check_cancel()) {
                 BOOST_LOG_TRIVIAL(debug) << "[SCHEDULER] thread_id: " << std::this_thread::get_id() <<
-                                         " sending message to " << msg.get_target().to_string();
+                                         " sending message to " << msg_copy.get_target().to_string();
                 BOOST_LOG_TRIVIAL(debug) << "hello from " << id << ' ' << '\n';
 
-                msg.get_target().tell(msg);
+                msg_copy.get_target().tell(msg_copy);
 
                 if (interval_ms > 0) {
                     std::chrono::milliseconds interval(interval_ms);
@@ -64,11 +69,12 @@ public:
                 }
             }
 
-            ret_cancellable->cancelled();
-            cancellable_vector_.erase(cancel_it);
-
-			return 0;
-        });
+			if (cancellable.expired()) return 2;
+			else {
+				cancellable.lock()->cancelled();
+				return 0;
+			}			
+        }, msg, ret_cancellable_weak_ptr);
 
         return ret_cancellable;
     }
@@ -79,8 +85,7 @@ public:
     }
 
 private:
+	std::mutex cancellable_vector_mutex_;
     std::shared_ptr<dispatcher> dispatcher_;
-    std::vector<std::shared_ptr<cancellable>> cancellable_vector_;
-    std::vector<std::shared_ptr<cancellable>>::iterator cancellable_vector_it_;
 
 };

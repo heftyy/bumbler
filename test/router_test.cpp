@@ -8,6 +8,7 @@
 #include "test_actor.h"
 #include "remote_test_actor.h"
 #include "test_router.h"
+#include "typed_data.h"
 
 BOOST_AUTO_TEST_SUITE( router_test_suite )
     BOOST_AUTO_TEST_CASE(RouterCreateTest) {
@@ -70,10 +71,12 @@ BOOST_AUTO_TEST_SUITE( router_test_suite )
 
         r1.tell(broadcast<int>(88));
 
+		r1.tell(typed_data<std::string>("blam"));
+
         //wait so the message don't get cleared instantly when the actor_system is shutdown
         std::this_thread::sleep_for(std::chrono::seconds(2));
 
-        BOOST_CHECK_EQUAL(test_router::message_count.load(), 2);
+        BOOST_CHECK_EQUAL(test_router::message_count.load(), 3);
 
         system1->stop(true);
     }
