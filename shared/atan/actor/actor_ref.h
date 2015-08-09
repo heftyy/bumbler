@@ -24,8 +24,8 @@ public:
             : actor_name(actor_name), system_name(system_name), ip(ip), port(port) { }
 
     actor_ref(const std::string& actor_ref) /** [actor]$[system_name]@[ip]:[port] */ {
-        unsigned long long int system_name_start = actor_ref.find('$');
-        unsigned long long int ip_start = actor_ref.find('@');
+	    auto system_name_start = actor_ref.find('$');
+	    auto ip_start = actor_ref.find('@');
         unsigned long long int port_start = actor_ref.find(':');
         actor_name = actor_ref.substr(0, system_name_start);
         system_name = actor_ref.substr(system_name_start + 1, ip_start - system_name_start - 1);
@@ -52,25 +52,25 @@ public:
 
     template<typename T>
     void tell(const T& data, actor_ref sender = actor_ref::none()) const {
-        std::unique_ptr<typed_message<T>> msg_ptr = std::unique_ptr<typed_message<T>>(new typed_message<T>(*this, sender, data));
+		auto msg_ptr = std::unique_ptr<typed_message<T>>(new typed_message<T>(*this, sender, data));
         actor_tell(std::move(msg_ptr));
     }
 
     template<typename T>
     void tell(const broadcast<T>& msg, actor_ref sender = actor_ref::none()) const {
-        std::unique_ptr<typed_message<T>> msg_ptr = std::unique_ptr<typed_message<T>>(new typed_message<T>(*this, sender, msg));
+		auto msg_ptr = std::unique_ptr<typed_message<T>>(new typed_message<T>(*this, sender, msg));
         actor_tell(std::move(msg_ptr));
     }
 
     template<typename T>
     void tell(const stop_actor<T>& msg, actor_ref sender = actor_ref::none()) const {
-        std::unique_ptr<typed_message<T>> msg_ptr = std::unique_ptr<typed_message<T>>(new typed_message<T>(*this, sender, msg));
+		auto msg_ptr = std::unique_ptr<typed_message<T>>(new typed_message<T>(*this, sender, msg));
         actor_tell(std::move(msg_ptr));
     }
 
     template<typename T>
     void tell(const kill_actor<T>& msg, actor_ref sender = actor_ref::none()) const {
-        std::unique_ptr<typed_message<T>> msg_ptr = std::unique_ptr<typed_message<T>>(new typed_message<T>(*this, sender, msg));
+        auto msg_ptr = std::unique_ptr<typed_message<T>>(new typed_message<T>(*this, sender, msg));
         actor_tell(std::move(msg_ptr));
     }
 
@@ -87,9 +87,9 @@ public:
     template<typename F, typename T>
     std::future<F> future(T&& data) const {
         auto promise_ptr = std::make_shared<std::promise<F>>();
-        std::future<F> f = promise_ptr->get_future();
+        auto f = promise_ptr->get_future();
 
-        size_t future_type_hashcode = typeid(F).hash_code();
+	    auto future_type_hashcode = typeid(F).hash_code();
 
         auto fn = [=](std::shared_ptr<std::promise<F>>& promise, boost::any response) {
             if(response.type().hash_code() == future_type_hashcode) {
@@ -104,7 +104,7 @@ public:
 
         std::function<void(boost::any)> bound_fn = std::bind(fn, promise_ptr, std::placeholders::_1);
 
-        std::unique_ptr<typed_message<T>> msg_ptr = std::unique_ptr<typed_message<T>>(new typed_message<T>(*this, none(), data));
+        auto msg_ptr = std::unique_ptr<typed_message<T>>(new typed_message<T>(*this, none(), data));
 
         actor_future_tell(std::move(msg_ptr), bound_fn);
 

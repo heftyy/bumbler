@@ -18,14 +18,13 @@ void actor_system_storage::remove_system(std::string system_name) {
     std::lock_guard<std::mutex> guard(this->systems_mutex_);
     auto search = systems_.find(system_name);
     if (search != systems_.end()) {
-        systems_[system_name]->stop();
         systems_.erase(search);
     }
 }
 
 std::shared_ptr<actor_system> actor_system_storage::get_system(std::string system_name) {
     std::lock_guard<std::mutex> guard(this->systems_mutex_);
-    for (auto pair : systems_) {
+    for (auto& pair : systems_) {
         if (system_name.compare(pair.second->system_name()) == 0) {
             return pair.second;
         }

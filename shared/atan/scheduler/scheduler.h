@@ -33,7 +33,7 @@ public:
 
     template<typename T>
     std::shared_ptr<cancellable> schedule(const typed_message<T>& msg, long initial_delay_ms, long interval_ms) {
-        std::shared_ptr<cancellable> ret_cancellable = std::make_shared<cancellable>();
+	    auto ret_cancellable = std::make_shared<cancellable>();
 		std::weak_ptr<cancellable> ret_cancellable_weak_ptr = ret_cancellable;
 
         dispatcher_->push([this, initial_delay_ms, interval_ms](int id, const typed_message<T> msg_copy, std::weak_ptr<cancellable> cancellable) -> int {

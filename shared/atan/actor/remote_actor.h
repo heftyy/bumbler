@@ -19,10 +19,10 @@ public:
                 "T has be a descendant of untyped_actor"
         );
 
-        std::unique_ptr<remote_actor> actor = std::unique_ptr<remote_actor>(new remote_actor(name, actor_system, network_actor_ref));
-        std::unique_ptr<T> typed_actor = utility::make_unique<T>(args...);
+	    auto actor = std::unique_ptr<remote_actor>(new remote_actor(name, actor_system, network_actor_ref));
+        auto typed_actor = utility::make_unique<T>(args...);
         actor->init(std::move(typed_actor));
-        actor_ref& ar = actor->get_self();
+	    auto& ar = actor->get_self();
         actor::add_to_actor_system(actor_system, std::move(actor));
         return ar;
     }

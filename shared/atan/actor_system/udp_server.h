@@ -18,7 +18,7 @@ public:
     std::function<void()> send_completed_function;
 
     udp_server(boost::asio::io_service& io_service, int port)
-            : port_(port), socket_(io_service, udp::endpoint(udp::v4(), (unsigned short) port)),
+            : port_(port), socket_(io_service, udp::endpoint(udp::v4(), static_cast<unsigned short>(port))),
               future_socket_(io_service, udp::endpoint(udp::v4(), 0)) {
         do_receive();
     }
@@ -38,8 +38,7 @@ public:
 
     std::unique_ptr<packet> future(const std::string& data, const udp::endpoint& target_endpoint, int timeout_ms) {
         sync_send(data, target_endpoint);
-        std::unique_ptr<packet> packet;
-        packet = sync_receive(target_endpoint, timeout_ms);
+        auto packet = sync_receive(target_endpoint, timeout_ms);
         if (packet) {
             return std::move(packet);
         }
@@ -65,15 +64,14 @@ public:
         });
 
         try {
-            size_t bytes_recvd = future_socket_.receive_from(boost::asio::buffer(data_, PACKET_MAX_LENGTH),
-                                                             sender_endpoint_);
+	        auto bytes_recvd = future_socket_.receive_from(boost::asio::buffer(data_, PACKET_MAX_LENGTH), sender_endpoint_);
             if (bytes_recvd &&
                 sender_endpoint_.address().to_string().compare(target_endpoint.address().to_string()) == 0) {
                 std::string string_data(data_.begin(), data_.begin() + bytes_recvd * sizeof(char));
                 try {
                     stop_deadline = true;
                     deadline_check.join();
-                    packet received_packet = packet::parse(string_data);
+	                auto received_packet = packet::parse(string_data);
                     return std::move(std::unique_ptr<packet>(new packet(received_packet)));
                 }
                 catch (std::exception e) {
@@ -127,7 +125,7 @@ private:
                                                  " received bytes " << bytes_recvd;
                         std::string string_data(data_.begin(), data_.begin() + bytes_recvd * sizeof(char));
                         try {
-                            packet received_packet = packet::parse(string_data);
+	                        auto received_packet = packet::parse(string_data);
                             receive_function(
                                     std::move(std::unique_ptr<packet>(new packet(received_packet))),
                                     sender_endpoint_

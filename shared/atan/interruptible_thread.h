@@ -56,8 +56,7 @@ public:
                 new std::thread(
                         [fun, period, initial_delay, this]() {
                             if (initial_delay > 0) {
-                                std::chrono::milliseconds sleep_duration(initial_delay);
-                                std::this_thread::sleep_for(sleep_duration);
+                                std::this_thread::sleep_for(std::chrono::milliseconds(initial_delay));
                             }
 
                             this->run(fun, period);

@@ -17,10 +17,10 @@ public:
                 "T has be a descendant of untyped_actor"
         );
 
-        std::unique_ptr<local_actor> actor = std::unique_ptr<local_actor>(new local_actor(name, actor_system));
-        std::unique_ptr<T> typed_actor = utility::make_unique<T>(args...);
+	    auto actor = std::unique_ptr<local_actor>(new local_actor(name, actor_system));
+        auto typed_actor = utility::make_unique<T>(args...);
         actor->init(std::move(typed_actor));
-        actor_ref& ar = actor->get_self();
+	    auto& ar = actor->get_self();
         actor::add_to_actor_system(actor_system, std::move(actor));
         return ar;
     }

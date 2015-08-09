@@ -5,7 +5,7 @@ void actor_system::init() {
 
     boost::asio::io_service::work work(io_service_);
 
-    server_ = std::shared_ptr<udp_server>(new udp_server(io_service_, port_));
+    server_ = std::make_shared<udp_server>(io_service_, port_);
     server_->send_completed_function = [&]() { send_completed(); };
     server_->receive_function = [&](std::unique_ptr<packet> packet,
                                     boost::asio::ip::udp::endpoint sender_endpoint) {
@@ -14,7 +14,7 @@ void actor_system::init() {
 
     //create a future that is going to wait until the io_service thread has started and io_service is reading messages
     auto promise_ptr = std::make_shared<std::promise<int>>();
-    std::future<int> f = promise_ptr->get_future();
+	auto f = promise_ptr->get_future();
 
     io_service_.dispatch([promise_ptr] () {
         BOOST_LOG_TRIVIAL(debug) << "[IO_SERVICE] run thread started";
@@ -38,18 +38,19 @@ void actor_system::init() {
 }
 
 void actor_system::stop(bool wait) {
-    if (stopped_) return;
-
-    dispatcher_->stop(wait);
+    if (stopped_) return;    
 
     for (auto iter = actors_.begin(); iter != actors_.end();) {
         iter->second->stop_actor(wait);
         actors_.erase(iter++);
     }
 
+	scheduler_.reset();
+	dispatcher_->stop(wait);
+	actor_system_storage::instance().remove_system(system_name_);
+
     if(!started_) {
         server_.reset();
-
         return;
     }
 
@@ -65,8 +66,6 @@ void actor_system::stop(bool wait) {
     //wait for the udp server to properly shutdown, otherwise it SIGSEGVs
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
     server_.reset();
-
-    actor_system_storage::instance().remove_system(system_name_);
 }
 
 std::shared_ptr<actor_system> actor_system::create_system(const std::string& name, int port, int thread_pool_size) {

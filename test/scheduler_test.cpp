@@ -3,7 +3,7 @@
 #include <boost/test/unit_test.hpp>
 #include <atan/actor/actor_ref.h>
 #include <atan/actor_system/actor_system.h>
-#include <atan/actor/router/random_router.h>
+#include <atan/actor/router/round_robin_router.h>
 #include "test_router.h"
 #include "typed_data.h"
 
@@ -14,13 +14,13 @@ BOOST_AUTO_TEST_CASE(SchedulerSingleMessageTest) {
 
 	auto system1 = actor_system::create_system("test_system1", 4555);
 
-	const actor_ref r1 = random_router::create<test_router>("test_actor1", system1, 3);
+	auto&& r1 = round_robin_router::create<test_router>("test_actor1", system1, 3);
 
 	auto blam1 = system1->schedule(55, r1, actor_ref::none(), 0, 0);
-	auto blam2 = system1->schedule(54, r1, actor_ref::none(), 0, 0);
+	auto blam2 = system1->schedule(54, r1, actor_ref::none(), 100, 0);
 
 	//cancel before the message is ever sent
-	auto c1 = system1->schedule(53, r1, actor_ref::none(), 500, 0);
+	auto c1 = system1->schedule(53, r1, actor_ref::none(), 500, 0 );
 	c1->cancel();
 
 	//cancel after the message is sent 4 times (0/300/600/900 ms)
@@ -32,7 +32,7 @@ BOOST_AUTO_TEST_CASE(SchedulerSingleMessageTest) {
 
 	BOOST_CHECK_EQUAL(test_router::message_count.load(), 1+1+4);
 
-	system1->stop(true);
+	system1->stop(false);
 }
 
 BOOST_AUTO_TEST_CASE(SchedulerBroadcastTest) {
@@ -40,7 +40,7 @@ BOOST_AUTO_TEST_CASE(SchedulerBroadcastTest) {
 
 	auto system1 = actor_system::create_system("test_system1", 4555);
 
-	const actor_ref r1 = random_router::create<test_router>("test_actor1", system1, 3);
+	auto&& r1 = round_robin_router::create<test_router>("test_actor1", system1, 3);
 
 	auto c1 = system1->schedule(broadcast<int>(5), r1, 200, 0);
 

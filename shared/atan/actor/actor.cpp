@@ -124,19 +124,19 @@ void actor::read_messages() {
     while (message_queue_.size() > 0 && !stop_flag_) {
         std::unique_lock<std::mutex> lock(this->message_queue_mutex_);
 
-        std::unique_ptr<message> msg = std::move(message_queue_.front());
+        auto msg = std::move(message_queue_.front());
         message_queue_.pop();
 
         lock.unlock();
 
         if(msg == nullptr) return;
 
-        std::function<int(int, const actor_ref&, const boost::any&)> fun = [this] (int thread_id, const actor_ref& sender, const boost::any& data) -> int {
+        auto fun = [this] (int thread_id, const actor_ref& sender, const boost::any& data) -> int {
             this->run_task(sender, data);
             return 0;
         };
 
-        std::future<int> future_result = this->actor_system_.lock()->get_dispatcher()->push(fun, msg->get_sender(), msg->get_data());
+        auto future_result = this->actor_system_.lock()->get_dispatcher()->push(fun, msg->get_sender(), msg->get_data());
 
         future_result.wait();
     }
