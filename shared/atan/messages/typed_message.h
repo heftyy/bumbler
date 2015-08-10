@@ -30,9 +30,9 @@ public:
     };
 
     typed_message(const actor_ref& target, const actor_ref& sender, const T& data) {
-        this->set_target(target);
-        this->set_sender(sender);
         this->data = data;
+        this->target = std::make_shared<actor_ref>(target);
+        this->sender = std::make_shared<actor_ref>(sender);
     }
 
     typed_message(const std::shared_ptr<actor_ref>& target, const std::shared_ptr<actor_ref>& sender, const T& data) {
@@ -46,15 +46,15 @@ public:
 		this->sender.reset();		
     }
 
-    virtual bool is_broadcast() const override {
+    bool is_broadcast() const override {
         return std::is_base_of<::untyped_broadcast, T>::value;
     }
 
-    virtual bool is_stop_actor() const override {
+    bool is_stop_actor() const override {
         return std::is_base_of<::untyped_stop_actor, T>::value;
     }
 
-    virtual bool is_kill_actor() const override {
+    bool is_kill_actor() const override {
         return std::is_base_of<::untyped_kill_actor, T>::value;
     }
 

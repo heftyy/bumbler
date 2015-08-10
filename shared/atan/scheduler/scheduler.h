@@ -56,7 +56,7 @@ public:
             while (!cancellable.expired() && cancellable.lock() != nullptr && !cancellable.lock()->check_cancel()) {
                 BOOST_LOG_TRIVIAL(debug) << "[SCHEDULER] thread_id: " << std::this_thread::get_id() <<
                                          " sending message to " << msg_copy.get_target().to_string();
-                BOOST_LOG_TRIVIAL(debug) << "hello from " << id << ' ' << '\n';
+                BOOST_LOG_TRIVIAL(debug) << "hello from " << id << ' ';
 
                 msg_copy.get_target().tell(msg_copy);
 
