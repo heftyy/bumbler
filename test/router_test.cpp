@@ -71,7 +71,7 @@ BOOST_AUTO_TEST_SUITE( router_test_suite )
 
         r1.tell(broadcast<int>(88));
 
-		r1.tell(typed_data<std::string>("blam"));
+		r1.tell(typed_data<std::string>(std::string("blam")));
 
         //wait so the message don't get cleared instantly when the actor_system is shutdown
         std::this_thread::sleep_for(std::chrono::seconds(2));

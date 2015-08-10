@@ -11,7 +11,6 @@
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
 #include <boost/any.hpp>
-#include "serialization_utility.h"
 #include "message.h"
 #include "commands/commands.h"
 
@@ -36,57 +35,27 @@ public:
         this->data = data;
     }
 
-    typed_message(std::shared_ptr<actor_ref>& target, std::shared_ptr<actor_ref>& sender, const T& data) {
+    typed_message(const std::shared_ptr<actor_ref>& target, const std::shared_ptr<actor_ref>& sender, const T& data) {
         this->target = target;
         this->sender = sender;
         this->data = data;
     }
 
-    typed_message(const actor_ref& target, const actor_ref& sender, const broadcast<T>& broadcast) {
-        this->set_target(target);
-        this->set_sender(sender);
-        this->data = broadcast.data;
-        this->type_ = BROADCAST;
-    }
-
-    typed_message(std::shared_ptr<actor_ref>& target, std::shared_ptr<actor_ref>& sender, const broadcast<T>& broadcast) {
-        this->target = target;
-        this->sender = sender;
-        this->data = broadcast.data;
-        this->type_ = BROADCAST;
-    }
-
-    typed_message(const actor_ref& target, const actor_ref& sender, const stop_actor<T>& stop_actor) {
-        this->set_target(target);
-        this->set_sender(sender);
-        this->data = stop_actor.data;
-        this->type_ = STOP_ACTOR;
-    }
-
-    typed_message(std::shared_ptr<actor_ref>& target, std::shared_ptr<actor_ref>& sender, const stop_actor<T>& stop_actor) {
-        this->target = target;
-        this->sender = sender;
-        this->data = stop_actor.data;
-        this->type_ = STOP_ACTOR;
-    }
-
-    typed_message(const actor_ref& target, const actor_ref& sender, const kill_actor<T>& kill_actor) {
-        this->set_target(target);
-        this->set_sender(sender);
-        this->data = kill_actor.data;
-        this->type_ = KILL_ACTOR;
-    }
-
-    typed_message(std::shared_ptr<actor_ref>& target, std::shared_ptr<actor_ref>& sender, const kill_actor<T>& kill_actor) {
-        this->target = target;
-        this->sender = sender;
-        this->data = kill_actor.data;
-        this->type_ = KILL_ACTOR;
-    }
-
 	~typed_message() {
 		this->target.reset();
 		this->sender.reset();		
+    }
+
+    virtual bool is_broadcast() const override {
+        return std::is_base_of<::untyped_broadcast, T>::value;
+    }
+
+    virtual bool is_stop_actor() const override {
+        return std::is_base_of<::untyped_stop_actor, T>::value;
+    }
+
+    virtual bool is_kill_actor() const override {
+        return std::is_base_of<::untyped_kill_actor, T>::value;
     }
 
     boost::any get_data() const override {
@@ -110,11 +79,7 @@ public:
     }
 
     std::unique_ptr<message> clone() const override {
-        auto result = std::unique_ptr<typed_message<T>>(new typed_message<T>());
-        result->set_target(this->get_target());
-        result->set_sender(this->get_sender());
-        result->type_.store(this->type_.load());
-        result->data = this->data;
+        auto result = std::unique_ptr<typed_message<T>>(new typed_message<T>(this->get_target(), this->get_sender(), static_cast<T>(this->data)));
 
         return std::move(result);
     }
@@ -128,6 +93,5 @@ private:
         ar & this->sender;
         ar & this->target;
         ar & this->data;
-        ar & this->type_;
     }
 };

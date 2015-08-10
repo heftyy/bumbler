@@ -18,12 +18,12 @@ protected:
     virtual void on_error(boost::any data, std::exception ex) { BOOST_LOG_TRIVIAL(error) << "[UNTYPED_ACTOR] " << ex.what(); };
 
     void reply(const char* data) {
-        reply(std::string(data));
+        this->reply(std::string(data));
     }
 
     template<typename T>
     void reply(T&& data) {
-        auto typed_msg = construct_reply_message(data);
+        auto typed_msg = construct_reply_message(static_cast<T>(data));
 
         if(send_reply_message_func_ != nullptr) {
             send_reply_message_func_(std::move(typed_msg));
@@ -71,26 +71,8 @@ private:
     std::function<void(std::unique_ptr<message>)> send_reply_message_func_;
 
     template<typename T>
-    std::unique_ptr<typed_message<T>> construct_reply_message(T data) {
-        auto typed_msg = std::unique_ptr<typed_message<T>>(new typed_message<T>(get_sender(), get_self(), data));
-        return std::move(typed_msg);
-    }
-
-    template<typename T>
-    std::unique_ptr<typed_message<T>> construct_reply_message(::broadcast<T> msg) {
-        auto typed_msg = std::unique_ptr<typed_message<T>>(new typed_message<T>(get_sender(), get_self(), msg));
-        return std::move(typed_msg);
-    }
-
-    template<typename T>
-    std::unique_ptr<typed_message<T>> construct_reply_message(::stop_actor<T> msg) {
-        auto typed_msg = std::unique_ptr<typed_message<T>>(new typed_message<T>(get_sender(), get_self(), msg));
-        return std::move(typed_msg);
-    }
-
-    template<typename T>
-    std::unique_ptr<typed_message<T>> construct_reply_message(::kill_actor<T> msg) {
-        auto typed_msg = std::unique_ptr<typed_message<T>>(new typed_message<T>(get_sender(), get_self(), msg));
+    std::unique_ptr<typed_message<T>> construct_reply_message(T&& data) {
+        auto typed_msg = std::unique_ptr<typed_message<T>>(new typed_message<T>(get_sender(), get_self(), static_cast<T>(data)));
         return std::move(typed_msg);
     }
 };

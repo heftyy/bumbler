@@ -49,53 +49,23 @@ public:
     const actor_ref get_actor(std::string actor_name);
 
 	template<typename T>
-	std::shared_ptr<cancellable> schedule(const T& data, const actor_ref& target, long initial_delay_ms, long interval_ms) const {
-		return this->schedule(data, target, actor_ref::none(), initial_delay_ms, interval_ms);
+	std::shared_ptr<cancellable> schedule(T&& data, const actor_ref& target, long initial_delay_ms, long interval_ms) const {
+		return this->schedule(static_cast<T>(data), target, actor_ref::none(), initial_delay_ms, interval_ms);
 	}
 
 	template<typename T>
-    std::shared_ptr<cancellable> schedule(const ::broadcast<T>& msg, const actor_ref& target, long initial_delay_ms, long interval_ms) const {
-		return this->schedule(typed_message<T>(target, actor_ref::none(), msg), initial_delay_ms, interval_ms);
-    }
-
-	template<typename T>
-	std::shared_ptr<cancellable> schedule(const ::kill_actor<T>& msg, const actor_ref& target, long initial_delay_ms, long interval_ms) const {
-		return this->schedule(typed_message<T>(target, actor_ref::none(), msg), initial_delay_ms, interval_ms);
-	}
-
-	template<typename T>
-	std::shared_ptr<cancellable> schedule(const ::stop_actor<T>& msg, const actor_ref& target, long initial_delay_ms, long interval_ms) const {
-		return this->schedule(typed_message<T>(target, actor_ref::none(), msg), initial_delay_ms, interval_ms);
-	}
-
-	template<typename T>
-	std::shared_ptr<cancellable> schedule(const T& data, const actor_ref& target, const actor_ref& sender, long initial_delay_ms, long interval_ms) const {
-		return this->schedule(typed_message<T>(target, sender, data), initial_delay_ms, interval_ms);
-	}
-
-	template<typename T>
-	std::shared_ptr<cancellable> schedule(const ::broadcast<T>& msg, const actor_ref& target, const actor_ref& sender, long initial_delay_ms, long interval_ms) const {
-		return this->schedule(typed_message<T>(target, sender, msg), initial_delay_ms, interval_ms);
-	}
-
-	template<typename T>
-	std::shared_ptr<cancellable> schedule(const ::kill_actor<T>& msg, const actor_ref& target, const actor_ref& sender, long initial_delay_ms, long interval_ms) const {
-		return this->schedule(typed_message<T>(target, sender, msg), initial_delay_ms, interval_ms);
-	}
-
-    template<typename T>
-    std::shared_ptr<cancellable> schedule(const ::stop_actor<T>& msg, const actor_ref& target, const actor_ref& sender, long initial_delay_ms, long interval_ms) const {
-        return this->schedule(typed_message<T>(target, sender, msg), initial_delay_ms, interval_ms);
+	std::shared_ptr<cancellable> schedule(T&& data, const actor_ref& target, const actor_ref& sender, long initial_delay_ms, long interval_ms) const {
+        return scheduler_->schedule(typed_message<T>(target, sender, data), initial_delay_ms, interval_ms);
     }
 
     template<typename T>
-    std::shared_ptr<cancellable> schedule(const typed_message<T>& msg, long initial_delay_ms, long interval_ms) const {
-        return scheduler_->schedule(msg, initial_delay_ms, interval_ms);
+    std::shared_ptr<cancellable> schedule_once(T&& data, const actor_ref& target, long initial_delay_ms) const {
+        return this->schedule(static_cast<T>(data), target, actor_ref::none(), initial_delay_ms, 0);
     }
 
     template<typename T>
-    std::shared_ptr<cancellable> schedule_once(const typed_message<T>& msg, long initial_delay_ms) const {
-        return scheduler_->schedule_once(msg, initial_delay_ms);
+    std::shared_ptr<cancellable> schedule(T&& data, const actor_ref& target, const actor_ref& sender, long initial_delay_ms) const {
+        return scheduler_->schedule(typed_message<T>(target, sender, data), initial_delay_ms, 0);
     }
 
     const std::shared_ptr<udp_server>& get_server() const {

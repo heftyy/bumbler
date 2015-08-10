@@ -46,31 +46,13 @@ public:
     }
 
     //if a string literal is passed to tell change it to std::string
-    void tell(const char* data, actor_ref sender = actor_ref::none()) {
-        tell(std::string(data), sender);
+    void tell(char* data, actor_ref sender = actor_ref::none()) {
+        this->tell(std::string(data), sender);
     }
 
     template<typename T>
-    void tell(const T& data, actor_ref sender = actor_ref::none()) const {
-		auto msg_ptr = std::unique_ptr<typed_message<T>>(new typed_message<T>(*this, sender, data));
-        actor_tell(std::move(msg_ptr));
-    }
-
-    template<typename T>
-    void tell(const broadcast<T>& msg, actor_ref sender = actor_ref::none()) const {
-		auto msg_ptr = std::unique_ptr<typed_message<T>>(new typed_message<T>(*this, sender, msg));
-        actor_tell(std::move(msg_ptr));
-    }
-
-    template<typename T>
-    void tell(const stop_actor<T>& msg, actor_ref sender = actor_ref::none()) const {
-		auto msg_ptr = std::unique_ptr<typed_message<T>>(new typed_message<T>(*this, sender, msg));
-        actor_tell(std::move(msg_ptr));
-    }
-
-    template<typename T>
-    void tell(const kill_actor<T>& msg, actor_ref sender = actor_ref::none()) const {
-        auto msg_ptr = std::unique_ptr<typed_message<T>>(new typed_message<T>(*this, sender, msg));
+    void tell(T&& data, actor_ref sender = actor_ref::none()) const {
+		auto msg_ptr = std::unique_ptr<typed_message<T>>(new typed_message<T>(*this, sender, static_cast<T>(data)));
         actor_tell(std::move(msg_ptr));
     }
 

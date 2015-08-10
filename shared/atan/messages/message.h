@@ -8,16 +8,11 @@
 
 class actor_ref;
 
-enum message_type {
-    BROADCAST, STOP_ACTOR, KILL_ACTOR
-};
-
 class message {
 public:
-    message() : type_(-1) {}
+    message() {}
 
 	message(const message& msg) {
-		this->type_.store(msg.type_);
     }
 
     virtual boost::any get_data() const = 0;
@@ -34,20 +29,11 @@ public:
 
     virtual ~message() {}
 
-    virtual bool is_broadcast() const {
-        return type_ == BROADCAST;
-    }
+    virtual bool is_broadcast() const = 0;
 
-    virtual bool is_stop_actor() const {
-        return type_ == STOP_ACTOR;
-    }
+    virtual bool is_stop_actor() const = 0;
 
-    virtual bool is_kill_actor() const {
-        return type_ == KILL_ACTOR;
-    }
-
-protected:
-    std::atomic<int> type_;
+    virtual bool is_kill_actor() const = 0;
 
 private:
 
