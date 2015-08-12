@@ -5,7 +5,6 @@
 #include <boost/serialization/serialization.hpp>
 #include <boost/serialization/type_info_implementation.hpp>
 #include <boost/serialization/unique_ptr.hpp>
-#include <boost/serialization/shared_ptr.hpp>
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/export.hpp>
 #include <boost/archive/text_oarchive.hpp>
@@ -13,31 +12,32 @@
 #include <boost/any.hpp>
 #include "message.h"
 #include "commands/commands.h"
+#include "../../utility.h"
 
 template<typename T>
 class typed_message : public message {
 public:
-    std::shared_ptr<actor_ref> target;
-    std::shared_ptr<actor_ref> sender;
+    std::unique_ptr<actor_ref> target;
+    std::unique_ptr<actor_ref> sender;
     T data;
 
     typed_message() { }
 
 	typed_message(const typed_message<T>& msg) : message(msg) {
 		this->data = msg.data;
-		this->target = msg.target;
-		this->sender = msg.sender;;
+		this->target = utility::make_unique<actor_ref>(*msg.target);
+		this->sender = utility::make_unique<actor_ref>(*msg.sender);
     };
 
     typed_message(const actor_ref& target, const actor_ref& sender, const T& data) {
         this->data = data;
-        this->target = std::make_shared<actor_ref>(target);
-        this->sender = std::make_shared<actor_ref>(sender);
+        this->target = utility::make_unique<actor_ref>(target);
+        this->sender = utility::make_unique<actor_ref>(sender);
     }
 
-    typed_message(const std::shared_ptr<actor_ref>& target, const std::shared_ptr<actor_ref>& sender, const T& data) {
-        this->target = target;
-        this->sender = sender;
+    typed_message(const std::unique_ptr<actor_ref> target, const std::unique_ptr<actor_ref> sender, const T& data) {
+        this->target = std::move(target);
+        this->sender = std::move(sender);
         this->data = data;
     }
 
@@ -71,15 +71,16 @@ public:
     }
 
     void set_sender(const actor_ref& sender) override {
-        this->sender = std::make_shared<actor_ref>(sender);
+        this->sender = utility::make_unique<actor_ref>(sender);
     }
 
     void set_target(const actor_ref& target) override {
-        this->target = std::make_shared<actor_ref>(target);
+        this->target = utility::make_unique<actor_ref>(target);
     }
 
     std::unique_ptr<message> clone() const override {
-        auto result = std::unique_ptr<typed_message<T>>(new typed_message<T>(this->get_target(), this->get_sender(), static_cast<T>(this->data)));
+        auto result = std::unique_ptr<typed_message<T>>(new typed_message<T>(this->get_target(), this->get_sender(),
+                                                                             this->data));
 
         return std::move(result);
     }

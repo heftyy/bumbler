@@ -35,6 +35,12 @@ public:
         port = atoi(actor_ref.substr(port_start + 1, actor_ref.length() - port_start - 1).c_str());
     }
 
+    virtual ~actor_ref() = default; // make dtor virtual
+    actor_ref(actor_ref&&) = default; // support moving
+    actor_ref& operator=(actor_ref&&) = default;
+    actor_ref(const actor_ref&) = default; // support copying
+    actor_ref& operator=(const actor_ref&) = default;
+
     std::string to_string() const {
         std::stringstream ss;
         ss << actor_name << "$" << system_name << "@" << ip << ":" << port;
@@ -73,22 +79,22 @@ public:
 
 	    auto future_type_hashcode = typeid(F).hash_code();
 
-        auto fn = [=](std::shared_ptr<std::promise<F>>& promise, boost::any response) {
+        std::function<void(boost::any)> fn = [future_type_hashcode, promise_ptr](boost::any response) {
             if(response.type().hash_code() == future_type_hashcode) {
                 F value = boost::any_cast<F>(response);
-                promise->set_value(value);
+                promise_ptr->set_value(value);
             }
             else {
                 BOOST_LOG_TRIVIAL(error) << "[FUTURE] expected type for the future didn't match the replied type";
-                promise->set_value(F());
+                promise_ptr->set_value(F());
             }
         };
 
-        std::function<void(boost::any)> bound_fn = std::bind(fn, promise_ptr, std::placeholders::_1);
+//        std::function<void(boost::any)> bound_fn = std::bind(fn, promise_ptr, std::placeholders::_1);
 
         auto msg_ptr = std::unique_ptr<typed_message<T>>(new typed_message<T>(*this, none(), data));
 
-        actor_future_tell(std::move(msg_ptr), bound_fn);
+        actor_future_tell(std::move(msg_ptr), fn);
 
         return f;
     }
