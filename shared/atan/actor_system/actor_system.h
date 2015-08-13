@@ -25,6 +25,12 @@ public:
         stop();
     }
 
+    /*
+     * if wait is true the dispatcher will wait for the all tasks to finish and actors in the system will
+     * go through all of their messages
+     *
+     * if wait is false system exits as soon as possible ignoring messages in the queue
+     */
     void stop(bool wait = false);
 
     template<class actor_type>
@@ -64,19 +70,19 @@ public:
     }
 
     template<typename T>
-    std::shared_ptr<cancellable> schedule(T&& data, const actor_ref& target, const actor_ref& sender, long initial_delay_ms) const {
+    std::shared_ptr<cancellable> schedule_once(T&& data, const actor_ref& target, const actor_ref& sender, long initial_delay_ms) const {
         return scheduler_->schedule(typed_message<T>(target, sender, data), initial_delay_ms, 0);
     }
 
-    const std::shared_ptr<udp_server>& get_server() const {
+    const std::shared_ptr<udp_server> get_server() const {
         return server_;
     }
 
-    const std::shared_ptr<scheduler>& get_scheduler() const {
+    const std::shared_ptr<scheduler> get_scheduler() const {
         return scheduler_;
     }
 
-    const std::shared_ptr<dispatcher>& get_dispatcher() const {
+    const std::shared_ptr<dispatcher> get_dispatcher() const {
         return dispatcher_;
     }
 
@@ -116,8 +122,15 @@ private:
 
     void send_completed() { }
 
+    /*
+     * callback used by the udp server when a message is received
+     */
     void receive(std::unique_ptr<packet> packet, boost::asio::ip::udp::endpoint& sender_endpoint);
 
+
+    /*
+     * generate a new name for a temporary actort
+     */
     const std::string get_next_temporary_actor_name() const;
 };
 
