@@ -5,7 +5,7 @@ I also wanted to write a library for multithreading and networking using the act
 
 Client and server applications are simple examples of usage of the library. 
 
-The library is in [shared/atan](https://www.github.com) ( i need to find a good name for it ).
+The library is in [shared/atan](https://github.com/heftyy/bumbler/tree/master/shared/atan) ( i need to find a good name for it ).
 
 TODO:
  * create more interesting client/server examples
