@@ -9,10 +9,8 @@
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
 
-class untyped_broadcast {};
-
 template<typename T>
-class broadcast : public untyped_broadcast {
+class broadcast {
 public:
     T data;
 

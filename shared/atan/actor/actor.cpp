@@ -121,7 +121,7 @@ void actor::stop_actor(bool wait) {
 }
 
 void actor::read_messages() {
-    while (message_queue_.size() > 0 && !stop_flag_) {
+    while (message_queue_.size() > 0) {
         std::unique_lock<std::mutex> lock(this->message_queue_mutex_);
 
         auto msg = std::move(message_queue_.front());
@@ -140,4 +140,11 @@ void actor::read_messages() {
 
         future_result.wait();
     }
+}
+
+void actor::add_message(std::unique_ptr<message> msg) {
+    BOOST_LOG_TRIVIAL(debug) << "[ACTOR] queueing new task";
+    std::unique_lock<std::mutex> lock(this->message_queue_mutex_);
+    message_queue_.push(std::move(msg));
+    cv.notify_one();
 }

@@ -9,10 +9,8 @@
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
 
-class untyped_kill_actor {};
-
 template<typename T>
-class kill_actor : public untyped_kill_actor {
+class kill_actor {
 public:
     T data;
 

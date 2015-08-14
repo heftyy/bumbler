@@ -30,6 +30,7 @@ set(ATAN_SOURCES
   actor/router/random_router.h
   actor/router/round_robin_router.cpp
   actor/router/round_robin_router.h
+  actor/untyped_actor.h
   packet/packet.h
   packet/packet_exceptions.h
   packet/packet_structs.h
@@ -50,4 +51,4 @@ ELSE()
   add_definitions(-DBOOST_LOG_DYN_LINK)
 ENDIF()
 
-add_library(atan STATIC ${ATAN_SOURCES} actor/untyped_actor.h)
+add_library(atan STATIC ${ATAN_SOURCES})

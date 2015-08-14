@@ -2,10 +2,15 @@
 
 #include <iostream>
 #include <atomic>
+#include <atan/messages/commands/commands.h>
 #include <communication/message_settings.h>
+#include <atan/actor/untyped_actor.h>
+#include "typed_data.h"
 
 class test_actor : public untyped_actor {
 public:
+    static std::atomic<int> message_count;
+
     test_actor() {}
 
     ~test_actor() {
@@ -13,7 +18,9 @@ public:
     }
 
 protected:
-    void on_receive(boost::any data) {
+    void on_receive(boost::any data) override {
+	    ++message_count;
+
         BOOST_LOG_TRIVIAL(debug) << "[OUT_ACTOR] on_receive thread id = " << std::this_thread::get_id();
         BOOST_LOG_TRIVIAL(debug) << "[OUT_ACTOR] received message from " << get_sender().actor_name;
 
@@ -39,8 +46,14 @@ protected:
             BOOST_LOG_TRIVIAL(debug) << "[OUT_ACTOR] message was " << in;
         }
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        if(is_type<typed_data<int>>(data)) {
+            reply("BLAM");
+        }
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
         //reply(msg_string, msg.sender_);
     }
 };
+
+std::atomic<int> test_actor::message_count(0);

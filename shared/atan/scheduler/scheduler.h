@@ -74,7 +74,7 @@ public:
 				cancellable.lock()->cancelled();
 				return 0;
 			}			
-        }, msg, ret_cancellable_weak_ptr);
+        }, std::move(msg), ret_cancellable_weak_ptr);
 
         return ret_cancellable;
     }

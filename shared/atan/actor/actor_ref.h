@@ -7,6 +7,7 @@
 #include <logger/logger.h>
 #include "../messages/typed_message.h"
 #include "../messages/commands/commands.h"
+#include "../../utility.h"
 
 class actor_ref {
 public:
@@ -58,13 +59,14 @@ public:
 
     template<typename T>
     void tell(T&& data, actor_ref sender = actor_ref::none()) const {
-		auto msg_ptr = std::unique_ptr<typed_message<T>>(new typed_message<T>(*this, sender, static_cast<T>(data)));
-        actor_tell(std::move(msg_ptr));
+        auto tm = typed_message_factory::create(*this, sender, static_cast<T>(data));
+		auto tm_ptr = utility::make_unique<decltype(tm)>(std::move(tm));
+        actor_tell(std::move(tm_ptr));
     }
 
     template<typename T>
     void tell(const typed_message<T>& msg) const {
-        actor_tell(std::move(msg.clone()));
+        actor_tell(std::move(utility::make_unique<typed_message<T>>(std::move(msg))));
     }
 
     template<typename F>
@@ -90,11 +92,10 @@ public:
             }
         };
 
-//        std::function<void(boost::any)> bound_fn = std::bind(fn, promise_ptr, std::placeholders::_1);
+        auto tm = typed_message_factory::create(*this, none(), data);
+        auto tm_ptr = utility::make_unique<decltype(tm)>(std::move(tm));
 
-        auto msg_ptr = std::unique_ptr<typed_message<T>>(new typed_message<T>(*this, none(), data));
-
-        actor_future_tell(std::move(msg_ptr), fn);
+        actor_future_tell(std::move(tm_ptr), fn);
 
         return f;
     }

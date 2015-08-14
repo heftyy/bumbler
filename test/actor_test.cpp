@@ -50,4 +50,46 @@ BOOST_AUTO_TEST_SUITE( actor_test_suite )
         system1->stop(false);
     }
 
+    BOOST_AUTO_TEST_CASE(ActorStopTest) {
+        test_actor::message_count = 0;
+
+        auto system1 = actor_system::create_system("test_system1", 4555);
+
+        const actor_ref la1 = local_actor::create<test_actor>("test_actor1", system1);
+
+        //task takes 500ms+ to finish
+        la1.tell(std::string("msg1"));
+        la1.tell(std::string("msg2"));
+
+        //stop the actor after all the messages from the queue are read
+        //this will block for 1000ms+
+        la1.tell(::stop_actor<int>(5));
+
+        system1->stop(false);
+
+        BOOST_CHECK_EQUAL(test_actor::message_count.load(), 2);
+    }
+
+    BOOST_AUTO_TEST_CASE(ActorKillTest) {
+        test_actor::message_count = 0;
+
+        auto system1 = actor_system::create_system("test_system1", 4555);
+
+        const actor_ref la1 = local_actor::create<test_actor>("test_actor1", system1);
+
+        //task takes 500ms+ to finish
+        la1.tell(std::string("msg1"));
+        la1.tell(std::string("msg2"));
+
+        //wait a bit so both the messages are added to the queue
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+        //clear the queue ( 1 message left ) and stop the actor
+        la1.tell(::kill_actor<int>(5));
+
+        system1->stop(false);
+
+        BOOST_CHECK_EQUAL(test_actor::message_count.load(), 1);
+    }
+
 BOOST_AUTO_TEST_SUITE_END()

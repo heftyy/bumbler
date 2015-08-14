@@ -45,11 +45,11 @@ protected:
         return data.type().hash_code() == typeid(T).hash_code();
     }
 
-    actor_ref& get_self() {
+    actor_ref get_self() {
         return self_;
     }
 
-    actor_ref& get_sender() {
+    actor_ref get_sender() {
         return sender_;
     }
 
@@ -71,8 +71,9 @@ private:
     std::function<void(std::unique_ptr<message>)> send_reply_message_func_;
 
     template<typename T>
-    std::unique_ptr<typed_message<T>> construct_reply_message(T&& data) {
-        auto typed_msg = std::unique_ptr<typed_message<T>>(new typed_message<T>(get_sender(), get_self(), static_cast<T>(data)));
-        return std::move(typed_msg);
+    std::unique_ptr<message> construct_reply_message(T&& data) {
+        auto tm = typed_message_factory::create(get_sender(), get_self(), static_cast<T>(data));
+        auto tm_ptr = utility::make_unique<decltype(tm)>(std::move(tm));
+        return std::move(tm_ptr);
     }
 };

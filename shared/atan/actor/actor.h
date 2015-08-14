@@ -30,12 +30,7 @@ public:
 
     void read_messages();
 
-    void add_message(std::unique_ptr<message> msg) {
-        BOOST_LOG_TRIVIAL(debug) << "[ACTOR] queueing new task";
-        std::unique_lock<std::mutex> lock(this->message_queue_mutex_);
-        message_queue_.push(std::move(msg));
-        cv.notify_one();
-    }
+    void add_message(std::unique_ptr<message> msg);
 
     bool is_busy() { return busy_; }
 

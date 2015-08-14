@@ -9,10 +9,8 @@
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
 
-class untyped_stop_actor {};
-
 template<typename T>
-class stop_actor : public untyped_stop_actor {
+class stop_actor {
 public:
     T data;
 
