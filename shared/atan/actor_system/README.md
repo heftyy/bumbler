@@ -39,6 +39,5 @@ const std::shared_ptr<dispatcher> get_dispatcher() const;
 const std::string system_name() const;
 
 bool started();
-
 bool stopped();
 ```
