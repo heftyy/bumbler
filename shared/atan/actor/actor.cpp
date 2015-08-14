@@ -143,6 +143,7 @@ void actor::read_messages() {
 }
 
 void actor::add_message(std::unique_ptr<message> msg) {
+    if(this->stop_flag_) return;
     BOOST_LOG_TRIVIAL(debug) << "[ACTOR] queueing new task";
     std::unique_lock<std::mutex> lock(this->message_queue_mutex_);
     message_queue_.push(std::move(msg));
