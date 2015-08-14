@@ -96,3 +96,18 @@ auto system1 = actor_system::create_system("test_system1", 4555, 1);
 const actor_ref r1 = round_robin_router::create<test_actor>("test_router1", system1, 2);
 r1.tell(broadcast<int>(88));
 ```
+
+Futures
+---
+Futures are used to synchronously wait for the reply from an actor. Futures work with all actor types.
+
+In the case below test_actor will reply with std::string when it receives an int.
+
+```c++
+auto system1 = actor_system::create_system("test_system1", 4555);
+const actor_ref test_actor_ref1 = local_actor::create<test_actor>("test_actor1", system1);
+
+std::future<std::string> f1 = test_actor_ref1.future<std::string>(1);
+auto status1 = f1.wait_for(std::chrono::seconds(1));
+```
+
