@@ -59,7 +59,7 @@ public:
 
     template<typename T>
     void tell(T&& data, actor_ref sender = actor_ref::none()) const {
-        auto tm = typed_message_factory::create(*this, sender, static_cast<T>(data));
+        auto tm = typed_message_factory::create(*this, sender, std::forward<T>(data));
 		auto tm_ptr = utility::make_unique<decltype(tm)>(std::move(tm));
         actor_tell(std::move(tm_ptr));
     }

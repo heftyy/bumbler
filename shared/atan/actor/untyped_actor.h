@@ -23,7 +23,7 @@ protected:
 
     template<typename T>
     void reply(T&& data) {
-        auto typed_msg = construct_reply_message(static_cast<T>(data));
+        auto typed_msg = construct_reply_message(std::forward<T>(data));
 
         if(send_reply_message_func_ != nullptr) {
             send_reply_message_func_(std::move(typed_msg));
@@ -72,7 +72,7 @@ private:
 
     template<typename T>
     std::unique_ptr<message> construct_reply_message(T&& data) {
-        auto tm = typed_message_factory::create(get_sender(), get_self(), static_cast<T>(data));
+        auto tm = typed_message_factory::create(get_sender(), get_self(), std::forward<T>(data));
         auto tm_ptr = utility::make_unique<decltype(tm)>(std::move(tm));
         return std::move(tm_ptr);
     }

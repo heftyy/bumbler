@@ -28,6 +28,7 @@ public:
     typed_message() { }
 
     typed_message(const typed_message<T>& msg) : message(msg) {
+        std::cout << "typed-message copy ctor\n";
         this->data = msg.data;
         this->target = utility::make_unique<actor_ref>(*msg.target);
         this->sender = utility::make_unique<actor_ref>(*msg.sender);

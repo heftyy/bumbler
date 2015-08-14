@@ -56,7 +56,7 @@ public:
 
 	template<typename T>
 	std::shared_ptr<cancellable> schedule(T&& data, const actor_ref& target, long initial_delay_ms, long interval_ms = 0) const {
-		return this->schedule(static_cast<T>(data), target, actor_ref::none(), initial_delay_ms, interval_ms);
+		return this->schedule(std::forward<T>(data), target, actor_ref::none(), initial_delay_ms, interval_ms);
 	}
 
 	template<typename T>
@@ -66,7 +66,7 @@ public:
 
     template<typename T>
     std::shared_ptr<cancellable> schedule_once(T&& data, const actor_ref& target, long initial_delay_ms = 0) const {
-        return this->schedule(static_cast<T>(data), target, actor_ref::none(), initial_delay_ms, 0);
+        return this->schedule(std::forward<T>(data), target, actor_ref::none(), initial_delay_ms, 0);
     }
 
     template<typename T>
