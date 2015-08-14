@@ -27,13 +27,22 @@ public:
 
     typed_message() { }
 
-    typed_message(const typed_message<T>& msg) : message(msg) {
-        std::cout << "typed-message copy ctor\n";
-        this->data = msg.data;
-        this->target = utility::make_unique<actor_ref>(*msg.target);
-        this->sender = utility::make_unique<actor_ref>(*msg.sender);
-        this->message_type_ = msg.message_type_;
-    };
+    typed_message(const typed_message<T>& rhs) : message(rhs) {
+        std::cout << "typed_message copy ctor\n";
+        this->data = rhs.data;
+        this->target = utility::make_unique<actor_ref>(*rhs.target);
+        this->sender = utility::make_unique<actor_ref>(*rhs.sender);
+        this->message_type_ = rhs.message_type_;
+    }
+
+	typed_message& operator=(const typed_message& rhs){
+		std::cout << "typed_message copy ctor\n";
+		this->data = rhs.data;
+		this->target = utility::make_unique<actor_ref>(*rhs.target);
+		this->sender = utility::make_unique<actor_ref>(*rhs.sender);
+		this->message_type_ = rhs.message_type_;
+		return *this;
+	}
 
     typed_message(const actor_ref& target, const actor_ref& sender, const T& data, message_type msg_type = message_type::regular) {
         this->data = data;
