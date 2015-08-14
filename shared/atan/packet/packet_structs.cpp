@@ -1,5 +1,5 @@
 #include "packet_structs.h"
-#include "../actor/actor_ref.h"
+#include "../actor/actor_ref/actor_ref.h"
 #include "../messages/typed_message.h"
 
 void packet_data::load(std::unique_ptr<message> msg) {

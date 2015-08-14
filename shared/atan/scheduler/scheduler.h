@@ -7,7 +7,7 @@
 #include <atan/dispatcher/dispatcher.h>
 #include "cancellable.h"
 #include "../thread_pool/ctpl_stl.h"
-#include "../actor/actor_ref.h"
+#include "../actor/actor_ref/actor_ref.h"
 #include "../interruptible_thread.h"
 #include "utility.h"
 

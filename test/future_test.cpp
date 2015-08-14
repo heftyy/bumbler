@@ -1,7 +1,6 @@
 #define BOOST_TEST_MODULE FUTURE_TEST
 
 #include <boost/test/unit_test.hpp>
-#include <atan/actor/actor_ref.h>
 #include <atan/actor_system/actor_system.h>
 #include <communication/serializable_types.h>
 #include <atan/actor/local_actor.h>

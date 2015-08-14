@@ -5,9 +5,9 @@
 #include <sstream>
 #include <future>
 #include <logger/logger.h>
-#include "../messages/typed_message.h"
-#include "../messages/commands/commands.h"
-#include "../../utility.h"
+#include "../../messages/typed_message.h"
+#include "../../messages/commands/commands.h"
+#include "../../../utility.h"
 
 class actor_ref {
 public:

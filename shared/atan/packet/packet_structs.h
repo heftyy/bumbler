@@ -7,7 +7,7 @@
 #include <boost/archive/text_iarchive.hpp>
 #include <boost/serialization/vector.hpp>
 
-#include "../actor/actor_ref.h"
+#include "../actor/actor_ref/actor_ref.h"
 #include "../messages/typed_message.h"
 
 enum packet_type {

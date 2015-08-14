@@ -3,7 +3,7 @@
 #include <memory>
 #include <functional>
 #include <boost/any.hpp>
-#include "actor_ref.h"
+#include "actor_ref/actor_ref.h"
 #include "../messages/typed_message.h"
 #include "../messages/commands/commands.h"
 

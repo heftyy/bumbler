@@ -11,7 +11,7 @@
 #include <logger/logger.h>
 #include <utility.h>
 #include <boost/static_assert.hpp>
-#include "actor_ref.h"
+#include "actor_ref/actor_ref.h"
 #include "../actor_system/actor_system_errors.h"
 #include "../messages/message.h"
 #include "../messages/commands/commands.h"

@@ -1,6 +1,6 @@
 #include "actor_ref.h"
-#include "promise_actor.h"
-#include "../actor_system/actor_system.h"
+#include "../promise_actor.h"
+#include "../../actor_system/actor_system.h"
 
 void actor_ref::stop() {
     this->tell(stop_actor<int>(0));

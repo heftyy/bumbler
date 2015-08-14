@@ -11,8 +11,8 @@ set(ATAN_SOURCES
   messages/commands/stop_actor.h
   messages/commands/kill_actor.h
   messages/commands/commands.h
-  actor/actor_ref.h
-  actor/actor_ref.cpp
+  actor/actor_ref/actor_ref.h
+  actor/actor_ref/actor_ref.cpp
   actor/remote_actor.cpp
   actor/local_actor.h
   actor/local_actor.cpp

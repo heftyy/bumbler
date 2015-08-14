@@ -4,7 +4,7 @@
 #include <boost/asio.hpp>
 #include <boost/any.hpp>
 #include "actor.h"
-#include "actor_ref.h"
+#include "actor_ref/actor_ref.h"
 #include "../packet/packet.h"
 
 class actor_system;
