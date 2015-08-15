@@ -61,7 +61,7 @@ public:
 
 	template<typename T>
 	std::shared_ptr<cancellable> schedule(T&& data, const actor_ref& target, const actor_ref& sender, long initial_delay_ms, long interval_ms = 0) const {
-        return scheduler_->schedule(std::move(typed_message_factory::create(target, sender, data)), initial_delay_ms, interval_ms);
+        return scheduler_->schedule(std::move(typed_message_factory::create(target, sender, std::forward<T>(data))), initial_delay_ms, interval_ms);
     }
 
     template<typename T>
@@ -71,7 +71,7 @@ public:
 
     template<typename T>
     std::shared_ptr<cancellable> schedule_once(T&& data, const actor_ref& target, const actor_ref& sender, long initial_delay_ms = 0) const {
-        return scheduler_->schedule(std::move(typed_message_factory::create(target, sender, data)), initial_delay_ms, 0);
+        return scheduler_->schedule(std::move(typed_message_factory::create(target, sender, std::forward<T>(data))), initial_delay_ms, 0);
     }
 
     const std::shared_ptr<udp_server> get_server() const {

@@ -29,10 +29,10 @@ protected:
                 "T has be a descendant of untyped_actor"
         );
 
-        auto typed_actor = utility::make_unique<T>(args...);
+        auto typed_actor = utility::make_unique<T>(std::forward<Args>(args)...);
 
         router_ptr->init(std::move(typed_actor));
-        router_ptr->template create_actors<T>(args...);
+        router_ptr->template create_actors<T>(std::forward<Args>(args)...);
 
 	    auto& ar = router_ptr->get_self();
         actor::add_to_actor_system(actor_system, std::move(router_ptr));
@@ -55,7 +55,7 @@ protected:
     void create_actors(Args&& ...args) {
         for(int i = 0; i < size; i++) {
 	        auto actor = std::unique_ptr<local_actor>(new local_actor(this->actor_name(), this->actor_system_.lock()));
-            auto typed_actor = utility::make_unique<T>(args...);
+            auto typed_actor = utility::make_unique<T>(std::forward<Args>(args)...);
             actor->init(std::move(typed_actor));
             this->actors.push_back(std::move(actor));
         }

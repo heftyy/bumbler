@@ -54,13 +54,13 @@ public:
     void start(Function&& fun, long initial_delay = 0, long period = 0) {
         thread_ = std::unique_ptr<std::thread>(
                 new std::thread(
-                        [fun, period, initial_delay, this]() {
+                        [period, initial_delay, this](Function&& fun_lambda) {
                             if (initial_delay > 0) {
                                 std::this_thread::sleep_for(std::chrono::milliseconds(initial_delay));
                             }
 
-                            this->run(fun, period);
-                        })
+                            this->run(std::forward<Function>(fun_lambda), period);
+                        }, std::forward<Function>(fun))
         );
     }
 

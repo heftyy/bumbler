@@ -13,6 +13,7 @@ set(ATAN_SOURCES
   messages/commands/commands.h
   actor/actor_ref/actor_ref.h
   actor/actor_ref/actor_ref.cpp
+  actor/remote_actor.h
   actor/remote_actor.cpp
   actor/local_actor.h
   actor/local_actor.cpp

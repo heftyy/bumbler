@@ -92,7 +92,7 @@ public:
             }
         };
 
-        auto tm = typed_message_factory::create(*this, none(), data);
+        auto tm = typed_message_factory::create(*this, none(), std::forward<T>(data));
         auto tm_ptr = utility::make_unique<decltype(tm)>(std::move(tm));
 
         actor_future_tell(std::move(tm_ptr), fn);

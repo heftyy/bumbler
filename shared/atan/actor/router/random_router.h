@@ -12,7 +12,7 @@ public:
     template<class T, typename ...Args>
     static actor_ref create(const std::string& name, const std::shared_ptr<actor_system>& actor_system, int size, Args&& ...args) {
 	    auto router_ptr = std::unique_ptr<random_router>(new random_router(name, actor_system, size));
-        return router::create<T>(std::move(router_ptr), actor_system, args...);
+        return router::create<T>(std::move(router_ptr), actor_system, std::forward<Args>(args)...);
     }
 protected:
 

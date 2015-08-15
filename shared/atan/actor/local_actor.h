@@ -18,7 +18,7 @@ public:
         );
 
 	    auto actor = std::unique_ptr<local_actor>(new local_actor(name, actor_system));
-        auto typed_actor = utility::make_unique<T>(args...);
+        auto typed_actor = utility::make_unique<T>(std::forward<Args>(args)...);
         actor->init(std::move(typed_actor));
 	    auto& ar = actor->get_self();
         actor::add_to_actor_system(actor_system, std::move(actor));

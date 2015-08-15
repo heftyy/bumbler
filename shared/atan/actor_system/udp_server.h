@@ -18,8 +18,8 @@ public:
     std::function<void()> send_completed_function;
 
     udp_server(boost::asio::io_service& io_service, int port)
-            : port_(port), socket_(io_service, udp::endpoint(udp::v4(), static_cast<unsigned short>(port))),
-              future_socket_(io_service, udp::endpoint(udp::v4(), 0)) {
+            : socket_(io_service, udp::endpoint(udp::v4(), static_cast<unsigned short>(port))), future_socket_(io_service, udp::endpoint(udp::v4(), 0)),
+              port_(port) {
         do_receive();
     }
 
