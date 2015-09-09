@@ -68,7 +68,7 @@ void actor::send_reply_message(std::unique_ptr<message> msg) {
         }
     }
     //actor is remote
-    else if(msg->get_target().is_remote()) {
+    else if(!msg->get_target().is_none() && msg->get_target().is_remote()) {
         try {
             std::string ip = msg->get_target().ip;
             int port = msg->get_target().port;
