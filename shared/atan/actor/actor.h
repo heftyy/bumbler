@@ -15,7 +15,6 @@
 #include "../actor_system/actor_system_errors.h"
 #include "../messages/message.h"
 #include "../messages/commands/commands.h"
-#include "../interruptible_thread.h"
 #include "../packet/packet.h"
 #include "untyped_actor.h"
 
@@ -46,7 +45,7 @@ public:
 protected:
     std::mutex message_queue_mutex_;
     std::mutex actor_thread_mutex_;
-    std::unique_ptr<interruptible_thread> queue_thread_;
+    std::future<void> queue_thread_future_;
     std::unique_ptr<untyped_actor> untyped_actor_;
     std::queue<std::unique_ptr<message>> message_queue_;
     std::atomic<bool> busy_;

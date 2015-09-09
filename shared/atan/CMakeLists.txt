@@ -41,7 +41,6 @@ set(ATAN_SOURCES
   dispatcher/dispatcher.cpp
   dispatcher/dispatcher.h
   thread_pool/ctpl_stl.h
-  interruptible_thread.h
   )
 
 include_directories(../)
