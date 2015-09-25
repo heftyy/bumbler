@@ -1,7 +1,7 @@
 #include "actor.h"
 #include "../actor_system/actor_system.h"
 
-actor::actor(const std::string& name, const std::shared_ptr<actor_system>& actor_system)
+actor::actor(std::string name, const std::shared_ptr<actor_system>& actor_system)
         : actor_name_(name), actor_system_(actor_system) {
     stop_flag_.store(false);
     self_ = actor_ref(actor_name(), system_name());

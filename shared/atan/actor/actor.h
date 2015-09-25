@@ -55,7 +55,7 @@ protected:
     std::condition_variable cv;
     actor_ref self_;
 
-    actor(const std::string& name, const std::shared_ptr<actor_system>& actor_system);
+    actor(std::string name, const std::shared_ptr<actor_system>& actor_system);
 
     virtual void init(std::unique_ptr<untyped_actor> u_actor);
 
