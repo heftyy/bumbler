@@ -29,11 +29,11 @@ SET(Boost_DEBUG ON)
 
 if(${WIN32})
     #windows
-    include_directories(F:/github/boost_1_58_0)
+    include_directories(E:/Workspace/boost_1_59_0)
 
     #add_definitions(-DBOOST_LOG_DYN_LINK)
     add_definitions(-D_WIN32_WINNT=0x0501)
-    set(BOOST_ROOT F:/github/boost_1_58_0)
+    set(BOOST_ROOT E:/Workspace/boost_1_59_0)
     SET(Boost_DETAILED_FAILURE_MSG ON)
     SET(Boost_USE_STATIC_LIBS      ON)
     SET(Boost_USE_MULTITHREADED    ON)
@@ -42,7 +42,7 @@ if(${WIN32})
     find_package(Boost COMPONENTS system thread chrono date_time regex filesystem log log_setup serialization unit_test_framework REQUIRED)
     find_library(ws2_32_LIBRARY_PATH ws2_32)
 
-    #set(CMAKE_RUNTIME_OUTPUT_DIRECTORY F:/github/bumbler/bin)
+    #set(CMAKE_RUNTIME_OUTPUT_DIRECTORY E:/Workspace/github/bumbler/bin)
 ELSE()
     #linux
     include_directories(../boost_1_58_0)
