@@ -1,7 +1,7 @@
 #include "actor.h"
 #include "../actor_system/actor_system.h"
 
-actor::actor(const std::string& name, const std::shared_ptr<actor_system>& actor_system)
+actor::actor(std::string name, const std::shared_ptr<actor_system>& actor_system)
         : actor_name_(name), actor_system_(actor_system) {
     stop_flag_.store(false);
     self_ = actor_ref(actor_name(), system_name());
@@ -21,8 +21,8 @@ void actor::init(std::unique_ptr<untyped_actor> u_actor) {
 }
 
 void actor::create_internal_queue_thread() {
-    queue_thread_ = utility::make_unique<interruptible_thread>();
-    queue_thread_->start([this]() {	
+//    queue_thread_ = utility::make_unique<interruptible_thread>();
+    queue_thread_future_ = std::async(std::launch::async ,[this]() {
         bool isPopped = false;
 
         while (true) {
@@ -68,7 +68,7 @@ void actor::send_reply_message(std::unique_ptr<message> msg) {
         }
     }
     //actor is remote
-    else if(msg->get_target().is_remote()) {
+    else if(!msg->get_target().is_none() && msg->get_target().is_remote()) {
         try {
             std::string ip = msg->get_target().ip;
             int port = msg->get_target().port;
@@ -111,11 +111,10 @@ void actor::stop_actor(bool wait) {
 
     if (!wait) clear_queue();
 
-    if (queue_thread_) {
+    if (queue_thread_future_.valid()) {
         BOOST_LOG_TRIVIAL(debug) << "[ACTOR] stopping";
         cv.notify_one();
-        queue_thread_->stop();
-        queue_thread_.reset(nullptr);
+        queue_thread_future_.wait();
         BOOST_LOG_TRIVIAL(debug) << "[ACTOR] stopped";
     }
 }
@@ -136,6 +135,7 @@ void actor::read_messages() {
             return 0;
         };
 
+        //run the task in the thread pool supplied by the dispatcher
         auto future_result = this->actor_system_.lock()->get_dispatcher()->push(fun, msg->get_sender(), msg->get_data());
 
         future_result.wait();

@@ -21,7 +21,7 @@ public:
 
     virtual actor_ref& get_target() const = 0;
 
-    virtual std::unique_ptr<message> clone() const = 0;
+    virtual std::unique_ptr<message> clone_ptr() const = 0;
 
     virtual void set_sender(const actor_ref& sender) = 0;
 

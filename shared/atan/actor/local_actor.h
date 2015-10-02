@@ -11,7 +11,7 @@ public:
     friend class router;
 
     template<class T, typename ...Args>
-    static actor_ref create(const std::string& name, const std::shared_ptr<actor_system>& actor_system, Args&& ...args) {
+    static actor_ref create(std::string name, const std::shared_ptr<actor_system>& actor_system, Args&& ...args) {
         static_assert(
                 (std::is_base_of<untyped_actor, T>::value),
                 "T has be a descendant of untyped_actor"

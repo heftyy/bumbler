@@ -91,7 +91,7 @@ public:
         this->target = utility::make_unique<actor_ref>(target);
     }
 
-    std::unique_ptr<message> clone() const override {
+    std::unique_ptr<message> clone_ptr() const override {
         auto tm = *this;
         auto result = utility::make_unique<decltype(tm)>(std::move(tm));
 
