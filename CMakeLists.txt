@@ -12,16 +12,16 @@ set(BUMBLER_SOURCE_FILES
 #    bumbler/launcher/server_info.cpp
 #    bumbler/launcher/server_info.h
 #    bumbler/launcher/server_list.h
-    bumbler/out_router.h
     bumbler/bumbler.cpp
+    bumbler/out_router.h
     bumbler/out_actor.h
     bumbler/remote_server_actor.h
     shared/logger/logger.cpp
 )
 
 set(SERVER_SOURCE_FILES
-    server/server_actor.h
     server/server.cpp
+    server/server_actor.h
 )
 
 set(CMAKE_BUILD_TYPE Debug)
@@ -50,10 +50,10 @@ ELSE()
     add_definitions(-DBOOST_LOG_DYN_LINK)
     add_definitions(-DBOOST_TEST_DYN_LINK)
 
-    #set(Boost_USE_STATIC_LIBS   ON)
+    set(Boost_USE_STATIC_LIBS   OFF)
     set(Boost_USE_MULTITHREADED ON)
     set(BOOST_ROOT ../boost_1_58_0)
-    find_package(Boost COMPONENTS thread system chrono date_time regex filesystem log log_setup serialization unit_test_framework REQUIRED)
+    find_package(Boost COMPONENTS system thread chrono date_time regex filesystem log log_setup serialization unit_test_framework REQUIRED)
 ENDIF()
 
 include_directories(shared)

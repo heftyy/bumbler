@@ -4,10 +4,7 @@
 #include <future>
 #include <boost/test/unit_test.hpp>
 #include <atan/thread_pool/thread_pool.h>
-#include <atan/actor_system/actor_system.h>
-#include <atan/actor/local_actor.h>
-#include "test_actor.h"
-#include "remote_test_actor.h"
+#include <logger/logger.h>
 
 BOOST_AUTO_TEST_SUITE( thread_pool_suite )
 
