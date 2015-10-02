@@ -10,6 +10,11 @@
 class actor;
 
 class untyped_actor {
+public:
+	virtual ~untyped_actor()
+	{
+	}
+
 protected:
     friend class actor;
 
