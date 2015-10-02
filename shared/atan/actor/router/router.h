@@ -5,7 +5,6 @@
 #include <functional>
 #include "../actor.h"
 #include "../local_actor.h"
-#include "../../thread_pool/ctpl_stl.h"
 
 class actor_system;
 class untyped_actor;

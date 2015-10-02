@@ -3,7 +3,7 @@
 void actor_system::init() {
     actor_system_storage::instance().add_system(shared_from_this());
 
-    boost::asio::io_service::work work(io_service_);
+    work_ = utility::make_unique<boost::asio::io_service::work>(io_service_);
 
     server_ = std::make_shared<udp_server>(io_service_, port_);
     server_->send_completed_function = [&]() { send_completed(); };
@@ -16,7 +16,7 @@ void actor_system::init() {
     auto promise_ptr = std::make_shared<std::promise<int>>();
 	auto f = promise_ptr->get_future();
 
-    io_service_.dispatch([promise_ptr] () {
+    io_service_.post([promise_ptr] () {
         BOOST_LOG_TRIVIAL(debug) << "[IO_SERVICE] run thread started";
         promise_ptr->set_value(0);
     });

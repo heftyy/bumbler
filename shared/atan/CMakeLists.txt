@@ -31,6 +31,9 @@ set(ATAN_SOURCES
   actor/router/random_router.h
   actor/router/round_robin_router.cpp
   actor/router/round_robin_router.h
+  actor/router/mailbox/mailbox.h
+  actor/router/mailbox/priority_mailbox.cpp
+  actor/router/mailbox/priority_mailbox.h
   actor/untyped_actor.h
   packet/packet.h
   packet/packet_exceptions.h
@@ -40,7 +43,7 @@ set(ATAN_SOURCES
   scheduler/cancellable.h
   dispatcher/dispatcher.cpp
   dispatcher/dispatcher.h
-  thread_pool/ctpl_stl.h
+  thread_pool/thread_pool.h
   )
 
 include_directories(../)
@@ -51,4 +54,4 @@ ELSE()
   add_definitions(-DBOOST_LOG_DYN_LINK)
 ENDIF()
 
-add_library(atan STATIC ${ATAN_SOURCES})
+add_library(atan STATIC ${ATAN_SOURCES} thread_pool/thread_pool.cpp)

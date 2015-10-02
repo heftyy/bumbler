@@ -36,7 +36,7 @@ public:
     }
 
 	typed_message& operator=(const typed_message& rhs){
-		std::cout << "typed_message copy ctor\n";
+		std::cout << "typed_message equals ctor\n";
 		this->data = rhs.data;
 		this->target = utility::make_unique<actor_ref>(*rhs.target);
 		this->sender = utility::make_unique<actor_ref>(*rhs.sender);

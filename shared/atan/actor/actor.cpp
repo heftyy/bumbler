@@ -130,7 +130,7 @@ void actor::read_messages() {
 
         if(msg == nullptr) return;
 
-        auto fun = [this] (int thread_id, const actor_ref& sender, const boost::any& data) -> int {
+        auto fun = [this] (const actor_ref& sender, const boost::any& data) -> int {
             this->run_task(sender, data);
             return 0;
         };

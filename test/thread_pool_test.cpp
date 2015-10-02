@@ -1,4 +1,4 @@
-#define BOOST_TEST_MODULE ACTOR_TEST
+#define BOOST_TEST_MODULE THREAD_POOL_TEST
 
 #include <memory>
 #include <future>
@@ -9,11 +9,11 @@
 #include "test_actor.h"
 #include "remote_test_actor.h"
 
-BOOST_AUTO_TEST_SUITE( actor_suite )
+BOOST_AUTO_TEST_SUITE( thread_pool_suite )
 
-    BOOST_AUTO_TEST_CASE(ActorSTUPIDTEST) {
+    BOOST_AUTO_TEST_CASE(ThreadPoolTest) {
         thread_pool tp(2);
-        /*
+
         int task_counter = 0;
 
         tp.push([&task_counter](int x) {
@@ -44,7 +44,6 @@ BOOST_AUTO_TEST_SUITE( actor_suite )
         tp.stop(true);
 
         BOOST_CHECK_EQUAL(task_counter, 4);
-        */
     }
 
     BOOST_AUTO_TEST_CASE(ActorRefTest) {

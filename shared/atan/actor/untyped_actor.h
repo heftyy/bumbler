@@ -25,7 +25,7 @@ protected:
     void reply(T&& data) {
         auto typed_msg = construct_reply_message(std::forward<T>(data));
 
-        if(send_reply_message_func_ != nullptr) {
+        if(send_reply_message_func_) {
             send_reply_message_func_(std::move(typed_msg));
         }
     }
