@@ -59,6 +59,7 @@ void actor_system::stop(bool wait) {
     started_ = false;
     stopped_ = true;
 
+	if (work_) work_.reset();
     if (!io_service_.stopped()) io_service_.stop();
     if (io_service_thread_->joinable()) io_service_thread_->join();
 

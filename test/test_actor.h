@@ -27,7 +27,7 @@ protected:
         if(is_type<int>(data)) {
             int in = cast_message<int>(data);
             BOOST_LOG_TRIVIAL(debug) << "[OUT_ACTOR] message was " << in;
-//            reply("BLAM");
+            reply("BLAM");
         }
 
         if(is_type<float>(data)) {
@@ -47,7 +47,7 @@ protected:
         }
 
         if(is_type<typed_data<int>>(data)) {
-//            reply("BLAM");
+            reply("BLAM");
         }
 
         std::this_thread::sleep_for(std::chrono::milliseconds(500));

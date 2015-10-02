@@ -34,6 +34,7 @@ set(ATAN_SOURCES
   actor/router/mailbox/mailbox.h
   actor/router/mailbox/priority_mailbox.cpp
   actor/router/mailbox/priority_mailbox.h
+  actor/router/mailbox/priority_queue.h
   actor/untyped_actor.h
   packet/packet.h
   packet/packet_exceptions.h
