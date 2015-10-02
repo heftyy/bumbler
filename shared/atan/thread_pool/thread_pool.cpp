@@ -11,7 +11,7 @@ thread_pool::~thread_pool() {
     this->stop();
 }
 
-void thread_pool::stop(bool wait = false) {
+void thread_pool::stop(bool wait) {
     // Force all threads to return from io_service::run().
     if(wait) work_.reset();
     else io_service_.stop();

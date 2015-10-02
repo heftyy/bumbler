@@ -39,7 +39,7 @@ if(${WIN32})
     SET(Boost_USE_MULTITHREADED    ON)
     SET(Boost_USE_STATIC_RUNTIME   OFF)
 
-    find_package(Boost COMPONENTS thread chrono system date_time regex filesystem log log_setup serialization unit_test_framework REQUIRED)
+    find_package(Boost COMPONENTS system thread chrono date_time regex filesystem log log_setup serialization unit_test_framework REQUIRED)
     find_library(ws2_32_LIBRARY_PATH ws2_32)
 
     #set(CMAKE_RUNTIME_OUTPUT_DIRECTORY F:/github/bumbler/bin)
@@ -49,10 +49,11 @@ ELSE()
 
     add_definitions(-DBOOST_LOG_DYN_LINK)
     add_definitions(-DBOOST_TEST_DYN_LINK)
+
     #set(Boost_USE_STATIC_LIBS   ON)
     set(Boost_USE_MULTITHREADED ON)
     set(BOOST_ROOT ../boost_1_58_0)
-    find_package(Boost COMPONENTS thread chrono system date_time regex filesystem log log_setup serialization unit_test_framework REQUIRED)
+    find_package(Boost COMPONENTS thread system chrono date_time regex filesystem log log_setup serialization unit_test_framework REQUIRED)
 ENDIF()
 
 include_directories(shared)
@@ -85,7 +86,7 @@ foreach(testSrc ${TEST_SRCS})
     add_executable(${testName} ${testSrc})
 
     #link to Boost libraries AND your targets and dependencies
-    target_link_libraries(${testName} ${Boost_LIBRARIES} atan)
+    target_link_libraries(${testName} ${Boost_LIBRARIES} shared)
 
     #I like to move testing binaries into a testBin directory
     set_target_properties(${testName} PROPERTIES

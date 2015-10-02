@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.1)
 project(atan)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pthread")
 
 set(ATAN_SOURCES
   messages/message.h
@@ -43,6 +43,7 @@ set(ATAN_SOURCES
   scheduler/cancellable.h
   dispatcher/dispatcher.cpp
   dispatcher/dispatcher.h
+  thread_pool/thread_pool.cpp
   thread_pool/thread_pool.h
   )
 
@@ -54,4 +55,4 @@ ELSE()
   add_definitions(-DBOOST_LOG_DYN_LINK)
 ENDIF()
 
-add_library(atan STATIC ${ATAN_SOURCES} thread_pool/thread_pool.cpp)
+add_library(atan STATIC ${ATAN_SOURCES})

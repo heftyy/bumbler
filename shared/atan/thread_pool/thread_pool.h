@@ -3,17 +3,12 @@
 #include <future>
 #include <functional>
 #include <memory>
-#include <boost/asio.hpp>
 #include <boost/thread.hpp>
+#include <boost/asio.hpp>
 #include <utility.h>
 
 class thread_pool {
-private:
-    boost::asio::io_service io_service_;
-    std::unique_ptr<boost::asio::io_service::work> work_;
-    boost::thread_group threads_;
 public:
-
     thread_pool(std::size_t pool_size);
 
     ~thread_pool();
@@ -49,4 +44,9 @@ public:
 
         return pck->get_future();
     }
+
+private:
+    boost::asio::io_service io_service_;
+    std::unique_ptr<boost::asio::io_service::work> work_;
+    boost::thread_group threads_;
 };
