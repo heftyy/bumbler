@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.1)
 project(atan)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pthread")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -lpthread")
 
 set(ATAN_SOURCES
   messages/message.h
@@ -34,7 +34,6 @@ set(ATAN_SOURCES
   actor/router/mailbox/mailbox.h
   actor/router/mailbox/priority_mailbox.cpp
   actor/router/mailbox/priority_mailbox.h
-  actor/router/mailbox/priority_queue.h
   actor/untyped_actor.h
   packet/packet.h
   packet/packet_exceptions.h
@@ -53,7 +52,7 @@ include_directories(../)
 if(${WIN32})
   add_definitions(-D_WIN32_WINNT=0x0501)
 ELSE()
-  add_definitions(-DBOOST_LOG_DYN_LINK)
 ENDIF()
 
 add_library(atan STATIC ${ATAN_SOURCES})
+target_link_libraries(atan ${Boost_LIBRARIES})
