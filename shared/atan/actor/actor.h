@@ -17,11 +17,11 @@
 #include "../messages/commands/commands.h"
 #include "../packet/packet.h"
 #include "untyped_actor.h"
+#include "mailbox/standard_mailbox.h"
 
 class actor_system;
-class router;
 
-class actor : public std::enable_shared_from_this<actor> {
+class actor {
 public:
     virtual void stop_actor(bool wait = false);
 
@@ -43,21 +43,25 @@ public:
     virtual ~actor();
 
 protected:
-    std::mutex message_queue_mutex_;
     std::mutex actor_thread_mutex_;
     std::future<void> queue_thread_future_;
     std::unique_ptr<untyped_actor> untyped_actor_;
-    std::queue<std::unique_ptr<message>> message_queue_;
+    std::unique_ptr<mailbox<std::unique_ptr<message>>> mailbox_;
     std::atomic<bool> busy_;
     std::atomic<bool> stop_flag_;
     std::string actor_name_;
     std::weak_ptr<actor_system> actor_system_;
-    std::condition_variable cv;
+    std::condition_variable cv_;
     actor_ref self_;
 
     actor(std::string name, const std::shared_ptr<actor_system>& actor_system);
 
     virtual void init(std::unique_ptr<untyped_actor> u_actor);
+
+    template<typename Mailbox>
+    void setup_mailbox() {
+        this->mailbox_.reset(new Mailbox());
+    }
 
     virtual void tell(std::unique_ptr<message> msg, bool remote = false) {
         atan_error(ATAN_WRONG_ACTOR_METHOD, "virtual tell called, should never happen");
@@ -65,11 +69,11 @@ protected:
 
     virtual void on_receive(boost::any data) {
         this->untyped_actor_->on_receive(data);
-    };
+    }
 
     virtual void on_error(boost::any data, std::exception& ex) {
         this->untyped_actor_->on_error(data, ex);
-    };
+    }
 
     void create_internal_queue_thread();
 
@@ -104,9 +108,7 @@ private:
     }
 
     void clear_queue() {
-        std::unique_lock<std::mutex> lock(this->message_queue_mutex_);
-        while (!this->message_queue_.empty())
-            this->message_queue_.pop();  // empty the queue
+        this->mailbox_->clear();
     }
 
     void send_reply_message(std::unique_ptr<message> msg);

@@ -12,7 +12,7 @@ class untyped_actor;
 
 class remote_actor : public actor {
 public:
-    template<class T, typename ...Args>
+    template<class T, typename Mailbox = standard_mailbox<std::unique_ptr<message>>, typename ...Args>
     static actor_ref create(std::string name, const std::shared_ptr<actor_system>& actor_system, const actor_ref& network_actor_ref, Args&& ...args) {
         static_assert(
                 (std::is_base_of<untyped_actor, T>::value),
@@ -21,6 +21,7 @@ public:
 
 	    auto actor = std::unique_ptr<remote_actor>(new remote_actor(name, actor_system, network_actor_ref));
         auto typed_actor = utility::make_unique<T>(std::forward<Args>(args)...);
+        actor->template setup_mailbox<Mailbox>();
         actor->init(std::move(typed_actor));
 	    auto& ar = actor->get_self();
         actor::add_to_actor_system(actor_system, std::move(actor));

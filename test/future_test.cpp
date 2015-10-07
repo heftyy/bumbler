@@ -26,7 +26,6 @@ BOOST_AUTO_TEST_SUITE( future_test_suite )
         system1->stop(true);
     }
 
-/*
     BOOST_AUTO_TEST_CASE(ActorRemoteFutureTest) {
         auto system1 = actor_system::create_system("test_system1", 4555);
         auto system2 = actor_system::create_system("test_system2", 4556);
@@ -64,6 +63,5 @@ BOOST_AUTO_TEST_SUITE( future_test_suite )
         system1->stop(true);
         system2->stop(true);
     }
-	*/
 
 BOOST_AUTO_TEST_SUITE_END()

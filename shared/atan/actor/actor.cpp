@@ -30,8 +30,8 @@ void actor::create_internal_queue_thread() {
 
             std::unique_lock<std::mutex> lock(this->actor_thread_mutex_);
 
-            this->cv.wait(lock, [this, &isPopped]() {
-                isPopped = !this->message_queue_.empty();
+            this->cv_.wait(lock, [this, &isPopped]() {
+                isPopped = !this->mailbox_->empty();
                 if (isPopped) {
                     this->read_messages();
                 }
@@ -113,20 +113,15 @@ void actor::stop_actor(bool wait) {
 
     if (queue_thread_future_.valid()) {
         BOOST_LOG_TRIVIAL(debug) << "[ACTOR] stopping";
-        cv.notify_one();
+        cv_.notify_one();
         queue_thread_future_.wait();
         BOOST_LOG_TRIVIAL(debug) << "[ACTOR] stopped";
     }
 }
 
 void actor::read_messages() {
-    while (message_queue_.size() > 0) {
-        std::unique_lock<std::mutex> lock(this->message_queue_mutex_);
-
-        auto msg = std::move(message_queue_.front());
-        message_queue_.pop();
-
-        lock.unlock();
+    while (!this->mailbox_->empty()) {
+        auto msg = this->mailbox_->pop_message();
 
         if(msg == nullptr) return;
 
@@ -135,9 +130,10 @@ void actor::read_messages() {
             return 0;
         };
 
-        //run the task in the thread pool supplied by the dispatcher
+        // run the task in the thread pool supplied by the dispatcher
         auto future_result = this->actor_system_.lock()->get_dispatcher()->push(fun, msg->get_sender(), msg->get_data());
 
+        // wait for the task to finish
         future_result.wait();
     }
 }
@@ -145,7 +141,6 @@ void actor::read_messages() {
 void actor::add_message(std::unique_ptr<message> msg) {
     if(this->stop_flag_) return;
     BOOST_LOG_TRIVIAL(debug) << "[ACTOR] queueing new task";
-    std::unique_lock<std::mutex> lock(this->message_queue_mutex_);
-    message_queue_.push(std::move(msg));
-    cv.notify_one();
+    this->mailbox_->push_message(std::move(msg));
+    cv_.notify_one();
 }

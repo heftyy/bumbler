@@ -31,9 +31,9 @@ set(ATAN_SOURCES
   actor/router/random_router.h
   actor/router/round_robin_router.cpp
   actor/router/round_robin_router.h
-  actor/router/mailbox/mailbox.h
-  actor/router/mailbox/priority_mailbox.cpp
-  actor/router/mailbox/priority_mailbox.h
+  actor/mailbox/mailbox.h
+  actor/mailbox/standard_mailbox.h
+  actor/mailbox/priority_mailbox.h
   actor/untyped_actor.h
   packet/packet.h
   packet/packet_exceptions.h

@@ -8,7 +8,6 @@
 
 BOOST_AUTO_TEST_SUITE(scheduler_test_suite)
 
-    /*
     BOOST_AUTO_TEST_CASE(SchedulerSingleMessageTest) {
         test_actor::message_count = 0;
 
@@ -40,7 +39,6 @@ BOOST_AUTO_TEST_SUITE(scheduler_test_suite)
 
         BOOST_LOG_TRIVIAL(debug) << "test_system1 shutdown";
     }
-    */
 
     BOOST_AUTO_TEST_CASE(SchedulerBroadcastTest) {
         test_actor::message_count = 0;
