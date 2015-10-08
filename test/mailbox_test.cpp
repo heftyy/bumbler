@@ -4,39 +4,59 @@
 #include <boost/test/unit_test.hpp>
 #include <atan/actor/mailbox/standard_mailbox.h>
 #include <atan/actor/mailbox/priority_mailbox.h>
+#include <utility.h>
+
+using intUptr = std::unique_ptr<int>;
+using pMsgIntUptr = priority_message<intUptr>;
 
 BOOST_AUTO_TEST_SUITE( mailbox_test_suite )
 
     BOOST_AUTO_TEST_CASE(StandardMailboxTest) {
-        auto mailbox = standard_mailbox<int>();
+        std::unique_ptr<mailbox<int>> mailbox = utility::make_unique<standard_mailbox<int>>();
 
-        int msg_before = 5;
+        mailbox->push_message(5);
+        mailbox->push_message(6);
+        mailbox->push_message(7);
 
-        BOOST_CHECK_EQUAL(5, msg_before);
-
-        mailbox.push_message(msg_before);
-
-        int msg_after = mailbox.pop_message();
-
-        BOOST_CHECK_EQUAL(5, msg_after);
+        BOOST_CHECK_EQUAL(5, mailbox->pop_message());
+        BOOST_CHECK_EQUAL(6, mailbox->pop_message());
+        BOOST_CHECK_EQUAL(7, mailbox->pop_message());
     }
 
-    BOOST_AUTO_TEST_CASE(StandardMailboxTestUnPtr) {
-        auto mailbox = standard_mailbox<std::unique_ptr<int>>();
+    BOOST_AUTO_TEST_CASE(StandardMailboxTestUniquePtr) {
+        std::unique_ptr<mailbox<intUptr>> mailbox = utility::make_unique<standard_mailbox<intUptr>>();
 
-        auto msg_before = std::unique_ptr<int>(new int(5));
+        mailbox->push_message(intUptr(new int(5)));
+        mailbox->push_message(intUptr(new int(6)));
+        mailbox->push_message(intUptr(new int(7)));
 
-        BOOST_CHECK_EQUAL(5, *msg_before);
-
-        mailbox.push_message(std::move(msg_before));
-
-        auto msg_after = mailbox.pop_message();
-
-        BOOST_CHECK_EQUAL(5, *msg_after);
+        BOOST_CHECK_EQUAL(5, *mailbox->pop_message());
+        BOOST_CHECK_EQUAL(6, *mailbox->pop_message());
+        BOOST_CHECK_EQUAL(7, *mailbox->pop_message());
     }
 
     BOOST_AUTO_TEST_CASE(PriorityMailboxTest) {
-        auto mailbox = priority_mailbox<std::shared_ptr<int>>();
+        std::unique_ptr<mailbox<priority_message<int>>> mailbox = utility::make_unique<priority_mailbox<priority_message<int>>>();
+
+        mailbox->push_message(priority_message<int>(5, 1));
+        mailbox->push_message(priority_message<int>(6, 2));
+        mailbox->push_message(priority_message<int>(7, 3));
+
+        BOOST_CHECK_EQUAL(7, mailbox->pop_message().message);
+        BOOST_CHECK_EQUAL(6, mailbox->pop_message().message);
+        BOOST_CHECK_EQUAL(5, mailbox->pop_message().message);
+    }
+
+    BOOST_AUTO_TEST_CASE(PriorityMailboxTestUniquePtr) {
+        std::unique_ptr<mailbox<pMsgIntUptr>> mailbox = utility::make_unique<priority_mailbox<pMsgIntUptr>>();
+
+        mailbox->push_message(pMsgIntUptr(intUptr(new int(5)), 1));
+        mailbox->push_message(pMsgIntUptr(intUptr(new int(6)), 2));
+        mailbox->push_message(pMsgIntUptr(intUptr(new int(7)), 3));
+
+        BOOST_CHECK_EQUAL(7, *mailbox->pop_message().message);
+        BOOST_CHECK_EQUAL(6, *mailbox->pop_message().message);
+        BOOST_CHECK_EQUAL(5, *mailbox->pop_message().message);
     }
 
 BOOST_AUTO_TEST_SUITE_END()

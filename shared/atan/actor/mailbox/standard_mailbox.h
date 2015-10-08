@@ -8,19 +8,21 @@ template<typename T>
 class standard_mailbox : public mailbox<T> {
 
 public:
-    void push_message(T&& message) {
-        BOOST_LOG_TRIVIAL(debug) << boost::typeindex::type_id_with_cvr<T>().pretty_name();
-        BOOST_LOG_TRIVIAL(debug) << boost::typeindex::type_id_with_cvr<decltype(message)>().pretty_name();
-
-        std::unique_lock<std::mutex> lock(this->mailbox_mutex_);
-        this->queue_.push(std::forward<T>(std::move(message)));
+    void push_message(T&& message) override {
+        this->push_any_message(std::move(message));
     }
 
-    T&& pop_message() {
+    void push_message(T& message) override {
+        this->push_any_message(message);
+    }
+
+    T pop_message() override {
         std::unique_lock<std::mutex> lock(this->mailbox_mutex_);
+
         auto msg = std::move(this->queue_.front());
         this->queue_.pop();
-        return std::forward<T>(msg);
+
+        return std::move(msg);
     }
 
     void clear() {
@@ -35,6 +37,15 @@ public:
     }
 
 private:
+    template<typename _Tp>
+    void push_any_message(_Tp&&message) {
+        BOOST_LOG_TRIVIAL(debug) << boost::typeindex::type_id_with_cvr<T>().pretty_name();
+        BOOST_LOG_TRIVIAL(debug) << boost::typeindex::type_id_with_cvr<decltype(message)>().pretty_name();
+
+        std::unique_lock<std::mutex> lock(this->mailbox_mutex_);
+        this->queue_.push(std::forward<T>(message));
+    }
+
     std::queue<T> queue_;
 
 };
