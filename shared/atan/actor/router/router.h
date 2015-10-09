@@ -21,7 +21,7 @@ public:
     }
 
 protected:
-    template<class T, typename ...Args>
+    template<class T, typename Mailbox = standard_mailbox<std::unique_ptr<message>>, typename ...Args>
     static actor_ref create(std::unique_ptr<router> router_ptr, const std::shared_ptr<actor_system>& actor_system, Args&& ...args) {
         static_assert(
                 (std::is_base_of<untyped_actor, T>::value),
@@ -50,11 +50,12 @@ protected:
     virtual void tell_one(std::unique_ptr<message> msg) = 0;
     void tell_all(std::unique_ptr<message> msg);
 
-    template<typename T, typename ...Args>
+    template<typename T, typename Mailbox = standard_mailbox<std::unique_ptr<message>>, typename ...Args>
     void create_actors(Args&& ...args) {
         for(int i = 0; i < size; i++) {
 	        auto actor = std::unique_ptr<local_actor>(new local_actor(this->actor_name(), this->actor_system_.lock()));
             auto typed_actor = utility::make_unique<T>(std::forward<Args>(args)...);
+            actor->template setup_mailbox<Mailbox>();
             actor->init(std::move(typed_actor));
             this->actors.push_back(std::move(actor));
         }

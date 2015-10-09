@@ -38,7 +38,7 @@ public:
 
 private:
     template<typename _Tp>
-    void push_any_message(_Tp&&message) {
+    void push_any_message(_Tp&& message) {
         BOOST_LOG_TRIVIAL(debug) << boost::typeindex::type_id_with_cvr<T>().pretty_name();
         BOOST_LOG_TRIVIAL(debug) << boost::typeindex::type_id_with_cvr<decltype(message)>().pretty_name();
 

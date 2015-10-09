@@ -8,6 +8,7 @@ set(ATAN_SOURCES
   messages/typed_message.h
   messages/serialization_utility.h
   messages/commands/broadcast.h
+  messages/commands/priority_message.h
   messages/commands/stop_actor.h
   messages/commands/kill_actor.h
   messages/commands/commands.h

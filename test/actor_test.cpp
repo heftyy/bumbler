@@ -64,7 +64,7 @@ BOOST_AUTO_TEST_SUITE( actor_suite )
 
         //stop the actor after all the messages from the queue are read
         //this will block for 1000ms+
-//        la1.tell(::stop_actor<int>(5));
+        la1.tell(::stop_actor<int>(5));
 
         system1->stop(false);
 
