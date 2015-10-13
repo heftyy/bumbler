@@ -97,3 +97,13 @@ const actor_ref r1 = round_robin_router::create<test_actor>("test_router1", syst
 r1.tell(broadcast<int>(88));
 ```
 
+Creating different actor types
+---
+
+Each actor has a mailbox thats responsible for storing and ordering the messages. You can set it when using the static create method. 
+```c++
+const actor_ref la1 = local_actor::create<test_actor, fifo_mailbox>("test_actor1", system1);
+const actor_ref la2 = local_actor::create<test_actor, lifo_mailbox>("test_actor1", system1);
+const actor_ref la3 = local_actor::create<test_actor, priority_mailbox>("test_actor1", system1);
+```
+fifo_mailbox is the default one.
