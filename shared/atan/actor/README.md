@@ -90,7 +90,7 @@ const actor_ref test_actor_ref2 = local_actor::create<test_actor>("test_actor2",
 
 actor_ref remote_test_actor1 = remote_actor::create<remote_test_actor>("remote_test_actor1", system1, actor_ref("test_actor2$test_system2@localhost:4556"));
 ```
- * router - routers create multiple instances of local_actors that you can send messages via one actor_ref. There are multiple types of routers : random_router, round_robin_router, mailbox_router( not done yet ). You can send a broadcast message to reach all local_actors in the router.
+ * router - routers create multiple instances of local_actors that you can send messages via one actor_ref. There are multiple types of routers : random_router, round_robin_router, smallest_mailbox_router. You can send a broadcast message to reach all local_actors in the router.
 ```c++
 auto system1 = actor_system::create_system("test_system1", 4555, 1);
 const actor_ref r1 = round_robin_router::create<test_actor>("test_router1", system1, 2);

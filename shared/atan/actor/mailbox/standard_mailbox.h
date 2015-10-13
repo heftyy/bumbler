@@ -11,15 +11,19 @@ public:
         this->push_to_queue(std::move(message));
     }
 
-    void clear() {
+    void clear() override {
         std::unique_lock<std::mutex> lock(this->mailbox_mutex_);
         while(!empty()) {
             this->queue_.pop();
         }
     }
 
-    bool empty() {
+    bool empty() override {
         return this->queue_.empty();
+    }
+
+    unsigned long size() override {
+        return this->queue_.size();
     }
 
 protected:

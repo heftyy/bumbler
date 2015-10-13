@@ -4,6 +4,7 @@
 #include <atan/actor_system/actor_system.h>
 #include <atan/actor/router/round_robin_router.h>
 #include <atan/actor/router/random_router.h>
+#include <atan/actor/router/smallest_mailbox_router.h>
 #include <communication/serializable_types.h>
 #include "test_actor.h"
 #include "remote_test_actor.h"
@@ -39,6 +40,26 @@ BOOST_AUTO_TEST_SUITE( router_test_suite )
         std::this_thread::sleep_for(std::chrono::seconds(1));
 
         BOOST_CHECK_EQUAL(test_actor::message_count.load(), 1);
+
+        system1->stop(true);
+    }
+
+    BOOST_AUTO_TEST_CASE(RouterSmallestMailboxTest) {
+        test_actor::message_count.store(0);
+
+        auto system1 = actor_system::create_system("test_system1", 4555);
+
+        const actor_ref r1 = smallest_mailbox_router::create<test_actor>("test_router1", system1, 2);
+
+        r1.tell(6);
+        r1.tell(7);
+        r1.tell(8);
+        r1.tell(9);
+
+        //wait for the message to get executed
+        std::this_thread::sleep_for(std::chrono::seconds(2));
+
+        BOOST_CHECK_EQUAL(test_actor::message_count.load(), 4);
 
         system1->stop(true);
     }

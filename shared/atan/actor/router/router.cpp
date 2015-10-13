@@ -15,9 +15,9 @@ void router::tell(std::unique_ptr<message> msg, bool remote) {
 }
 
 void router::tell_all(std::unique_ptr<message> msg) {
-    for(int i = 0; i < this->actors.size(); i++) {
+    for(int i = 0; i < this->actors_.size(); i++) {
 	    auto msg_copy = std::move(msg->clone_ptr());
 
-        actors[i]->add_message(std::move(msg_copy));
+        actors_[i]->add_message(std::move(msg_copy));
     }
 }

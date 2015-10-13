@@ -32,6 +32,7 @@ public:
     void add_message(std::unique_ptr<message> msg);
 
     bool is_busy() { return busy_; }
+    unsigned long mailbox_size() { return this->mailbox_->size(); }
 
     std::string actor_name();
     std::string system_name();

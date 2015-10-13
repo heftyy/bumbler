@@ -33,6 +33,8 @@ set(ATAN_SOURCES
     actor/router/random_router.h
     actor/router/round_robin_router.cpp
     actor/router/round_robin_router.h
+    actor/router/smallest_mailbox_router.cpp
+    actor/router/smallest_mailbox_router.h
     actor/mailbox/mailbox.h
     actor/mailbox/standard_mailbox.h
     actor/mailbox/fifo_mailbox.h
