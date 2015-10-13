@@ -97,7 +97,7 @@ const actor_ref r1 = round_robin_router::create<test_actor>("test_router1", syst
 r1.tell(broadcast<int>(88));
 ```
 
-Creating different actor types
+Using different types of mailboxes
 ---
 
 Each actor has a mailbox thats responsible for storing and ordering the messages. You can set it when using the static create method. 
