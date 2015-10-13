@@ -1,12 +1,15 @@
 #define BOOST_TEST_MODULE ACTOR_TEST
 
+#include <memory>
+#include <future>
 #include <boost/test/unit_test.hpp>
+#include <atan/thread_pool/thread_pool.h>
 #include <atan/actor_system/actor_system.h>
 #include <atan/actor/local_actor.h>
 #include "test_actor.h"
 #include "remote_test_actor.h"
 
-BOOST_AUTO_TEST_SUITE( actor_test_suite )
+BOOST_AUTO_TEST_SUITE( actor_suite )
 
     BOOST_AUTO_TEST_CASE(ActorRefTest) {
         actor_ref test_ref = actor_ref("test_actor", "test_system");
@@ -29,10 +32,9 @@ BOOST_AUTO_TEST_SUITE( actor_test_suite )
         BOOST_CHECK_EQUAL(system1->started(), true);
 
         BOOST_CHECK_EQUAL(system1->stopped(), false);
-		system1->stop(false);
+        system1->stop(false);
         BOOST_CHECK_EQUAL(system1->stopped(), true);
     }
-
 
     BOOST_AUTO_TEST_CASE(ActorInitTest) {
         auto system1 = actor_system::create_system("test_system1", 4555);
@@ -84,11 +86,12 @@ BOOST_AUTO_TEST_SUITE( actor_test_suite )
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
         //clear the queue ( 1 message left ) and stop the actor
-        la1.tell(::kill_actor<int>(5));
+//        la1.tell(::kill_actor<int>(5));
 
         system1->stop(false);
 
         BOOST_CHECK_EQUAL(test_actor::message_count.load(), 1);
     }
+
 
 BOOST_AUTO_TEST_SUITE_END()

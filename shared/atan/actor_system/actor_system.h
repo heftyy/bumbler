@@ -115,6 +115,7 @@ private:
     std::shared_ptr<udp_server> server_;
     std::unique_ptr<std::thread> io_service_thread_;
     boost::asio::io_service io_service_;
+    std::unique_ptr<boost::asio::io_service::work> work_;
     std::shared_ptr<scheduler> scheduler_;
     std::shared_ptr<dispatcher> dispatcher_;
 

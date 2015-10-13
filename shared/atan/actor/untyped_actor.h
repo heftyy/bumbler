@@ -28,9 +28,14 @@ protected:
 
     template<typename T>
     void reply(T&& data) {
+        if(get_sender().is_none()) {
+            BOOST_LOG_TRIVIAL(error) << "reply failed because the sender is not set";
+            return;
+        }
+
         auto typed_msg = construct_reply_message(std::forward<T>(data));
 
-        if(send_reply_message_func_ != nullptr) {
+        if(send_reply_message_func_) {
             send_reply_message_func_(std::move(typed_msg));
         }
     }

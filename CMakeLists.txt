@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.1)
 project(bumbler)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pthread")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -lpthread")
 
 set(BUMBLER_SOURCE_FILES
 #    bumbler/launcher/frame_servers.cpp
@@ -12,16 +12,16 @@ set(BUMBLER_SOURCE_FILES
 #    bumbler/launcher/server_info.cpp
 #    bumbler/launcher/server_info.h
 #    bumbler/launcher/server_list.h
-    bumbler/out_router.h
     bumbler/bumbler.cpp
+    bumbler/out_router.h
     bumbler/out_actor.h
     bumbler/remote_server_actor.h
     shared/logger/logger.cpp
 )
 
 set(SERVER_SOURCE_FILES
-    server/server_actor.h
     server/server.cpp
+    server/server_actor.h
 )
 
 set(CMAKE_BUILD_TYPE Debug)
@@ -39,20 +39,22 @@ if(${WIN32})
     SET(Boost_USE_MULTITHREADED    ON)
     SET(Boost_USE_STATIC_RUNTIME   OFF)
 
-    find_package(Boost COMPONENTS thread chrono system date_time regex filesystem log log_setup serialization unit_test_framework REQUIRED)
+    find_package(Boost 1.59 COMPONENTS system thread chrono date_time regex filesystem log log_setup serialization unit_test_framework REQUIRED)
     find_library(ws2_32_LIBRARY_PATH ws2_32)
 
     #set(CMAKE_RUNTIME_OUTPUT_DIRECTORY E:/Workspace/github/bumbler/bin)
 ELSE()
     #linux
-    include_directories(../boost_1_58_0)
+    include_directories(../boost_1_59_0)
 
-    add_definitions(-DBOOST_LOG_DYN_LINK)
-    add_definitions(-DBOOST_TEST_DYN_LINK)
+    #add_definitions(-DBOOST_TEST_DYN_LINK)
+
+    add_definitions(-DBOOST_ALL_DYN_LINK)
+    SET(Boost_USE_STATIC_RUNTIME   OFF)
     #set(Boost_USE_STATIC_LIBS   ON)
     set(Boost_USE_MULTITHREADED ON)
-    set(BOOST_ROOT ../boost_1_58_0)
-    find_package(Boost COMPONENTS thread chrono system date_time regex filesystem log log_setup serialization unit_test_framework REQUIRED)
+    set(BOOST_ROOT ../boost_1_59_0)
+    find_package(Boost 1.59 COMPONENTS system thread chrono date_time regex filesystem log log_setup serialization unit_test_framework REQUIRED)
 ENDIF()
 
 include_directories(shared)
@@ -85,7 +87,7 @@ foreach(testSrc ${TEST_SRCS})
     add_executable(${testName} ${testSrc})
 
     #link to Boost libraries AND your targets and dependencies
-    target_link_libraries(${testName} ${Boost_LIBRARIES} atan)
+    target_link_libraries(${testName} -lpthread ${Boost_LIBRARIES} shared)
 
     #I like to move testing binaries into a testBin directory
     set_target_properties(${testName} PROPERTIES

@@ -7,6 +7,7 @@
 #include <boost/serialization/access.hpp>
 
 class actor_ref;
+class message;
 
 class message {
 public:
@@ -29,11 +30,15 @@ public:
 
     virtual ~message() {}
 
+    virtual int get_priority() const = 0;
+
     virtual bool is_broadcast() const = 0;
 
     virtual bool is_stop_actor() const = 0;
 
     virtual bool is_kill_actor() const = 0;
+
+    virtual bool is_priority_message() const = 0;
 
 private:
 
@@ -44,5 +49,3 @@ private:
     }
 
 };
-
-BOOST_SERIALIZATION_ASSUME_ABSTRACT(message)

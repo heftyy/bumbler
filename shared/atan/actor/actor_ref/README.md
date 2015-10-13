@@ -14,11 +14,11 @@ void tell(const typed_message<T>& msg) const;
 
 Tell method will send a message to the actor.
 
-There are 3 special types of messages:
+There are 4 special types of messages:
  * broadcast - used for routers, send messages to all actors in the router
  * stop_actor - stops the actor after all the messages in the queue have been read and tasks are finished. Sending this message will synchrnously wait for the actor to stop.
  * kill_actor - clears the message queue and stops the actor as soon as possible. Sending this message will synchrnously wait for the actor to stop.
- * priority_message - if the actor that recevies the message uses priority_mailbox, messages with highest priority are passed to the on_recevied method first.
+ * priority_message - if the actor that recevies the message uses priority_mailbox, messages with highest priority are passed to the on_recevied method first. Broadcast, stop_actor and kill_actor messages can also have the priority set in the constructor.
 ```c++
 actor_ref.tell(broadcast<int>(88));
 actor_ref.tell(stop_actor<int>(5));

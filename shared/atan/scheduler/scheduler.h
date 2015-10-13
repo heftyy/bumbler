@@ -6,7 +6,6 @@
 #include <iostream>
 #include <atan/dispatcher/dispatcher.h>
 #include "cancellable.h"
-#include "../thread_pool/ctpl_stl.h"
 #include "../actor/actor_ref/actor_ref.h"
 #include "utility.h"
 
@@ -35,7 +34,7 @@ public:
 	    auto ret_cancellable = std::make_shared<cancellable>();
 		std::weak_ptr<cancellable> ret_cancellable_weak_ptr = ret_cancellable;
 
-        dispatcher_->push([this, initial_delay_ms, interval_ms](int id, const typed_message<T> msg_copy, std::weak_ptr<cancellable> cancellable) -> int {
+        dispatcher_->push([this, initial_delay_ms, interval_ms](const typed_message<T> msg_copy, std::weak_ptr<cancellable> cancellable) -> int {
 			if (cancellable.expired()) return 2;
 			else {
 				cancellable.lock()->thread_id = std::this_thread::get_id();
@@ -55,7 +54,6 @@ public:
             while (!cancellable.expired() && cancellable.lock() != nullptr && !cancellable.lock()->check_cancel()) {
                 BOOST_LOG_TRIVIAL(debug) << "[SCHEDULER] thread_id: " << std::this_thread::get_id() <<
                                          " sending message to " << msg_copy.get_target().to_string();
-                BOOST_LOG_TRIVIAL(debug) << "hello from " << id << ' ';
 
                 msg_copy.get_target().tell(msg_copy);
 
