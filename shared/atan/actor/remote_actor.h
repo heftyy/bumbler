@@ -12,7 +12,7 @@ class untyped_actor;
 
 class remote_actor : public actor {
 public:
-    template<class T, typename Mailbox = standard_mailbox<std::unique_ptr<message>>, typename ...Args>
+    template<class T, typename Mailbox = fifo_mailbox, typename ...Args>
     static actor_ref create(std::string name, const std::shared_ptr<actor_system>& actor_system, const actor_ref& network_actor_ref, Args&& ...args) {
         static_assert(
                 (std::is_base_of<untyped_actor, T>::value),

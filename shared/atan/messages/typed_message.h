@@ -14,8 +14,10 @@
 #include "commands/commands.h"
 #include "utility.h"
 
+BOOST_SERIALIZATION_ASSUME_ABSTRACT(message)
+
 enum class message_type {
-    regular, broadcast, stop_actor, kill_actor
+    regular, broadcast, stop_actor, kill_actor, priority_message
 };
 
 template<typename T>
@@ -24,6 +26,7 @@ public:
     T data;
     std::unique_ptr<actor_ref> target;
     std::unique_ptr<actor_ref> sender;
+    int priority;
 
     typed_message() { }
 
@@ -33,6 +36,7 @@ public:
         this->target = utility::make_unique<actor_ref>(*rhs.target);
         this->sender = utility::make_unique<actor_ref>(*rhs.sender);
         this->message_type_ = rhs.message_type_;
+        this->priority = rhs.priority;
     }
 
 	typed_message& operator=(const typed_message& rhs){
@@ -41,14 +45,16 @@ public:
 		this->target = utility::make_unique<actor_ref>(*rhs.target);
 		this->sender = utility::make_unique<actor_ref>(*rhs.sender);
 		this->message_type_ = rhs.message_type_;
+        this->priority = rhs.priority;
 		return *this;
 	}
 
-    typed_message(const actor_ref& target, const actor_ref& sender, const T& data, message_type msg_type = message_type::regular) {
+    typed_message(const actor_ref& target, const actor_ref& sender, const T& data, message_type msg_type = message_type::regular, int priority = 0) {
         this->data = data;
         this->target = utility::make_unique<actor_ref>(std::move(target));
         this->sender = utility::make_unique<actor_ref>(std::move(sender));
         this->message_type_ = msg_type;
+        this->priority = priority;
     }
 
     typed_message(typed_message<T>&&) = default; // support moving
@@ -57,6 +63,10 @@ public:
     ~typed_message() {
         this->target.reset();
         this->sender.reset();
+    }
+
+    int get_priority() const override {
+        return priority;
     }
 
     bool is_broadcast() const override {
@@ -69,6 +79,10 @@ public:
 
     bool is_kill_actor() const override {
         return message_type_ == message_type::kill_actor;
+    }
+
+    bool is_priority_message() const override {
+        return message_type_ == message_type::priority_message;
     }
 
     boost::any get_data() const override {
@@ -133,5 +147,10 @@ public:
     template<typename T>
     static auto create(const actor_ref& target, const actor_ref& sender, const kill_actor<T>& cmd) -> const typed_message<T> {
         return typed_message<T>(target, sender, cmd.data, message_type::kill_actor);
+    }
+
+    template<typename T>
+    static auto create(const actor_ref& target, const actor_ref& sender, const priority_message<T>& cmd) -> const typed_message<T> {
+        return typed_message<T>(target, sender, cmd.data, message_type::priority_message, cmd.priority);
     }
 };

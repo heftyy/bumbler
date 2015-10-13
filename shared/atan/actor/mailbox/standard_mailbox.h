@@ -4,25 +4,11 @@
 #include <logger/logger.h>
 #include "mailbox.h"
 
-template<typename T>
-class standard_mailbox : public mailbox<T> {
+class standard_mailbox : public mailbox {
 
 public:
-    void push_message(T&& message) override {
-        this->push_any_message(std::move(message));
-    }
-
-    void push_message(T& message) override {
-        this->push_any_message(message);
-    }
-
-    T pop_message() override {
-        std::unique_lock<std::mutex> lock(this->mailbox_mutex_);
-
-        auto msg = std::move(this->queue_.front());
-        this->queue_.pop();
-
-        return std::move(msg);
+    void push_message(std::unique_ptr<message> message) override {
+        this->push_to_queue(std::move(message));
     }
 
     void clear() {
@@ -36,17 +22,14 @@ public:
         return this->queue_.empty();
     }
 
+protected:
+    std::queue<std::unique_ptr<message>> queue_;
+
 private:
-    template<typename _Tp>
-    void push_any_message(_Tp&& message) {
-        BOOST_LOG_TRIVIAL(debug) << boost::typeindex::type_id_with_cvr<T>().pretty_name();
-        BOOST_LOG_TRIVIAL(debug) << boost::typeindex::type_id_with_cvr<decltype(message)>().pretty_name();
-
+    void push_to_queue(std::unique_ptr<message> msg) {
         std::unique_lock<std::mutex> lock(this->mailbox_mutex_);
-        this->queue_.push(std::forward<T>(message));
+        this->queue_.emplace(std::move(msg));
     }
-
-    std::queue<T> queue_;
 
 };
 

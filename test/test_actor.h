@@ -38,7 +38,7 @@ protected:
         if(is_type<std::string>(data)) {
             std::string in = cast_message<std::string>(data);
             BOOST_LOG_TRIVIAL(debug) << "[OUT_ACTOR] message was " << in;
-            reply(::stop_actor<std::string>("HAH!"));
+//            reply(::stop_actor<std::string>("HAH!"));
         }
 
         if(is_type<char*>(data)) {
@@ -48,6 +48,11 @@ protected:
 
         if(is_type<typed_data<int>>(data)) {
             reply("BLAM");
+        }
+
+        if(is_type<typed_data<std::string>>(data)) {
+            typed_data<std::string> in = cast_message<typed_data<std::string>>(data);
+            BOOST_LOG_TRIVIAL(debug) << "[OUT_ACTOR] message was typed_data " << in.data;
         }
 
         std::this_thread::sleep_for(std::chrono::milliseconds(500));

@@ -1,29 +1,51 @@
 #pragma once
 
+#include <memory>
 #include <queue>
+#include <boost/any.hpp>
 #include <logger/logger.h>
 #include "mailbox.h"
-#include "../../messages/commands/priority_message.h"
 
-template<typename T>
-class priority_mailbox : public mailbox<T> {
+class message_wrapper {
+public:
+    std::unique_ptr<message> msg;
+    int priority;
+
+    message_wrapper(std::unique_ptr<message> msg, int priority) : msg(std::move(msg)), priority(priority) { }
+    message_wrapper(const message_wrapper& lhs) {
+        this->msg = lhs.msg->clone_ptr();
+        this->priority = lhs.priority;
+    }
+
+    message_wrapper(message_wrapper&& lhs) {
+        this->msg = std::move(lhs.msg);
+        this->priority = lhs.priority;
+    }
+
+    message_wrapper& operator=(message_wrapper&& lhs) {
+        this->msg = std::move(lhs.msg);
+        this->priority = lhs.priority;
+        return *this;
+    }
+};
+
+class priority_mailbox : public mailbox {
 
 public:
-    void push_message(T&& message) override {
-        this->push_any_message(std::move(message));
+    using QueueElement = message_wrapper;
+    using Queue = std::priority_queue<QueueElement, std::deque<QueueElement>, std::function<bool(const QueueElement&, const QueueElement&)>>;
+
+    void push_message(std::unique_ptr<message> msg) {
+        this->push_to_queue(std::move(msg), msg->get_priority());
     }
 
-    void push_message(T& message) override {
-        this->push_any_message(message);
-    }
-
-    T pop_message() override {
+    std::unique_ptr<message> pop_message() override {
         std::unique_lock<std::mutex> lock(this->mailbox_mutex_);
 
-        T moved = std::move(const_cast<T&>(this->queue_.top()));
+        QueueElement moved = std::move(const_cast<QueueElement&>(this->queue_.top()));
         this->queue_.pop();
 
-        return std::move(moved);
+        return std::move(moved.msg);
     }
 
     void clear() {
@@ -38,19 +60,13 @@ public:
     }
 
 private:
-    using Queue = std::priority_queue<T, std::deque<T>, std::function<bool(const T&, const T&)>>;
-    Queue queue_ = Queue([](const T& lhs, const T& rhs) {
+    Queue queue_ = Queue([](const QueueElement& lhs, const QueueElement& rhs) {
         return lhs.priority < rhs.priority;
     });
 
-    template<typename _Tp>
-    void push_any_message(_Tp&& message) {
-        BOOST_LOG_TRIVIAL(debug) << boost::typeindex::type_id_with_cvr<T>().pretty_name();
-        BOOST_LOG_TRIVIAL(debug) << boost::typeindex::type_id_with_cvr<decltype(message)>().pretty_name();
-
+    void push_to_queue(std::unique_ptr<message> msg, int priority) {
         std::unique_lock<std::mutex> lock(this->mailbox_mutex_);
-        this->queue_.push(std::forward<T>(message));
+        this->queue_.emplace(std::move(msg), priority);
     }
 
 };
-

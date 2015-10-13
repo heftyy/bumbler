@@ -4,13 +4,13 @@ project(shared)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -lpthread")
 
 set(SHARED_SOURCES
-  communication/message_settings.h
-  communication/serializable_types.h
-  communication/server_status.h
-  logger/logger.h
-  logger/logger.cpp
-  utility.h
-  utility.cpp
+    communication/message_settings.h
+    communication/serializable_types.h
+    communication/server_status.h
+    logger/logger.h
+    logger/logger.cpp
+    utility.h
+    utility.cpp
   )
 
 add_subdirectory(atan)

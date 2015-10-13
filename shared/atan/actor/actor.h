@@ -17,7 +17,7 @@
 #include "../messages/commands/commands.h"
 #include "../packet/packet.h"
 #include "untyped_actor.h"
-#include "mailbox/standard_mailbox.h"
+#include "mailbox/fifo_mailbox.h"
 
 class actor_system;
 
@@ -46,7 +46,7 @@ protected:
     std::mutex actor_thread_mutex_;
     std::future<void> queue_thread_future_;
     std::unique_ptr<untyped_actor> untyped_actor_;
-    std::unique_ptr<mailbox<std::unique_ptr<message>>> mailbox_;
+    std::unique_ptr<mailbox> mailbox_;
     std::atomic<bool> busy_;
     std::atomic<bool> stop_flag_;
     std::string actor_name_;
