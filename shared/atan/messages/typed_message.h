@@ -40,7 +40,7 @@ public:
     }
 
 	typed_message& operator=(const typed_message& rhs){
-		std::cout << "typed_message equals ctor\n";
+		std::cout << "typed_message assign ctor\n";
 		this->data = rhs.data;
 		this->target = utility::make_unique<actor_ref>(*rhs.target);
 		this->sender = utility::make_unique<actor_ref>(*rhs.sender);
@@ -51,8 +51,8 @@ public:
 
     typed_message(const actor_ref& target, const actor_ref& sender, const T& data, message_type msg_type = message_type::regular, int priority = 0) {
         this->data = data;
-        this->target = utility::make_unique<actor_ref>(std::move(target));
-        this->sender = utility::make_unique<actor_ref>(std::move(sender));
+        this->target = utility::make_unique<actor_ref>(target);
+        this->sender = utility::make_unique<actor_ref>(sender);
         this->message_type_ = msg_type;
         this->priority = priority;
     }

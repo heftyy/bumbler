@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.1)
 project(atan)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -lpthread")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 set(ATAN_SOURCES
     messages/message.h
@@ -61,4 +61,4 @@ ELSE()
 ENDIF()
 
 add_library(atan STATIC ${ATAN_SOURCES})
-target_link_libraries(atan ${Boost_LIBRARIES})
+target_link_libraries(atan ${Boost_LIBRARIES} -lpthread)

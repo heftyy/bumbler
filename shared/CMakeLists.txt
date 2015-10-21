@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.1)
 project(shared)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -lpthread")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 set(SHARED_SOURCES
     communication/message_settings.h
@@ -16,4 +16,4 @@ set(SHARED_SOURCES
 add_subdirectory(atan)
 
 add_library(shared STATIC ${SHARED_SOURCES})
-target_link_libraries(shared atan)
+target_link_libraries(shared atan -lpthread)

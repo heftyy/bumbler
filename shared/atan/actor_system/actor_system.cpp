@@ -149,7 +149,6 @@ const actor_ref actor_system::get_actor(std::string actor_name) {
 }
 
 void actor_system::receive(std::unique_ptr<packet> packet, boost::asio::ip::udp::endpoint& sender_endpoint) {
-//        BOOST_LOG_TRIVIAL(debug) << "Received data: \n" << packet->data.data;
     std::stringstream ss(packet->data.data);
     boost::archive::text_iarchive ia(ss);
 
