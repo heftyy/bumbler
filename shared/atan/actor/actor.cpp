@@ -1,7 +1,7 @@
 #include "actor.h"
 #include "../actor_system/actor_system.h"
 
-actor::actor(std::string name, const std::shared_ptr<actor_system>& actor_system)
+actor::actor(const std::string name, const std::shared_ptr<actor_system>& actor_system)
         : actor_name_(name), actor_system_(actor_system) {
     stop_flag_.store(false);
     self_ = actor_ref(actor_name(), system_name());
@@ -74,7 +74,7 @@ void actor::send_reply_message(std::unique_ptr<message> msg) {
             int port = msg->get_target().port;
 
             BOOST_LOG_TRIVIAL(debug) << "[ACTOR] replying to " << msg->get_target().to_string();
-            packet p = message_to_packet(std::move(msg));
+            packet p = packet(std::move(msg));
 
             auto remote_actor_endpoint = boost::asio::ip::udp::endpoint(
                     boost::asio::ip::address().from_string(ip), port

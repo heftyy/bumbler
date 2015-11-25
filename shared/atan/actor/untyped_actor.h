@@ -11,15 +11,12 @@ class actor;
 
 class untyped_actor {
 public:
-	virtual ~untyped_actor()
-	{
-	}
+	virtual ~untyped_actor() { }
 
 protected:
     friend class actor;
 
     virtual void on_receive(boost::any data) = 0;
-
     virtual void on_error(boost::any data, std::exception ex) { BOOST_LOG_TRIVIAL(error) << "[UNTYPED_ACTOR] " << ex.what(); };
 
     void reply(const char* data) {

@@ -111,7 +111,7 @@ int actor_system::tell_actor(std::unique_ptr<message> msg, bool from_remote) {
     //throw new actor_not_found(message.target.actor_name);
 }
 
-int actor_system::future_tell_actor(std::unique_ptr<message> msg, std::function<void(boost::any)>& response_fn) {
+int actor_system::ask_actor(std::unique_ptr<message> msg, std::function<void(boost::any)> &response_fn) {
     if (stopped_.load()) return atan_error(ACTOR_SYSTEM_STOPPED, system_name_);
 
     if (msg->get_target().system_name.compare(system_name_) != 0)
@@ -146,6 +146,11 @@ const actor_ref actor_system::get_actor(std::string actor_name) {
     else {
         return actor_ref::none();
     }
+}
+
+const actor_ref actor_system::actor_of(std::unique_ptr<props> props) {
+
+    return actor_ref();
 }
 
 void actor_system::receive(std::unique_ptr<packet> packet, boost::asio::ip::udp::endpoint& sender_endpoint) {

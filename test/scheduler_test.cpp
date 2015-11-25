@@ -2,7 +2,7 @@
 
 #include <boost/test/unit_test.hpp>
 #include <atan/actor_system/actor_system.h>
-#include <atan/actor/router/round_robin_router.h>
+#include <atan/actor/routing/round_robin_router.h>
 #include "test_actor.h"
 #include "typed_data.h"
 

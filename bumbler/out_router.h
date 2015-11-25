@@ -2,7 +2,7 @@
 
 #include <iostream>
 #include <atomic>
-#include <atan/actor/router/round_robin_router.h>
+#include <atan/actor/routing/round_robin_router.h>
 #include <atan/actor_system/actor_system.h>
 #include <communication/message_settings.h>
 

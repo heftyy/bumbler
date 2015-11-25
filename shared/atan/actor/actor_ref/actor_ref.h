@@ -70,12 +70,12 @@ public:
     }
 
     template<typename F>
-    std::future<F> future(const char* data) const {
-        return future<F>(std::string(data));
+    std::future<F> ask(const char* data) const {
+        return ask<F>(std::string(data));
     }
 
     template<typename F, typename T>
-    std::future<F> future(T&& data) const {
+    std::future<F> ask(T&& data) const {
         auto promise_ptr = std::make_shared<std::promise<F>>();
         auto f = promise_ptr->get_future();
 
@@ -95,7 +95,7 @@ public:
         auto tm = typed_message_factory::create(*this, none(), std::forward<T>(data));
         auto tm_ptr = utility::make_unique<decltype(tm)>(std::move(tm));
 
-        actor_future_tell(std::move(tm_ptr), fn);
+        actor_ask_system(std::move(tm_ptr), fn);
 
         return f;
     }
@@ -138,7 +138,7 @@ private:
         this->port = 0;
     }
 
-    void actor_future_tell(std::unique_ptr<message> msg, std::function<void(boost::any)>& response_fn) const;
+    void actor_ask_system(std::unique_ptr<message> msg, std::function<void(boost::any)>& response_fn) const;
     void actor_tell(std::unique_ptr<message> msg) const;
 
 };

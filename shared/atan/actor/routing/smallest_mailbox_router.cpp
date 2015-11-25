@@ -1,6 +1,8 @@
 #include "smallest_mailbox_router.h"
 
 void smallest_mailbox_router::tell_one(std::unique_ptr<message> msg) {
+    std::lock_guard<std::mutex> lock(this->mailbox_mutex_);
+
     int actor_number = 0;
     unsigned long smallest_mailbox_size = 0;
 

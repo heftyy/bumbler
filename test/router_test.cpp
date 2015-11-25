@@ -2,9 +2,9 @@
 
 #include <boost/test/unit_test.hpp>
 #include <atan/actor_system/actor_system.h>
-#include <atan/actor/router/round_robin_router.h>
-#include <atan/actor/router/random_router.h>
-#include <atan/actor/router/smallest_mailbox_router.h>
+#include <atan/actor/routing/round_robin_router.h>
+#include <atan/actor/routing/random_router.h>
+#include <atan/actor/routing/smallest_mailbox_router.h>
 #include <communication/serializable_types.h>
 #include "test_actor.h"
 #include "remote_test_actor.h"
@@ -71,7 +71,7 @@ BOOST_AUTO_TEST_SUITE( router_test_suite )
 
         const actor_ref r1 = round_robin_router::create<test_actor>("test_router1", system1, 3);
 
-        std::future<std::string> f = r1.future<std::string>(6);
+        std::future<std::string> f = r1.ask<std::string>(6);
         std::future_status s = f.wait_for(std::chrono::seconds(1));
 
         BOOST_REQUIRE(s == std::future_status::ready);

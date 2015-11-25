@@ -30,7 +30,7 @@ public:
 
     typed_message() { }
 
-    typed_message(const typed_message<T>& rhs) : message(rhs) {
+    typed_message(const typed_message& rhs) : message(rhs) {
         std::cout << "typed_message copy ctor\n";
         this->data = rhs.data;
         this->target = utility::make_unique<actor_ref>(*rhs.target);
@@ -105,11 +105,8 @@ public:
         this->target = utility::make_unique<actor_ref>(target);
     }
 
-    std::unique_ptr<message> clone_ptr() const override {
-        auto tm = *this;
-        auto result = utility::make_unique<decltype(tm)>(std::move(tm));
-
-        return std::move(result);
+    std::unique_ptr<message> clone() const override {
+        return std::unique_ptr<message>(new typed_message(*this));
     }
 
 private:

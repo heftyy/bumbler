@@ -18,6 +18,10 @@ public:
 
 	virtual ~mailbox() { }
 
+    virtual std::unique_ptr<mailbox> clone() {
+
+    }
+
 protected:
     std::mutex mailbox_mutex_;
 

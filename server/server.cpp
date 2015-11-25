@@ -3,6 +3,7 @@
 
 #include <atan/actor_system/actor_system.h>
 #include <communication/serializable_types.h>
+#include <atan/actor/routing/round_robin_router.h>
 #include "out_router.h"
 
 int main(int argc, char *argv[]) {

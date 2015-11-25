@@ -19,7 +19,7 @@ void remote_actor::tell(std::unique_ptr<message> msg, bool remote) {
         msg->set_sender(get_self());
     }
 
-	auto p = message_to_packet(std::move(msg));
+	auto p = packet(std::move(msg));
     tell_(p);
 }
 

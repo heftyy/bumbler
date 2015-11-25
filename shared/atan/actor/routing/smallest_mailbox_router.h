@@ -1,6 +1,7 @@
 #pragma once
 
 #include <atomic>
+#include <mutex>
 #include "router.h"
 
 class smallest_mailbox_router : public router
@@ -15,10 +16,11 @@ public:
 protected:
     friend class actor;
 
-    smallest_mailbox_router(const std::string& name, const std::shared_ptr<actor_system>& actor_system, int size)
+    smallest_mailbox_router(const std::string name, const std::shared_ptr<actor_system>& actor_system, int size)
             : router(name, actor_system, size) { }
 
-    void tell_one(std::unique_ptr<message> msg) override;
+private:
+    std::mutex mailbox_mutex_;
 
 };
 

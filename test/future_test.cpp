@@ -17,7 +17,7 @@ BOOST_AUTO_TEST_SUITE( future_test_suite )
 
         const actor_ref test_actor_ref1 = local_actor::create<test_actor>("test_actor1", system1);
 
-        std::future<std::string> f1 = test_actor_ref1.future<std::string>(1);
+        std::future<std::string> f1 = test_actor_ref1.ask<std::string>(1);
         auto status1 = f1.wait_for(std::chrono::seconds(1));
         BOOST_REQUIRE(status1 == std::future_status::ready);
 
@@ -35,7 +35,7 @@ BOOST_AUTO_TEST_SUITE( future_test_suite )
 
         actor_ref remote_test_actor1 = remote_actor::create<remote_test_actor>("remote_test_actor1", system1, actor_ref("test_actor2$test_system2@localhost:4556"));
 
-        std::future<std::string> f1 = remote_test_actor1.future<std::string>(priority_message<int>(5, 10));
+        std::future<std::string> f1 = remote_test_actor1.ask<std::string>(priority_message<int>(5, 10));
         auto status1 = f1.wait_for(std::chrono::seconds(1));
         BOOST_REQUIRE(status1 == std::future_status::ready);
 
@@ -54,7 +54,7 @@ BOOST_AUTO_TEST_SUITE( future_test_suite )
 
         actor_ref remote_test_actor1 = remote_actor::create<remote_test_actor>("remote_test_actor1", system1, actor_ref("test_actor2$test_system2@localhost:4556"));
 
-        std::future<std::string> f1 = remote_test_actor1.future<std::string>(typed_data<int>(66));
+        std::future<std::string> f1 = remote_test_actor1.ask<std::string>(typed_data<int>(66));
         auto status1 = f1.wait_for(std::chrono::seconds(1));
         BOOST_REQUIRE(status1 == std::future_status::ready);
 

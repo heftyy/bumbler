@@ -15,12 +15,10 @@ public:
 protected:
     friend class actor;
 
-    round_robin_router(const std::string& name, const std::shared_ptr<actor_system>& actor_system, int size)
+    round_robin_router(const std::string name, const std::shared_ptr<actor_system>& actor_system, int size)
             : router(name, actor_system, size) {
         this->current_actor_to_message_ = 0;
     }
-
-    void tell_one(std::unique_ptr<message> msg) override;
 
 private:
     std::atomic<int> current_actor_to_message_;
