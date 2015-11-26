@@ -2,8 +2,6 @@
 
 #include <memory>
 #include <queue>
-#include <boost/any.hpp>
-#include <logger/logger.h>
 #include "mailbox.h"
 
 class message_wrapper {
@@ -13,7 +11,7 @@ public:
 
     message_wrapper(std::unique_ptr<message> msg, int priority) : msg(std::move(msg)), priority(priority) { }
     message_wrapper(const message_wrapper& lhs) {
-        this->msg = lhs.msg->clone_ptr();
+        this->msg = lhs.msg->clone();
         this->priority = lhs.priority;
     }
 
@@ -30,10 +28,22 @@ public:
 };
 
 class priority_mailbox : public mailbox {
-
 public:
     using QueueElement = message_wrapper;
     using Queue = std::priority_queue<QueueElement, std::deque<QueueElement>, std::function<bool(const QueueElement&, const QueueElement&)>>;
+
+    priority_mailbox() : mailbox() {}
+
+    priority_mailbox(priority_mailbox&&) = default; // support moving
+    priority_mailbox& operator=(priority_mailbox&&) = default;
+
+    priority_mailbox(const priority_mailbox& rhs) : mailbox(rhs) { }
+    priority_mailbox& operator=(const priority_mailbox& rhs) {
+        if(this != &rhs) {
+            mailbox::operator=(rhs);
+        }
+        return *this;
+    }
 
     void push_message(std::unique_ptr<message> msg) {
         this->push_to_queue(std::move(msg), msg->get_priority());
@@ -61,6 +71,10 @@ public:
 
     unsigned long size() override {
         return this->queue_.size();
+    }
+
+    std::unique_ptr<mailbox> clone() const override {
+        return std::unique_ptr<mailbox>(new priority_mailbox(*this));
     }
 
 private:

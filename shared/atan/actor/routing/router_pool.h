@@ -8,15 +8,26 @@
 
 class router_pool {
 public:
-    router_pool(router_pool&& rhs) = default;
-    router_pool(const router_pool& rhs) = default;
+    router_pool(router_pool&& rhs) = default; // support moving
     router_pool& operator=(router_pool&& rhs) = default;
-    router_pool& operator=(const router_pool& rhs) = default;
+    router_pool(const router_pool& rhs) : pool_size_(rhs.pool_size_), logic_(rhs.logic_), routees_() { }
+    router_pool& operator=(const router_pool& rhs) {
+        if(this != &rhs) {
+            this->pool_size_ = rhs.pool_size_;
+            this->logic_ = rhs.logic_;
+        }
+        return *this;
+    }
     virtual ~router_pool() {}
 
-    virtual std::unique_ptr<router_pool> clone() { }
+    virtual std::unique_ptr<router_pool> clone() const = 0;
 
     void tell(std::unique_ptr<message> msg) {
+        assert(
+                (routees_.size() > 0) &&
+                "router pool has to be initialized before you use tell"
+        );
+
         if(msg->is_broadcast()) {
             this->tell_all(std::move(msg));
         }
@@ -25,21 +36,32 @@ public:
         }
     }
 
-    template<typename ActorType>
+    template<typename ActorType, typename TypedActorFunc>
     void create_pool(
             std::string router_name,
             const std::shared_ptr<actor_system>& actor_system,
-            std::function<std::unique_ptr<untyped_actor>()>& get_typed_actor,
-            const std::unique_ptr<mailbox>& mbox) {
-        auto actor = std::unique_ptr<ActorType>(new ActorType(router_name, actor_system));
-        actor->set_mailbox(mbox->clone());
-        actor->init(std::move(get_typed_actor()));
-        this->routees_.push_back(std::move(actor));
-    };
+            const std::unique_ptr<mailbox>& mbox,
+            TypedActorFunc&& get_typed_actor_func) {
+        for(int i = 0; i < this->pool_size_; i++) {
+            auto actor = std::unique_ptr<ActorType>(new ActorType(router_name, actor_system));
+            actor->set_mailbox(mbox->clone());
+            actor->init(std::move(get_typed_actor_func()));
+            this->routees_.emplace_back(std::move(actor));
+        }
+    }
+
+    void stop(bool wait = false) {
+
+    }
 
 protected:
     router_pool(int pool_size, const router_logic &logic)
-            : pool_size_(pool_size), logic_(logic) { }
+            : pool_size_(pool_size), logic_(logic) {
+        assert(
+                (pool_size > 0) &&
+                "router pool size has to be greater than 0"
+        );
+    }
 
     int pool_size_;
     router_logic logic_;

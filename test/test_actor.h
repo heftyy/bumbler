@@ -12,6 +12,7 @@ public:
     static std::atomic<int> message_count;
     int x;
 
+    test_actor() {}
     test_actor(int x) : x(x) {}
 
     ~test_actor() {

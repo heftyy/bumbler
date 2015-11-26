@@ -31,6 +31,7 @@ public:
     actor& operator=(const actor& rhs) = delete;
     virtual ~actor();
 
+    virtual void init(std::unique_ptr<untyped_actor> u_actor);
     virtual void stop_actor(bool wait = false);
 
     void read_messages();
@@ -43,7 +44,7 @@ public:
     std::string actor_name();
     std::string system_name();
 
-    actor_ref& get_self() {
+    actor_ref get_self() const {
         return self_;
     }
 
@@ -62,8 +63,6 @@ protected:
     std::weak_ptr<actor_system> actor_system_;
     std::condition_variable cv_;
     actor_ref self_;
-
-    virtual void init(std::unique_ptr<untyped_actor> u_actor);
 
     virtual void tell(std::unique_ptr<message> msg, bool remote = false) = 0;
 

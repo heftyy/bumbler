@@ -1,7 +1,6 @@
 #pragma once
 
 #include <mutex>
-#include <boost/any.hpp>
 #include "../../messages/message.h"
 
 class mailbox {
@@ -14,18 +13,19 @@ public:
 
     mailbox() { }
 
-    mailbox(const mailbox& rhs) = delete;
+    mailbox(mailbox&&) = default; // support moving
+    mailbox& operator=(mailbox&&) = default;
+
+    mailbox(const mailbox&) : mailbox_mutex_() { }
+    mailbox& operator=(const mailbox& rhs) {
+        if(this != &rhs) { }
+        return *this;
+    }
 
 	virtual ~mailbox() { }
-
-    virtual std::unique_ptr<mailbox> clone() {
-
-    }
+    virtual std::unique_ptr<mailbox> clone() const = 0;
 
 protected:
     std::mutex mailbox_mutex_;
-
-private:
-
 };
 

@@ -148,9 +148,12 @@ const actor_ref actor_system::get_actor(std::string actor_name) {
     }
 }
 
-const actor_ref actor_system::actor_of(std::unique_ptr<props> props) {
+const actor_ref actor_system::actor_of(const std::unique_ptr<props>& props, std::string name) {
+    auto actor = props->create_actor_instance(name, shared_from_this());
+    actor_ref ref = actor->get_self();
+    add_actor(std::move(actor));
 
-    return actor_ref();
+    return ref;
 }
 
 void actor_system::receive(std::unique_ptr<packet> packet, boost::asio::ip::udp::endpoint& sender_endpoint) {
@@ -189,4 +192,16 @@ const std::string actor_system::get_next_temporary_actor_name() const {
     }
 
     return temp_name;
+}
+
+int actor_system::add_actor(std::unique_ptr<actor> actor) {
+    if (stopped_) return atan_error(ACTOR_SYSTEM_STOPPED, system_name_);
+    std::lock_guard<std::mutex> guard(actors_write_mutex_);
+    auto search = actors_.find(actor->actor_name());
+    if (search != actors_.end()) {
+        return atan_error(ATAN_ACTOR_ALREADY_EXISTS, actor->actor_name());
+    }
+
+    actors_.emplace(actor->actor_name(), std::move(actor));
+    return 0;
 }

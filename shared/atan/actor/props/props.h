@@ -16,7 +16,15 @@ public:
         return *this;
     }
 
-    virtual std::unique_ptr<actor> create_actor_instance(std::string name, const std::shared_ptr<actor_system>& actor_system) = 0;
+    bool has_router() const {
+        return router_pool_ != nullptr;
+    }
+
+    bool has_mailbox() const {
+        return mailbox_ != nullptr;
+    }
+
+    virtual std::unique_ptr<actor> create_actor_instance(std::string name, const std::shared_ptr<actor_system>& actor_system) const = 0;
 
 protected:
     std::unique_ptr<untyped_actor> untyped_actor_;

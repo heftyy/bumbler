@@ -82,9 +82,6 @@ BOOST_AUTO_TEST_SUITE( actor_suite )
         la1.tell(std::string("msg1"));
         la1.tell(std::string("msg2"));
 
-        //wait a bit so both the messages are added to the queue
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
-
         //clear the queue ( 1 message left ) and stop the actor
 //        la1.tell(::kill_actor<int>(5));
 

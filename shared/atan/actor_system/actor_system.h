@@ -37,12 +37,12 @@ public:
     int stop_actor(std::string actor_name, bool wait = false);
 
     int tell_actor(std::unique_ptr<message> msg, bool from_remote = false);
-
     int ask_actor(std::unique_ptr<message> msg, std::function<void(boost::any)> &response_fn);
 
     const actor_ref get_actor(std::string actor_name);
+    const actor_ref actor_of(const std::unique_ptr<props>& props, std::string name);
 
-    const actor_ref actor_of(std::unique_ptr<props> props);
+    int add_actor(std::unique_ptr<actor> actor);
 
 	template<typename T>
 	std::shared_ptr<cancellable> schedule(T&& data, const actor_ref& target, long initial_delay_ms, long interval_ms = 0) const {
@@ -86,19 +86,6 @@ public:
 
     bool stopped() {
         return stopped_;
-    }
-
-    template<class actor_type>
-    int add_actor(std::unique_ptr<actor_type> actor) {
-        if (stopped_) return atan_error(ACTOR_SYSTEM_STOPPED, system_name_);
-        std::lock_guard<std::mutex> guard(actors_write_mutex_);
-        auto search = actors_.find(actor->actor_name());
-        if (search != actors_.end()) {
-            return atan_error(ATAN_ACTOR_ALREADY_EXISTS, actor->actor_name());
-        }
-
-        actors_.emplace(actor->actor_name(), std::move(actor));
-        return 0;
     }
 
 protected:

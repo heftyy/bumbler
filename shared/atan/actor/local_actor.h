@@ -8,7 +8,11 @@ class untyped_actor;
 
 class local_actor : public actor {
 public:
-    friend class router;
+    local_actor(const std::string name, const std::shared_ptr<actor_system>& actor_system)
+            : actor(name, actor_system) {
+    }
+
+    void init(std::unique_ptr<untyped_actor> u_actor) override;
 
     template<class T, typename Mailbox = fifo_mailbox, typename ...Args>
     static actor_ref create(std::string name, const std::shared_ptr<actor_system>& actor_system, Args&& ...args) {
@@ -26,13 +30,5 @@ public:
     }
 
 protected:
-    friend class actor;
-
-    local_actor(const std::string name, const std::shared_ptr<actor_system>& actor_system)
-            : actor(name, actor_system) {
-    }
-
-    void init(std::unique_ptr<untyped_actor> u_actor) override;
-
     void tell(std::unique_ptr<message> msg, bool remote = false) override;
 };

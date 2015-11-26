@@ -17,6 +17,7 @@ public:
 
     void stop_actor(bool wait = false) override {
         actor::stop_actor(wait);
+        router_pool_->stop(wait);
     }
 
     void set_router_pool(std::unique_ptr<router_pool> pool) {

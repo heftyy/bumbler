@@ -53,7 +53,7 @@ set(ATAN_SOURCES
         dispatcher/dispatcher.h
         thread_pool/thread_pool.cpp
         thread_pool/thread_pool.h
-        actor/props/props.h)
+        actor/props/props.h actor/routing/router_pool.cpp)
 
 include_directories(../)
 
