@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <memory>
+#include <random>
 #include "router_pool.h"
 
 class random_pool : public router_pool {

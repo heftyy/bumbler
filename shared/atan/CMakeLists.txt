@@ -38,6 +38,8 @@ set(ATAN_SOURCES
         actor/routing/smallest_mailbox_pool.h
         actor/routing/round_robin_pool.cpp
         actor/routing/round_robin_pool.h
+		actor/routing/random_pool.cpp
+        actor/routing/random_pool.h
         actor/routing/router_pool.h
         packet/packet.h
         packet/packet_exceptions.h
