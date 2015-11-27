@@ -1,5 +1,9 @@
 # actor_ref
 
+actor_ref
+---
+lightweight class that's the only way users can send messages to actors.
+
 tell
 ---
 ```c++
@@ -35,8 +39,9 @@ In the case below test_actor will reply with std::string when it receives an int
 
 ```c++
 auto system1 = actor_system::create_system("test_system1", 4555);
-const actor_ref test_actor_ref1 = local_actor::create<test_actor>("test_actor1", system1);
+auto props = typed_props<local_actor, test_actor>();
+auto test_actor_ref1 = system1->actor_of(props, "test_actor1");
 
-std::future<std::string> f1 = test_actor_ref1.future<std::string>(1);
+std::future<std::string> f1 = test_actor_ref1.ask<std::string>(1);
 auto status1 = f1.wait_for(std::chrono::seconds(1));
 ```
