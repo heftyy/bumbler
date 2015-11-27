@@ -45,7 +45,10 @@ r1.tell(broadcast<int>(88));
 Using different types of mailboxes
 ---
 
-Each actor has a mailbox thats responsible for storing and ordering the messages. You can set it using props.with_mailbox<MailboxType>(Args...).
+Each actor has a mailbox thats responsible for storing and ordering the messages. You can set it using
+```c++
+props.with_mailbox<MailboxType>(Args...)
+```
 Available mailboxes:
   fifo_mailbox
   lifo_mailbox
