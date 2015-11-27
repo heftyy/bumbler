@@ -51,7 +51,8 @@ set(ATAN_SOURCES
         thread_pool/thread_pool.h
         actor/props/props.h
         actor/routing/router_pool.cpp
-        actor_system/typed_promise_actor.h actor/promise_actor.cpp)
+        actor_system/typed_promise_actor.h
+        actor/promise_actor.cpp)
 
 include_directories(../)
 
