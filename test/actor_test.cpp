@@ -39,8 +39,12 @@ BOOST_AUTO_TEST_SUITE( actor_suite )
     BOOST_AUTO_TEST_CASE(ActorInitTest) {
         auto system1 = actor_system::create_system("test_system1", 4555);
 
-        const actor_ref la1 = local_actor::create<test_actor>("test_actor1", system1);
-        const actor_ref ra1 = remote_actor::create<remote_test_actor>("remote_test_actor1", system1, actor_ref("test_actor1$test_system1@localhost:4555"));
+        auto props_local = typed_props<local_actor, test_actor>();
+        auto props_remote = typed_props<remote_actor, test_actor>();
+        props_remote.with_network_actor("test_actor1$test_system1@localhost:4555");
+
+        const actor_ref la1 = system1->actor_of(props_local, "test_actor1");
+        const actor_ref ra1 = system1->actor_of(props_remote, "remote_test_actor1");
 
         actor_ref from_system1 = system1->get_actor("test_actor1");
         actor_ref from_system2 = system1->get_actor("remote_test_actor1");
@@ -56,7 +60,8 @@ BOOST_AUTO_TEST_SUITE( actor_suite )
 
         auto system1 = actor_system::create_system("test_system1", 4555);
 
-        const actor_ref la1 = local_actor::create<test_actor>("test_actor1", system1);
+        auto props_local = typed_props<local_actor, test_actor>();
+        const actor_ref la1 = system1->actor_of(props_local, "test_actor1");
 
         //task takes 500ms+ to finish
         la1.tell(std::string("msg1"));
@@ -76,14 +81,12 @@ BOOST_AUTO_TEST_SUITE( actor_suite )
 
         auto system1 = actor_system::create_system("test_system1", 4555);
 
-        const actor_ref la1 = local_actor::create<test_actor>("test_actor1", system1);
+        auto props_local = typed_props<local_actor, test_actor>();
+        const actor_ref la1 = system1->actor_of(props_local, "test_actor1");
 
         //task takes 500ms+ to finish
         la1.tell(std::string("msg1"));
         la1.tell(std::string("msg2"));
-
-        //wait a bit so both the messages are added to the queue
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
         //clear the queue ( 1 message left ) and stop the actor
 //        la1.tell(::kill_actor<int>(5));

@@ -9,6 +9,7 @@
 #include "udp_server.h"
 #include "actor_system_errors.h"
 #include "actor_system_storage.h"
+#include "typed_promise_actor.h"
 #include "../messages/typed_message.h"
 #include "../actor/actor.h"
 #include "../actor/promise_actor.h"
@@ -16,12 +17,13 @@
 #include "../scheduler/scheduler.h"
 #include "../scheduler/cancellable.h"
 #include "../dispatcher/dispatcher.h"
+#include "../actor/props/typed_props.h"
 
 class actor_system : public std::enable_shared_from_this<actor_system> {
 public:
     static std::shared_ptr<actor_system> create_system(const std::string& name, int port, int thread_pool_size = 5);
 
-    ~actor_system() {
+    virtual ~actor_system() {
         stop();
     }
 
@@ -33,26 +35,23 @@ public:
      */
     void stop(bool wait = false);
 
-    template<class actor_type>
-    int add_actor(std::unique_ptr<actor_type> actor) {
-        if (stopped_) return atan_error(ACTOR_SYSTEM_STOPPED, system_name_);
-        std::lock_guard<std::mutex> guard(actors_write_mutex_);
-        auto search = actors_.find(actor->actor_name());
-        if (search != actors_.end()) {
-            return atan_error(ATAN_ACTOR_ALREADY_EXISTS, actor->actor_name());
-        }
-
-        actors_.emplace(actor->actor_name(), std::move(actor));
-        return 0;
-    }
-
     int stop_actor(std::string actor_name, bool wait = false);
 
     int tell_actor(std::unique_ptr<message> msg, bool from_remote = false);
-
-    int future_tell_actor(std::unique_ptr<message> msg, std::function<void(boost::any)>& response_fn);
+    int ask_actor(std::unique_ptr<message> msg, const std::function<void(boost::any)>& response_fn);
 
     const actor_ref get_actor(std::string actor_name);
+
+    template<typename ...ActorArgs>
+    const actor_ref actor_of(const props& props, ActorArgs&&... actor_args) {
+        auto actor = props.create_actor_instance(shared_from_this(), std::forward<ActorArgs>(actor_args)...);
+        actor_ref ref = actor->get_self();
+        add_actor(std::move(actor));
+
+        return ref;
+    }
+
+    int add_actor(std::unique_ptr<actor> actor);
 
 	template<typename T>
 	std::shared_ptr<cancellable> schedule(T&& data, const actor_ref& target, long initial_delay_ms, long interval_ms = 0) const {

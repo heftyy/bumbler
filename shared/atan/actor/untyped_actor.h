@@ -11,17 +11,24 @@ class actor;
 
 class untyped_actor {
 public:
-	virtual ~untyped_actor()
-	{
-	}
-
-protected:
-    friend class actor;
+	virtual ~untyped_actor() { }
 
     virtual void on_receive(boost::any data) = 0;
-
     virtual void on_error(boost::any data, std::exception ex) { BOOST_LOG_TRIVIAL(error) << "[UNTYPED_ACTOR] " << ex.what(); };
 
+    void set_reply_message_function(std::function<void(std::unique_ptr<message>)> func) {
+        this->send_reply_message_func_ = std::move(func);
+    }
+
+    void set_sender(const actor_ref& sender) {
+        this->sender_ = sender;
+    }
+
+    void set_self(const actor_ref& self) {
+        this->self_ = self;
+    }
+
+protected:
     void reply(const char* data) {
         this->reply(std::string(data));
     }
@@ -29,7 +36,7 @@ protected:
     template<typename T>
     void reply(T&& data) {
         if(get_sender().is_none()) {
-            BOOST_LOG_TRIVIAL(error) << "reply failed because the sender is not set";
+            BOOST_LOG_TRIVIAL(error) << "reply failed, sender is not set";
             return;
         }
 
@@ -61,18 +68,6 @@ protected:
 
     actor_ref get_sender() {
         return sender_;
-    }
-
-    void set_sender(const actor_ref& sender) {
-        this->sender_ = sender;
-    }
-
-    void set_self(const actor_ref& self) {
-        this->self_ = self;
-    }
-
-    void set_reply_message_function(std::function<void(std::unique_ptr<message>)> func) {
-        this->send_reply_message_func_ = std::move(func);
     }
 
 private:

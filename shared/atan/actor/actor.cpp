@@ -1,8 +1,8 @@
 #include "actor.h"
 #include "../actor_system/actor_system.h"
 
-actor::actor(std::string name, const std::shared_ptr<actor_system>& actor_system)
-        : actor_name_(name), actor_system_(actor_system) {
+actor::actor(const std::shared_ptr<actor_system>& actor_system, const std::string name)
+        : actor_system_(actor_system), actor_name_(name) {
     stop_flag_.store(false);
     self_ = actor_ref(actor_name(), system_name());
 }
@@ -74,7 +74,7 @@ void actor::send_reply_message(std::unique_ptr<message> msg) {
             int port = msg->get_target().port;
 
             BOOST_LOG_TRIVIAL(debug) << "[ACTOR] replying to " << msg->get_target().to_string();
-            packet p = message_to_packet(std::move(msg));
+            packet p = packet(std::move(msg));
 
             auto remote_actor_endpoint = boost::asio::ip::udp::endpoint(
                     boost::asio::ip::address().from_string(ip), port
@@ -98,10 +98,6 @@ void actor::pass_message(std::unique_ptr<message> msg, bool remote) {
     else {
         this->tell(std::move(msg), remote);
     }
-}
-
-void actor::add_to_actor_system(const std::shared_ptr<actor_system>& system, std::unique_ptr<actor> actor_ptr) {
-    system->add_actor(std::move(actor_ptr));
 }
 
 void actor::stop_actor(bool wait) {

@@ -31,6 +31,11 @@ public:
         data = d;
     }
 
+    packet(std::unique_ptr<message> msg) {
+        header.type = PACKET_DATA;
+        data.load(std::move(msg));
+    }
+
     std::string get_serialized() {
         if (header.type == 0) {
             throw new packet_structure_error("packet had no type");
