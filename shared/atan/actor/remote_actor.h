@@ -12,37 +12,23 @@ class untyped_actor;
 
 class remote_actor : public actor {
 public:
-    template<class T, typename Mailbox = fifo_mailbox, typename ...Args>
-    static actor_ref create(std::string name, const std::shared_ptr<actor_system>& actor_system, const actor_ref& network_actor_ref, Args&& ...args) {
-        static_assert(
-                (std::is_base_of<untyped_actor, T>::value),
-                "T has be a derived from untyped_actor"
-        );
+    remote_actor(const std::shared_ptr<actor_system>& actor_system, const std::string name)
+            : actor(actor_system, name) { }
 
-	    auto actor = std::unique_ptr<remote_actor>(new remote_actor(name, actor_system, network_actor_ref));
-        auto typed_actor = utility::make_unique<T>(std::forward<Args>(args)...);
-        actor->template set<Mailbox>();
-        actor->init(std::move(typed_actor));
-	    auto& ar = actor->get_self();
-        actor::add_to_actor_system(actor_system, std::move(actor));
-        return ar;
+    void init(std::unique_ptr<untyped_actor> u_actor) override;
+    void set_network__actor_ref(const actor_ref& network_actor_ref) {
+        this->network_actor_ref_ = network_actor_ref;
+        this->network_actor_endpoint_ = boost::asio::ip::udp::endpoint(
+                boost::asio::ip::address().from_string(network_actor_ref.ip),
+                network_actor_ref.port
+        );
     }
 
 protected:
-    friend class actor;
-
-    remote_actor(const std::string name, const std::shared_ptr<actor_system>& actor_system, const actor_ref& network_actor_ref)
-            : actor(name, actor_system), network_actor_ref_(network_actor_ref) {
-        remote_actor_endpoint_ = boost::asio::ip::udp::endpoint(
-                boost::asio::ip::address().from_string(network_actor_ref.ip), network_actor_ref.port);
-    }
-
-    void init(std::unique_ptr<untyped_actor> u_actor) override;
-
     void tell(std::unique_ptr<message> msg, bool remote = false) override;
 
 private:
-    boost::asio::ip::udp::endpoint remote_actor_endpoint_;
+    boost::asio::ip::udp::endpoint network_actor_endpoint_;
     actor_ref network_actor_ref_;
 
     void tell_(packet& p);

@@ -6,10 +6,10 @@
 #include <memory>
 #include <chrono>
 #include <future>
-#include <atan/actor/props/props.h>
 #include "udp_server.h"
 #include "actor_system_errors.h"
 #include "actor_system_storage.h"
+#include "typed_promise_actor.h"
 #include "../messages/typed_message.h"
 #include "../actor/actor.h"
 #include "../actor/promise_actor.h"
@@ -17,12 +17,13 @@
 #include "../scheduler/scheduler.h"
 #include "../scheduler/cancellable.h"
 #include "../dispatcher/dispatcher.h"
+#include "../actor/props/typed_props.h"
 
 class actor_system : public std::enable_shared_from_this<actor_system> {
 public:
     static std::shared_ptr<actor_system> create_system(const std::string& name, int port, int thread_pool_size = 5);
 
-    ~actor_system() {
+    virtual ~actor_system() {
         stop();
     }
 
@@ -37,10 +38,18 @@ public:
     int stop_actor(std::string actor_name, bool wait = false);
 
     int tell_actor(std::unique_ptr<message> msg, bool from_remote = false);
-    int ask_actor(std::unique_ptr<message> msg, std::function<void(boost::any)> &response_fn);
+    int ask_actor(std::unique_ptr<message> msg, const std::function<void(boost::any)>& response_fn);
 
     const actor_ref get_actor(std::string actor_name);
-    const actor_ref actor_of(const std::unique_ptr<props>& props, std::string name);
+
+    template<typename ...ActorArgs>
+    const actor_ref actor_of(const props& props, ActorArgs&&... actor_args) {
+        auto actor = props.create_actor_instance(shared_from_this(), std::forward<ActorArgs>(actor_args)...);
+        actor_ref ref = actor->get_self();
+        add_actor(std::move(actor));
+
+        return ref;
+    }
 
     int add_actor(std::unique_ptr<actor> actor);
 

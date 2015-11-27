@@ -111,7 +111,7 @@ int actor_system::tell_actor(std::unique_ptr<message> msg, bool from_remote) {
     //throw new actor_not_found(message.target.actor_name);
 }
 
-int actor_system::ask_actor(std::unique_ptr<message> msg, std::function<void(boost::any)> &response_fn) {
+int actor_system::ask_actor(std::unique_ptr<message> msg, const std::function<void(boost::any)>& response_fn) {
     if (stopped_.load()) return atan_error(ACTOR_SYSTEM_STOPPED, system_name_);
 
     if (msg->get_target().system_name.compare(system_name_) != 0)
@@ -121,7 +121,9 @@ int actor_system::ask_actor(std::unique_ptr<message> msg, std::function<void(boo
 
     std::string actor_name = msg->get_target().actor_name;
 
-    actor_ref p_actor = promise_actor::create(get_next_temporary_actor_name(), shared_from_this(), response_fn);
+    auto p = typed_props<promise_actor, typed_promise_actor>(response_fn);
+    actor_ref p_actor = actor_of(p, get_next_temporary_actor_name());
+
     msg->set_sender(p_actor);
 
     auto search = actors_.find(actor_name);
@@ -146,14 +148,6 @@ const actor_ref actor_system::get_actor(std::string actor_name) {
     else {
         return actor_ref::none();
     }
-}
-
-const actor_ref actor_system::actor_of(const std::unique_ptr<props>& props, std::string name) {
-    auto actor = props->create_actor_instance(name, shared_from_this());
-    actor_ref ref = actor->get_self();
-    add_actor(std::move(actor));
-
-    return ref;
 }
 
 void actor_system::receive(std::unique_ptr<packet> packet, boost::asio::ip::udp::endpoint& sender_endpoint) {

@@ -85,7 +85,9 @@ BOOST_AUTO_TEST_SUITE( mailbox_test_suite )
 
         auto system1 = actor_system::create_system("test_system1", 4555);
 
-        const actor_ref la1 = local_actor::create<test_actor, priority_mailbox>("test_actor1", system1);
+        auto props_local = typed_props<local_actor, test_actor>();
+        props_local.with_mailbox<priority_mailbox>();
+        const actor_ref la1 = system1->actor_of(props_local, "test_actor1");
 
         // task takes 500ms+ to finish
         la1.tell(std::string("regular msg1"));

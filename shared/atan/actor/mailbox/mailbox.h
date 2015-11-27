@@ -16,16 +16,16 @@ public:
     mailbox(mailbox&&) = default; // support moving
     mailbox& operator=(mailbox&&) = default;
 
-    mailbox(const mailbox&) : mailbox_mutex_() { }
-    mailbox& operator=(const mailbox& rhs) {
-        if(this != &rhs) { }
-        return *this;
-    }
-
 	virtual ~mailbox() { }
     virtual std::unique_ptr<mailbox> clone() const = 0;
 
 protected:
     std::mutex mailbox_mutex_;
+
+    mailbox(const mailbox&) : mailbox_mutex_() { }
+    mailbox& operator=(const mailbox& rhs) {
+        if(this != &rhs) { }
+        return *this;
+    }
 };
 

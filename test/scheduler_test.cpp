@@ -2,7 +2,8 @@
 
 #include <boost/test/unit_test.hpp>
 #include <atan/actor_system/actor_system.h>
-#include <atan/actor/routing/round_robin_router.h>
+#include <atan/actor/routing/round_robin_pool.h>
+#include <atan/actor/props/typed_props.h>
 #include "test_actor.h"
 #include "typed_data.h"
 
@@ -13,7 +14,10 @@ BOOST_AUTO_TEST_SUITE(scheduler_test_suite)
 
         auto system1 = actor_system::create_system("test_system1", 4555);
 
-        auto&& r1 = round_robin_router::create<test_actor>("test_actor1", system1, 3);
+        auto p = typed_props<router, test_actor>();
+        p.with_mailbox<fifo_mailbox>().with_router<round_robin_pool>(2);
+
+        const actor_ref r1 = system1->actor_of(p, "test_actor1");
 
         auto blam1 = system1->schedule(55, r1, actor_ref::none(), 0, 0);
         auto blam2 = system1->schedule(54, r1, actor_ref::none(), 100, 0);
@@ -47,7 +51,10 @@ BOOST_AUTO_TEST_SUITE(scheduler_test_suite)
 
         auto system1 = actor_system::create_system("test_system1", 4556);
 
-        auto r1 = round_robin_router::create<test_actor>("test_actor1", system1, 3);
+        auto p = typed_props<router, test_actor>();
+        p.with_mailbox<fifo_mailbox>().with_router<round_robin_pool>(2);
+
+        const actor_ref r1 = system1->actor_of(p, "test_actor1");
 
         auto c1 = system1->schedule(::broadcast<int>(5), r1, actor_ref::none(), 200, 0);
 

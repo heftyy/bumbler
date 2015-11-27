@@ -3,14 +3,18 @@
 
 #include <atan/actor_system/actor_system.h>
 #include <communication/serializable_types.h>
-#include <atan/actor/routing/round_robin_router.h>
+#include <atan/actor/routing/round_robin_pool.h>
+#include <atan/actor/props/typed_props.h>
 #include "out_router.h"
 
 int main(int argc, char *argv[]) {
     try {
-        std::shared_ptr<actor_system> system = actor_system::create_system("server_system", 4445);
+        std::shared_ptr<actor_system> system1 = actor_system::create_system("server_system", 4445);
 
-        actor_ref l_router = round_robin_router::create<out_router>("out_router", system, 5);
+        auto p = typed_props<router, out_router>();
+        p.with_mailbox<fifo_mailbox>().with_router<round_robin_pool>(2);
+
+        auto l_router = system1->actor_of(p, "test_actor1");
 
         std::string input;
         while (1) {
@@ -20,7 +24,7 @@ int main(int argc, char *argv[]) {
             }
         }
 
-        system->stop(true);
+        system1->stop(true);
     }
     catch (std::runtime_error& e) {
         std::cerr << "Exception: " << e.what() << "\n";

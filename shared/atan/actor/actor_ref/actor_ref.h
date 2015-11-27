@@ -69,26 +69,26 @@ public:
         actor_tell(std::move(utility::make_unique<typed_message<T>>(std::move(msg))));
     }
 
-    template<typename F>
-    std::future<F> ask(const char* data) const {
-        return ask<F>(std::string(data));
+    template<typename Result>
+    std::future<Result> ask(const char* data) const {
+        return ask<Result>(std::string(data));
     }
 
-    template<typename F, typename T>
-    std::future<F> ask(T&& data) const {
-        auto promise_ptr = std::make_shared<std::promise<F>>();
+    template<typename Result, typename T>
+    std::future<Result> ask(T && data) const {
+        auto promise_ptr = std::make_shared<std::promise<Result>>();
         auto f = promise_ptr->get_future();
 
-	    auto future_type_hashcode = typeid(F).hash_code();
+	    auto future_type_hashcode = typeid(Result).hash_code();
 
         std::function<void(boost::any)> fn = [future_type_hashcode, promise_ptr](boost::any response) {
             if(response.type().hash_code() == future_type_hashcode) {
-                F value = boost::any_cast<F>(response);
+                Result value = boost::any_cast<Result>(response);
                 promise_ptr->set_value(value);
             }
             else {
                 BOOST_LOG_TRIVIAL(error) << "[FUTURE] expected type for the future didn't match the replied type";
-                promise_ptr->set_value(F());
+                promise_ptr->set_value(Result());
             }
         };
 
@@ -138,7 +138,7 @@ private:
         this->port = 0;
     }
 
-    void actor_ask_system(std::unique_ptr<message> msg, std::function<void(boost::any)>& response_fn) const;
+    void actor_ask_system(std::unique_ptr<message> msg, const std::function<void(boost::any)>& response_fn) const;
     void actor_tell(std::unique_ptr<message> msg) const;
 
 };

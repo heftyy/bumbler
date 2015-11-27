@@ -6,28 +6,22 @@
 
 class props {
 public:
-    props& with_router(std::unique_ptr<router_pool> pool) {
-        router_pool_ = std::move(pool);
-        return *this;
-    }
-
-    props& with_mailbox(std::unique_ptr<mailbox> mailbox) {
-        mailbox_ = std::move(mailbox);
-        return *this;
-    }
-
     bool has_router() const {
-        return router_pool_ != nullptr;
+        return router_pool_set_;
     }
 
     bool has_mailbox() const {
-        return mailbox_ != nullptr;
+        return mailbox_set_;
     }
 
-    virtual std::unique_ptr<actor> create_actor_instance(std::string name, const std::shared_ptr<actor_system>& actor_system) const = 0;
+    bool has_network_actor() const {
+        return network_actor_ref_set_;
+    }
+
+    virtual std::unique_ptr<actor> create_actor_instance(const std::shared_ptr<actor_system>& actor_system, const std::string name) const = 0;
 
 protected:
-    std::unique_ptr<untyped_actor> untyped_actor_;
-    std::unique_ptr<router_pool> router_pool_;
-    std::unique_ptr<mailbox> mailbox_;
+    bool router_pool_set_;
+    bool mailbox_set_;
+    bool network_actor_ref_set_;
 };

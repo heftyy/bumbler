@@ -10,14 +10,6 @@ public:
     standard_mailbox(standard_mailbox&&) = default; // support moving
     standard_mailbox& operator=(standard_mailbox&&) = default;
 
-    standard_mailbox(const standard_mailbox& rhs) : mailbox(rhs), queue_() { }
-    standard_mailbox& operator=(const standard_mailbox& rhs) {
-        if(this != &rhs) {
-            mailbox::operator=(rhs);
-        }
-        return *this;
-    }
-
     virtual ~standard_mailbox() { }
 
     void push_message(std::unique_ptr<message> message) override {
@@ -43,6 +35,14 @@ public:
 
 protected:
     std::queue<std::unique_ptr<message>> queue_;
+
+    standard_mailbox(const standard_mailbox& rhs) : mailbox(rhs), queue_() { }
+    standard_mailbox& operator=(const standard_mailbox& rhs) {
+        if(this != &rhs) {
+            mailbox::operator=(rhs);
+        }
+        return *this;
+    }
 
 private:
     void push_to_queue(std::unique_ptr<message> msg) {

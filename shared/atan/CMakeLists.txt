@@ -20,7 +20,6 @@ set(ATAN_SOURCES
         actor/local_actor.h
         actor/local_actor.cpp
         actor/promise_actor.h
-        actor/promise_actor.cpp
         actor/actor.cpp
         actor_system/actor_system.h
         actor_system/actor_system.cpp
@@ -29,9 +28,6 @@ set(ATAN_SOURCES
         actor_system/actor_system_storage.cpp
         actor/routing/router.cpp
         actor/routing/router.h
-        actor/routing/random_router.h
-        actor/routing/round_robin_router.h
-        actor/routing/smallest_mailbox_router.h
         actor/mailbox/mailbox.h
         actor/mailbox/standard_mailbox.h
         actor/mailbox/fifo_mailbox.h
@@ -53,7 +49,9 @@ set(ATAN_SOURCES
         dispatcher/dispatcher.h
         thread_pool/thread_pool.cpp
         thread_pool/thread_pool.h
-        actor/props/props.h actor/routing/router_pool.cpp)
+        actor/props/props.h
+        actor/routing/router_pool.cpp
+        actor_system/typed_promise_actor.h actor/promise_actor.cpp)
 
 include_directories(../)
 

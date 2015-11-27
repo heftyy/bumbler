@@ -23,7 +23,7 @@ class actor_system;
 
 class actor {
 public:
-    actor(const std::string name, const std::shared_ptr<actor_system>& actor_system);
+    actor(const std::shared_ptr<actor_system>& actor_system, const std::string name);
 
     actor(actor&& rhs) = delete;
     actor(const actor& rhs) = delete;
@@ -75,8 +75,6 @@ protected:
     }
 
     void create_internal_queue_thread();
-
-    static void add_to_actor_system(const std::shared_ptr<actor_system>& system, std::unique_ptr<actor> actor_ptr);
 
 private:
     void run_task(const actor_ref& sender, const boost::any& data) {

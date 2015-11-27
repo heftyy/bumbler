@@ -37,14 +37,6 @@ public:
     priority_mailbox(priority_mailbox&&) = default; // support moving
     priority_mailbox& operator=(priority_mailbox&&) = default;
 
-    priority_mailbox(const priority_mailbox& rhs) : mailbox(rhs) { }
-    priority_mailbox& operator=(const priority_mailbox& rhs) {
-        if(this != &rhs) {
-            mailbox::operator=(rhs);
-        }
-        return *this;
-    }
-
     void push_message(std::unique_ptr<message> msg) {
         this->push_to_queue(std::move(msg), msg->get_priority());
     }
@@ -75,6 +67,15 @@ public:
 
     std::unique_ptr<mailbox> clone() const override {
         return std::unique_ptr<mailbox>(new priority_mailbox(*this));
+    }
+
+protected:
+    priority_mailbox(const priority_mailbox& rhs) : mailbox(rhs) { }
+    priority_mailbox& operator=(const priority_mailbox& rhs) {
+        if(this != &rhs) {
+            mailbox::operator=(rhs);
+        }
+        return *this;
     }
 
 private:
