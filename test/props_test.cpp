@@ -1,4 +1,4 @@
-#define BOOST_TEST_MODULE MESSAGE_TEST
+#define BOOST_TEST_MODULE PROPS_TEST
 
 #include <memory>
 #include <map>
@@ -23,6 +23,7 @@ BOOST_AUTO_TEST_SUITE(props_test_suite)
 
         BOOST_CHECK_EQUAL(p.has_router(), false);
         BOOST_CHECK_EQUAL(p.has_mailbox(), true);
+        BOOST_CHECK_EQUAL(p.has_network_actor(), false);
 
         auto system1 = actor_system::create_system("test_system1", 4555);
 
@@ -42,6 +43,7 @@ BOOST_AUTO_TEST_SUITE(props_test_suite)
 
         BOOST_CHECK_EQUAL(p.has_router(), false);
         BOOST_CHECK_EQUAL(p.has_mailbox(), true);
+		BOOST_CHECK_EQUAL(p.has_network_actor(), true);
 
         auto system1 = actor_system::create_system("test_system1", 4555);
 
@@ -60,6 +62,7 @@ BOOST_AUTO_TEST_SUITE(props_test_suite)
 
         BOOST_CHECK_EQUAL(p.has_router(), true);
         BOOST_CHECK_EQUAL(p.has_mailbox(), true);
+		BOOST_CHECK_EQUAL(p.has_network_actor(), false);
 
         auto system1 = actor_system::create_system("test_system1", 4555);
 

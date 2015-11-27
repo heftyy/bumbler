@@ -42,11 +42,11 @@ public:
 
     const actor_ref get_actor(std::string actor_name);
 
-    template<typename ...ActorArgs>
-    const actor_ref actor_of(const props& props, ActorArgs&&... actor_args) {
-        auto actor = props.create_actor_instance(shared_from_this(), std::forward<ActorArgs>(actor_args)...);
-        actor_ref ref = actor->get_self();
-        add_actor(std::move(actor));
+    template<typename Props, typename ...ActorArgs>
+    actor_ref actor_of(Props&& props, ActorArgs&&... actor_args) {
+        std::unique_ptr<actor> actor_ptr = props.create_actor_instance(shared_from_this(), std::forward<ActorArgs>(actor_args)...);
+        actor_ref ref = actor_ptr->get_self();
+        add_actor(std::move(actor_ptr));
 
         return ref;
     }

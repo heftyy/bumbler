@@ -27,7 +27,7 @@ public:
         return this->queue_.empty();
     }
 
-    unsigned long size() override {
+    size_t size() override {
         return this->queue_.size();
     }
 

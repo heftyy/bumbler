@@ -44,15 +44,15 @@ void actor::create_internal_queue_thread() {
     });
 }
 
-std::string actor::actor_name() {
+std::string actor::actor_name() const {
     return this->actor_name_;
 }
 
-std::string actor::system_name() {
+std::string actor::system_name() const {
     return actor_system_.lock()->system_name();
 }
 
-void actor::send_reply_message(std::unique_ptr<message> msg) {
+void actor::send_reply_message(std::unique_ptr<message> msg) const {
     if (stop_flag_.load()) return;
 
     //actor is not none and local
@@ -60,7 +60,7 @@ void actor::send_reply_message(std::unique_ptr<message> msg) {
         auto ac = actor_system_storage::instance().get_system(msg->get_target().system_name);
 
         if(ac != nullptr) {
-            actor_ref actor_from_system = ac->get_actor(msg->get_target().actor_name);
+	        auto actor_from_system = ac->get_actor(msg->get_target().actor_name);
             if(!actor_from_system.is_none()) {
                 ac->tell_actor(std::move(msg));
                 return;
@@ -70,11 +70,11 @@ void actor::send_reply_message(std::unique_ptr<message> msg) {
     //actor is remote
     else if(!msg->get_target().is_none() && msg->get_target().is_remote()) {
         try {
-            std::string ip = msg->get_target().ip;
-            int port = msg->get_target().port;
+	        auto ip = msg->get_target().ip;
+	        auto port = msg->get_target().port;
 
             BOOST_LOG_TRIVIAL(debug) << "[ACTOR] replying to " << msg->get_target().to_string();
-            packet p = packet(std::move(msg));
+	        auto p = packet(std::move(msg));
 
             auto remote_actor_endpoint = boost::asio::ip::udp::endpoint(
                     boost::asio::ip::address().from_string(ip), port

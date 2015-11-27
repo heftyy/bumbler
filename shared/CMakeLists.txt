@@ -1,8 +1,6 @@
 cmake_minimum_required(VERSION 3.1)
 project(shared)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-
 set(SHARED_SOURCES
     communication/message_settings.h
     communication/serializable_types.h
@@ -15,5 +13,13 @@ set(SHARED_SOURCES
 
 add_subdirectory(atan)
 
-add_library(shared STATIC ${SHARED_SOURCES})
-target_link_libraries(shared atan -lpthread)
+if(${WIN32})
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+	add_definitions(-D_WIN32_WINNT=0x0501)
+	add_library(shared STATIC ${SHARED_SOURCES})
+	target_link_libraries(shared atan)
+ELSE()
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+	add_library(shared STATIC ${SHARED_SOURCES})
+	target_link_libraries(shared atan -lpthread)
+ENDIF()

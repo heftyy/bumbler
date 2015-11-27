@@ -4,6 +4,7 @@
 #include <atan/actor_system/actor_system.h>
 #include <communication/serializable_types.h>
 #include <atan/actor/routing/round_robin_pool.h>
+#include <atan/actor/routing/smallest_mailbox_pool.h>
 #include "test_actor.h"
 #include "remote_test_actor.h"
 #include "test_actor.h"
@@ -49,7 +50,7 @@ BOOST_AUTO_TEST_SUITE( router_test_suite )
         auto system1 = actor_system::create_system("test_system1", 4555);
 
         auto p = typed_props<router, test_actor>();
-        p.with_mailbox<fifo_mailbox>().with_router<round_robin_pool>(2);
+        p.with_mailbox<fifo_mailbox>().with_router<smallest_mailbox_pool>(2);
 
         const actor_ref r1 = system1->actor_of(p, "test_router1");
 

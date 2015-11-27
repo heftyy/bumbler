@@ -9,7 +9,7 @@ public:
     virtual std::unique_ptr<message> pop_message() = 0;
     virtual void clear() = 0;
     virtual bool empty() = 0;
-    virtual unsigned long size() = 0;
+    virtual size_t size() = 0;
 
     mailbox() { }
 

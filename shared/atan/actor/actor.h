@@ -38,11 +38,11 @@ public:
     void pass_message(std::unique_ptr<message> msg, bool remote = false);
     void add_message(std::unique_ptr<message> msg);
 
-    bool is_busy() { return busy_; }
-    unsigned long mailbox_size() { return this->mailbox_->size(); }
+    bool is_busy() const { return busy_; }
+    size_t mailbox_size() const { return this->mailbox_->size(); }
 
-    std::string actor_name();
-    std::string system_name();
+    std::string actor_name() const;
+    std::string system_name() const;
 
     actor_ref get_self() const {
         return self_;
@@ -97,6 +97,6 @@ private:
         if(this->mailbox_) this->mailbox_->clear();
     }
 
-    void send_reply_message(std::unique_ptr<message> msg);
+    void send_reply_message(std::unique_ptr<message> msg) const;
 
 };
