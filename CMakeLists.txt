@@ -1,8 +1,6 @@
 cmake_minimum_required(VERSION 3.1)
 project(bumbler)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -lpthread")
-
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/modules/")
 
 set(CMAKE_BUILD_TYPE Debug)
@@ -10,6 +8,7 @@ set(Boost_DEBUG ON)
 
 if(${WIN32})
     #windows
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
     include_directories(E:/Workspace/boost_1_59_0)
 
     #add_definitions(-DBOOST_LOG_DYN_LINK)
@@ -26,6 +25,7 @@ if(${WIN32})
     #set(CMAKE_RUNTIME_OUTPUT_DIRECTORY E:/Workspace/github/bumbler/bin)
 ELSE()
     #linux
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -lpthread")
     include_directories(../boost_1_59_0)
 
     #add_definitions(-DBOOST_TEST_DYN_LINK)

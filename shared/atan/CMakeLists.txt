@@ -1,8 +1,6 @@
 cmake_minimum_required(VERSION 3.1)
 project(atan)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-
 set(ATAN_SOURCES
         messages/message.h
         messages/typed_message.h
@@ -36,8 +34,12 @@ set(ATAN_SOURCES
         actor/untyped_actor.h
         actor/props/typed_props.h
         actor/routing/router_logic.h
+		actor/routing/smallest_mailbox_pool.cpp
+        actor/routing/smallest_mailbox_pool.h
         actor/routing/round_robin_pool.cpp
         actor/routing/round_robin_pool.h
+		actor/routing/random_pool.cpp
+        actor/routing/random_pool.h
         actor/routing/router_pool.h
         packet/packet.h
         packet/packet_exceptions.h
@@ -57,9 +59,12 @@ set(ATAN_SOURCES
 include_directories(../)
 
 if(${WIN32})
-  add_definitions(-D_WIN32_WINNT=0x0501)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+	add_definitions(-D_WIN32_WINNT=0x0501)
+	add_library(atan STATIC ${ATAN_SOURCES})
+	target_link_libraries(atan ${Boost_LIBRARIES})
 ELSE()
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+	add_library(atan STATIC ${ATAN_SOURCES})
+	target_link_libraries(atan ${Boost_LIBRARIES} -lpthread)
 ENDIF()
-
-add_library(atan STATIC ${ATAN_SOURCES})
-target_link_libraries(atan ${Boost_LIBRARIES} -lpthread)

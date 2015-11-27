@@ -6,7 +6,14 @@
 
 class props {
 public:
-    bool has_router() const {
+	props() : 
+		router_pool_set_(false),
+		mailbox_set_(false), 
+		network_actor_ref_set_(false) { }
+
+	virtual ~props() {}
+
+	bool has_router() const {
         return router_pool_set_;
     }
 
@@ -18,7 +25,7 @@ public:
         return network_actor_ref_set_;
     }
 
-    virtual std::unique_ptr<actor> create_actor_instance(const std::shared_ptr<actor_system>& actor_system, const std::string name) const = 0;
+    virtual std::unique_ptr<actor> create_actor_instance(const std::shared_ptr<actor_system>& actor_system, const std::string name) = 0;
 
 protected:
     bool router_pool_set_;

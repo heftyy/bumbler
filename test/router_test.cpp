@@ -4,6 +4,8 @@
 #include <atan/actor_system/actor_system.h>
 #include <communication/serializable_types.h>
 #include <atan/actor/routing/round_robin_pool.h>
+#include <atan/actor/routing/smallest_mailbox_pool.h>
+#include <atan/actor/routing/random_pool.h>
 #include "test_actor.h"
 #include "remote_test_actor.h"
 #include "test_actor.h"
@@ -43,13 +45,33 @@ BOOST_AUTO_TEST_SUITE( router_test_suite )
         BOOST_CHECK_EQUAL(test_actor::message_count.load(), 1);
     }
 
+	BOOST_AUTO_TEST_CASE(RouterRandomTest) {
+		test_actor::message_count.store(0);
+
+		auto system1 = actor_system::create_system("test_system1", 4555);
+
+		auto p = typed_props<router, test_actor>();
+		p.with_mailbox<fifo_mailbox>().with_router<random_pool>(2);
+
+		const actor_ref r1 = system1->actor_of(p, "test_router1");
+
+		r1.tell(6);
+		r1.tell(7);
+		r1.tell(8);
+		r1.tell(9);
+
+		system1->stop(true);
+
+		BOOST_CHECK_EQUAL(test_actor::message_count.load(), 4);
+	}
+
     BOOST_AUTO_TEST_CASE(RouterSmallestMailboxTest) {
         test_actor::message_count.store(0);
 
         auto system1 = actor_system::create_system("test_system1", 4555);
 
         auto p = typed_props<router, test_actor>();
-        p.with_mailbox<fifo_mailbox>().with_router<round_robin_pool>(2);
+        p.with_mailbox<fifo_mailbox>().with_router<smallest_mailbox_pool>(2);
 
         const actor_ref r1 = system1->actor_of(p, "test_router1");
 

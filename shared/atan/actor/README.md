@@ -74,36 +74,4 @@ protected:
 
 Creating different actor types
 ---
-
- * local_actor - a regular actor type. Each local actor has a lightweight thread that reads incoming messages and runs the tasks in the dispatcher supplied by the actor_system.
-```c++
-auto system1 = actor_system::create_system("test_system1", 4555);
-const actor_ref la1 = local_actor::create<test_actor>("test_actor1", system1);
-```
- * remote_actor - used to send messages to a remote application. Messages send to this actor have their target replaced with the network address of the actor it points to. Each remote actor has a lightweight thread that reads incoming messages from the network and runs the tasks in the dispatcher supplied by the actor_system.
-```c++
-auto system1 = actor_system::create_system("test_system1", 4555);
-auto system2 = actor_system::create_system("test_system2", 4556);
-
-const actor_ref test_actor_ref1 = local_actor::create<test_actor>("test_actor1", system1);
-const actor_ref test_actor_ref2 = local_actor::create<test_actor>("test_actor2", system2);
-
-actor_ref remote_test_actor1 = remote_actor::create<remote_test_actor>("remote_test_actor1", system1, actor_ref("test_actor2$test_system2@localhost:4556"));
-```
- * router - routers create multiple instances of local_actors that you can send messages via one actor_ref. There are multiple types of routers : random_router, round_robin_router, smallest_mailbox_router. You can send a broadcast message to reach all local_actors in the router.
-```c++
-auto system1 = actor_system::create_system("test_system1", 4555, 1);
-const actor_ref r1 = round_robin_router::create<test_actor>("test_router1", system1, 2);
-r1.tell(broadcast<int>(88));
-```
-
-Using different types of mailboxes
----
-
-Each actor has a mailbox thats responsible for storing and ordering the messages. You can set it when using the static create method. 
-```c++
-const actor_ref la1 = local_actor::create<test_actor, fifo_mailbox>("test_actor1", system1);
-const actor_ref la2 = local_actor::create<test_actor, lifo_mailbox>("test_actor1", system1);
-const actor_ref la3 = local_actor::create<test_actor, priority_mailbox>("test_actor1", system1);
-```
-fifo_mailbox is the default one.
+check out [props](https://github.com/heftyy/bumbler/tree/master/shared/atan/actor/props)

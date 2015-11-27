@@ -15,13 +15,13 @@ public:
     using DefaultMailbox = fifo_mailbox;
 
     template<typename ...Args>
-    typed_props(Args&&... args) {
+    typed_props(Args&&... args) : props() {
         static_assert(
                 (std::is_base_of<untyped_actor, TypedActor>::value),
                 "TypedActor template has to be a derived from untyped_actor class"
         );
 
-        this->get_typed_actor_ = [args...]() -> std::unique_ptr<untyped_actor> {
+        get_typed_actor_function_ = [args...]() -> std::unique_ptr<untyped_actor> {
             return utility::make_unique<TypedActor>(args...);
         };
     }
@@ -34,19 +34,19 @@ public:
 
     template<typename RouterPool, typename ...RouterPoolArgs>
     typed_props& with_router(RouterPoolArgs&&... pool_args) {
-        this->get_router_pool_ = [pool_args...]() -> std::unique_ptr<router_pool> {
+        get_router_pool_function_ = [pool_args...]() -> std::unique_ptr<router_pool> {
             return utility::make_unique<RouterPool>(pool_args...);
         };
-        this->router_pool_set_ = true;
+        router_pool_set_ = true;
         return *this;
     }
 
     template<typename Mailbox, typename ...MailboxArgs>
     typed_props& with_mailbox(MailboxArgs&&... mailbox_args) {
-        this->get_mailbox_ = [mailbox_args...]() -> std::unique_ptr<mailbox> {
+        get_mailbox_function_ = [mailbox_args...]() -> std::unique_ptr<mailbox> {
             return utility::make_unique<Mailbox>(mailbox_args...);
         };
-        this->mailbox_set_ = true;
+        mailbox_set_ = true;
         return *this;
     }
 
@@ -55,31 +55,36 @@ public:
     }
 
     typed_props& with_network_actor(const actor_ref& network_actor_ref) {
-        this->network_actor_ref_ = network_actor_ref;
-        this->network_actor_ref_set_ = true;
+        network_actor_ref_ = network_actor_ref;
+        network_actor_ref_set_ = true;
         return *this;
     }
 
-    std::unique_ptr<actor> create_actor_instance(const std::shared_ptr<actor_system>& actor_system,
-                                                 const std::string name) const override {
+    virtual std::unique_ptr<actor> create_actor_instance(const std::shared_ptr<actor_system>& actor_system, 
+														 const std::string name) override {
+		if(!get_mailbox_function_) {
+			get_mailbox_function_ = []() -> std::unique_ptr<mailbox> {
+				return utility::make_unique<DefaultMailbox>();
+			};
+		}
+
         return init_actor_instance(std::move(utility::make_unique<ActorType>(actor_system, name)),
                                    actor_system,
                                    name);
-
     }
 
 private:
-    std::function<std::unique_ptr<untyped_actor>()> get_typed_actor_;
-    std::function<std::unique_ptr<router_pool>()> get_router_pool_;
-    std::function<std::unique_ptr<mailbox>()> get_mailbox_;
+    std::function<std::unique_ptr<untyped_actor>(void)> get_typed_actor_function_;
+    std::function<std::unique_ptr<router_pool>(void)> get_router_pool_function_;
+    std::function<std::unique_ptr<mailbox>(void)> get_mailbox_function_;
     actor_ref network_actor_ref_;
 
     // router instance
     std::unique_ptr<actor> init_actor_instance(std::unique_ptr<router>&& actor,
                                                const std::shared_ptr<actor_system>& actor_system,
                                                const std::string name) const {
-        auto pool = get_router_pool_();
-        pool->template create_pool<local_actor>(actor_system, name, get_mailbox_, get_typed_actor_);
+        auto pool = get_router_pool_function_();
+        pool->template create_pool<local_actor>(actor_system, name, get_mailbox_function_, get_typed_actor_function_);
         actor->set_router_pool(std::move(pool));
 
         return std::move(actor);
@@ -88,11 +93,9 @@ private:
     // remote actor instance
     std::unique_ptr<actor> init_actor_instance(std::unique_ptr<remote_actor>&& actor,
                                                const std::shared_ptr<actor_system>& actor_system,
-                                               const std::string name) const {
-        if (has_mailbox()) actor->set_mailbox(get_mailbox_());
-        else actor->set_mailbox(std::move(utility::make_unique<DefaultMailbox>()));
-
-        actor->init(get_typed_actor_());
+                                               const std::string name) const {        
+		actor->set_mailbox(get_mailbox_function_());
+        actor->init(get_typed_actor_function_());
         actor->set_network__actor_ref(network_actor_ref_);
 
         return std::move(actor);
@@ -102,7 +105,7 @@ private:
     std::unique_ptr<actor> init_actor_instance(std::unique_ptr<promise_actor>&& actor,
                                                const std::shared_ptr<actor_system>& actor_system,
                                                const std::string name) const {
-        actor->init(get_typed_actor_());
+        actor->init(get_typed_actor_function_());
         return std::move(actor);
     }
 
@@ -110,10 +113,8 @@ private:
     std::unique_ptr<actor> init_actor_instance(std::unique_ptr<local_actor>&& actor,
                                                const std::shared_ptr<actor_system>& actor_system,
                                                const std::string name) const {
-        if (has_mailbox()) actor->set_mailbox(get_mailbox_());
-        else actor->set_mailbox(std::move(utility::make_unique<DefaultMailbox>()));
-
-        actor->init(get_typed_actor_());
+		actor->set_mailbox(get_mailbox_function_());
+        actor->init(get_typed_actor_function_());
 
         return std::move(actor);
     }
