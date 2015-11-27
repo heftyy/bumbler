@@ -19,7 +19,7 @@ void remote_actor::tell(std::unique_ptr<message> msg, bool remote) {
         msg->set_sender(get_self());
     }
 
-	auto p = message_to_packet(std::move(msg));
+	auto p = packet(std::move(msg));
     tell_(p);
 }
 
@@ -28,5 +28,5 @@ void remote_actor::tell_(packet& p) {
 
 	auto serialized_packet = p.get_serialized();
 
-    actor_system_.lock()->get_server()->do_send(serialized_packet, remote_actor_endpoint_);
+    actor_system_.lock()->get_server()->do_send(serialized_packet, network_actor_endpoint_);
 }

@@ -3,7 +3,6 @@
 #include <iostream>
 #include <atomic>
 #include <boost/format.hpp>
-#include <atan/actor/router/round_robin_router.h>
 #include <atan/actor_system/actor_system.h>
 #include <communication/message_settings.h>
 

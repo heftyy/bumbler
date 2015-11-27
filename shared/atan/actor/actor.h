@@ -23,12 +23,19 @@ class actor_system;
 
 class actor {
 public:
+    actor(const std::shared_ptr<actor_system>& actor_system, const std::string name);
+
+    actor(actor&& rhs) = delete;
+    actor(const actor& rhs) = delete;
+    actor& operator=(actor&& rhs) = delete;
+    actor& operator=(const actor& rhs) = delete;
+    virtual ~actor();
+
+    virtual void init(std::unique_ptr<untyped_actor> u_actor);
     virtual void stop_actor(bool wait = false);
 
-    void pass_message(std::unique_ptr<message> msg, bool remote = false);
-
     void read_messages();
-
+    void pass_message(std::unique_ptr<message> msg, bool remote = false);
     void add_message(std::unique_ptr<message> msg);
 
     bool is_busy() { return busy_; }
@@ -37,11 +44,13 @@ public:
     std::string actor_name();
     std::string system_name();
 
-    actor_ref& get_self() {
+    actor_ref get_self() const {
         return self_;
     }
 
-    virtual ~actor();
+    void set_mailbox(std::unique_ptr<mailbox> mbox) {
+        this->mailbox_ = std::move(mbox);
+    }
 
 protected:
     std::mutex actor_thread_mutex_;
@@ -55,18 +64,7 @@ protected:
     std::condition_variable cv_;
     actor_ref self_;
 
-    actor(std::string name, const std::shared_ptr<actor_system>& actor_system);
-
-    virtual void init(std::unique_ptr<untyped_actor> u_actor);
-
-    template<typename Mailbox>
-    void setup_mailbox() {
-        this->mailbox_.reset(new Mailbox());
-    }
-
-    virtual void tell(std::unique_ptr<message> msg, bool remote = false) {
-        atan_error(ATAN_WRONG_ACTOR_METHOD, "virtual tell called, should never happen");
-    }
+    virtual void tell(std::unique_ptr<message> msg, bool remote = false) = 0;
 
     virtual void on_receive(boost::any data) {
         this->untyped_actor_->on_receive(data);
@@ -77,19 +75,6 @@ protected:
     }
 
     void create_internal_queue_thread();
-
-    packet message_to_packet(std::unique_ptr<message> msg) {
-        packet_header header;
-        header.type = PACKET_DATA;
-
-        packet_data data;
-        data.load(std::move(msg));
-        packet p(header, data);
-
-        return p;
-    }
-
-    static void add_to_actor_system(const std::shared_ptr<actor_system>& system, std::unique_ptr<actor> actor_ptr);
 
 private:
     void run_task(const actor_ref& sender, const boost::any& data) {

@@ -111,7 +111,7 @@ int actor_system::tell_actor(std::unique_ptr<message> msg, bool from_remote) {
     //throw new actor_not_found(message.target.actor_name);
 }
 
-int actor_system::future_tell_actor(std::unique_ptr<message> msg, std::function<void(boost::any)>& response_fn) {
+int actor_system::ask_actor(std::unique_ptr<message> msg, const std::function<void(boost::any)>& response_fn) {
     if (stopped_.load()) return atan_error(ACTOR_SYSTEM_STOPPED, system_name_);
 
     if (msg->get_target().system_name.compare(system_name_) != 0)
@@ -121,7 +121,9 @@ int actor_system::future_tell_actor(std::unique_ptr<message> msg, std::function<
 
     std::string actor_name = msg->get_target().actor_name;
 
-    actor_ref p_actor = promise_actor::create(get_next_temporary_actor_name(), shared_from_this(), response_fn);
+    auto p = typed_props<promise_actor, typed_promise_actor>(response_fn);
+    actor_ref p_actor = actor_of(p, get_next_temporary_actor_name());
+
     msg->set_sender(p_actor);
 
     auto search = actors_.find(actor_name);
@@ -184,4 +186,16 @@ const std::string actor_system::get_next_temporary_actor_name() const {
     }
 
     return temp_name;
+}
+
+int actor_system::add_actor(std::unique_ptr<actor> actor) {
+    if (stopped_) return atan_error(ACTOR_SYSTEM_STOPPED, system_name_);
+    std::lock_guard<std::mutex> guard(actors_write_mutex_);
+    auto search = actors_.find(actor->actor_name());
+    if (search != actors_.end()) {
+        return atan_error(ATAN_ACTOR_ALREADY_EXISTS, actor->actor_name());
+    }
+
+    actors_.emplace(actor->actor_name(), std::move(actor));
+    return 0;
 }
