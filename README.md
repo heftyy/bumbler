@@ -5,4 +5,4 @@ I also wanted to write a library for multithreading and networking using the act
 
 Client and server applications are simple examples of usage of the library.
 
-The library is in [shared/atan](https://github.com/heftyy/bumbler/tree/master/docs/atan.md) ( i need to find a good name for it ).
+The library is in [shared/atan](https://github.com/heftyy/bumbler/tree/master/docs) ( i need to find a good name for it ).
