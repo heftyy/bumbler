@@ -74,4 +74,4 @@ protected:
 
 Creating different actor types
 ---
-check out [props](https://github.com/heftyy/bumbler/tree/master/docs/props.md)
+* [props](https://github.com/heftyy/bumbler/tree/master/shared/atan/actor/props)
