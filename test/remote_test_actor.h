@@ -2,9 +2,9 @@
 
 #include <iostream>
 #include <atomic>
-#include <atan/messages/commands/commands.h>
+#include <bumbler/messages/commands/commands.h>
 #include <communication/message_settings.h>
-#include <atan/actor/remote_actor.h>
+#include <bumbler/actor/remote_actor.h>
 
 class remote_test_actor : public untyped_actor {
 public:

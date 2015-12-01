@@ -3,11 +3,11 @@
 #include <memory>
 #include <map>
 #include <boost/test/unit_test.hpp>
-#include <atan/actor/mailbox/priority_mailbox.h>
-#include <atan/actor/mailbox/fifo_mailbox.h>
-#include <atan/actor/local_actor.h>
-#include <atan/actor_system/actor_system.h>
-#include <utility.h>
+#include <bumbler/actor/mailbox/priority_mailbox.h>
+#include <bumbler/actor/mailbox/fifo_mailbox.h>
+#include <bumbler/actor/local_actor.h>
+#include <bumbler/actor_system/actor_system.h>
+#include <bumbler/utility.h>
 #include "test_actor.h"
 
 using msgPtr = std::unique_ptr<message>;

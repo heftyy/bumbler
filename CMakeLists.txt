@@ -38,11 +38,13 @@ ELSE()
   find_package(Boost 1.59 COMPONENTS system thread chrono date_time regex filesystem log log_setup serialization unit_test_framework REQUIRED)
 ENDIF()
 
-include_directories(shared)
-add_subdirectory(shared)
+include_directories(src)
+add_subdirectory(src/bumbler)
 
 enable_testing()
 
-add_subdirectory(bumbler)
-add_subdirectory(server)
+include_directories(example/shared)
+add_subdirectory(example/shared)
+add_subdirectory(example/app)
+add_subdirectory(example/server)
 add_subdirectory(test)

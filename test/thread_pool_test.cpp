@@ -3,8 +3,8 @@
 #include <memory>
 #include <future>
 #include <boost/test/unit_test.hpp>
-#include <atan/thread_pool/thread_pool.h>
-#include <logger/logger.h>
+#include <bumbler/thread_pool/thread_pool.h>
+#include <bumbler/logger/logger.h>
 
 BOOST_AUTO_TEST_SUITE( thread_pool_suite )
 
@@ -39,7 +39,7 @@ BOOST_AUTO_TEST_SUITE( thread_pool_suite )
 
         // wait for all tasks to finish
         tp.stop(true);
-        
+
         BOOST_LOG_TRIVIAL(debug) << "task_counter = " << task_counter;
 
         BOOST_CHECK_EQUAL(task_counter, 4);

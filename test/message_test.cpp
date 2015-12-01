@@ -3,9 +3,9 @@
 #include <memory>
 #include <map>
 #include <boost/test/unit_test.hpp>
-#include <atan/messages/typed_message.h>
-#include <atan/actor/actor_ref/actor_ref.h>
-#include <utility.h>
+#include <bumbler/messages/typed_message.h>
+#include <bumbler/actor/actor_ref/actor_ref.h>
+#include <bumbler/utility.h>
 
 using intMsg = typed_message<int>;
 

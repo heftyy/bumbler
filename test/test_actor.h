@@ -2,9 +2,9 @@
 
 #include <iostream>
 #include <atomic>
-#include <atan/messages/commands/commands.h>
+#include <bumbler/messages/commands/commands.h>
 #include <communication/message_settings.h>
-#include <atan/actor/untyped_actor.h>
+#include <bumbler/actor/untyped_actor.h>
 #include "typed_data.h"
 
 class test_actor : public untyped_actor {
