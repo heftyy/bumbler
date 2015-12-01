@@ -2,8 +2,17 @@ props
 ---
 props is used for creating actors. props is the interface and typed_propsis the implementation.
 
-```
+```c++
 typed_props<ActorType, TypedActor : UntypedActor>
+
+template<typename RouterPool, typename ...RouterPoolArgs>
+typed_props& with_router(RouterPoolArgs&&... pool_args);
+
+template<typename Mailbox, typename ...MailboxArgs>
+typed_props& with_mailbox(MailboxArgs&&... mailbox_args);
+
+typed_props& with_network_actor(const std::string network_actor_ref);
+typed_props& with_network_actor(const actor_ref& network_actor_ref);
 ```
 
 creating actors
@@ -45,7 +54,10 @@ r1.tell(broadcast<int>(88));
 Using different types of mailboxes
 ---
 
-Each actor has a mailbox thats responsible for storing and ordering the messages. You can set it using props.with_mailbox<MailboxType>(Args...).
+Each actor has a mailbox thats responsible for storing and ordering the messages. You can set it using
+```c++
+props.with_mailbox<MailboxType>(Args...)
+```
 Available mailboxes:
   fifo_mailbox
   lifo_mailbox
