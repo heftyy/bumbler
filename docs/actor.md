@@ -74,4 +74,4 @@ protected:
 
 Creating different actor types
 ---
-* [props](/props.md)
+* [props](/docs/props.md)
