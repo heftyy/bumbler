@@ -5,4 +5,4 @@ I also wanted to write a message driven library for multithreading and networkin
 
 Client and server applications are simple examples of usage of the library.
 
-The library is in [src/bumbler](https://github.com/heftyy/bumbler/tree/master/docs).
+Basic documentation [src/bumbler](https://github.com/heftyy/bumbler/tree/master/docs).
