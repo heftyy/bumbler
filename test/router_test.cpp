@@ -1,11 +1,11 @@
 #define BOOST_TEST_MODULE ROUTER_TEST
 
 #include <boost/test/unit_test.hpp>
-#include <atan/actor_system/actor_system.h>
+#include <bumbler/actor_system/actor_system.h>
 #include <communication/serializable_types.h>
-#include <atan/actor/routing/round_robin_pool.h>
-#include <atan/actor/routing/smallest_mailbox_pool.h>
-#include <atan/actor/routing/random_pool.h>
+#include <bumbler/actor/routing/round_robin_pool.h>
+#include <bumbler/actor/routing/smallest_mailbox_pool.h>
+#include <bumbler/actor/routing/random_pool.h>
 #include "test_actor.h"
 #include "remote_test_actor.h"
 #include "test_actor.h"

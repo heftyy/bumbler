@@ -74,4 +74,4 @@ protected:
 
 Creating different actor types
 ---
-* [props](https://github.com/heftyy/bumbler/tree/master/docs/props.md)
+* [props](/docs/props.md)

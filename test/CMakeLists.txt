@@ -1,5 +1,4 @@
 cmake_minimum_required(VERSION 3.1)
-project(bumbler)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -lpthread")
 
@@ -15,7 +14,7 @@ foreach(testSrc ${TEST_SRCS})
     add_executable(${testName} ${testSrc})
 
     #link to Boost libraries AND your targets and dependencies
-    target_link_libraries(${testName} -lpthread ${Boost_LIBRARIES} shared)
+    target_link_libraries(${testName} -lpthread ${Boost_LIBRARIES} bumbler)
 
     #I like to move testing binaries into a testBin directory
     set_target_properties(${testName} PROPERTIES

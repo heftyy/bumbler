@@ -3,9 +3,9 @@
 #include <memory>
 #include <future>
 #include <boost/test/unit_test.hpp>
-#include <atan/thread_pool/thread_pool.h>
-#include <atan/actor_system/actor_system.h>
-#include <atan/actor/local_actor.h>
+#include <bumbler/thread_pool/thread_pool.h>
+#include <bumbler/actor_system/actor_system.h>
+#include <bumbler/actor/local_actor.h>
 #include "test_actor.h"
 #include "remote_test_actor.h"
 

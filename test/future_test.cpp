@@ -1,9 +1,9 @@
 #define BOOST_TEST_MODULE FUTURE_TEST
 
 #include <boost/test/unit_test.hpp>
-#include <atan/actor_system/actor_system.h>
+#include <bumbler/actor_system/actor_system.h>
 #include <communication/serializable_types.h>
-#include <atan/actor/local_actor.h>
+#include <bumbler/actor/local_actor.h>
 #include "test_actor.h"
 #include "remote_test_actor.h"
 #include "typed_data.h"

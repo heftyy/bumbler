@@ -3,12 +3,11 @@
 #include <memory>
 #include <map>
 #include <boost/test/unit_test.hpp>
-#include <atan/actor/props/typed_props.h>
-#include <atan/actor/routing/router.h>
-#include <atan/actor/routing/round_robin_pool.h>
-#include <atan/actor_system/actor_system.h>
-#include <utility.h>
-#include <atan/actor/remote_actor.h>
+#include <bumbler/actor/props/typed_props.h>
+#include <bumbler/actor/routing/router.h>
+#include <bumbler/actor/routing/round_robin_pool.h>
+#include <bumbler/actor_system/actor_system.h>
+#include <bumbler/actor/remote_actor.h>
 #include "test_actor.h"
 
 BOOST_AUTO_TEST_SUITE(props_test_suite)

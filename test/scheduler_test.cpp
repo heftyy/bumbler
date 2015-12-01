@@ -1,9 +1,9 @@
 #define BOOST_TEST_MODULE SCHEDULER_TEST
 
 #include <boost/test/unit_test.hpp>
-#include <atan/actor_system/actor_system.h>
-#include <atan/actor/routing/round_robin_pool.h>
-#include <atan/actor/props/typed_props.h>
+#include <bumbler/actor_system/actor_system.h>
+#include <bumbler/actor/routing/round_robin_pool.h>
+#include <bumbler/actor/props/typed_props.h>
 #include "test_actor.h"
 #include "typed_data.h"
 
