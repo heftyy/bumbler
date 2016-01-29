@@ -2,7 +2,7 @@
 #include "../actor_system/actor_system.h"
 
 void remote_actor::init(std::unique_ptr<untyped_actor> u_actor) {
-    actor::init(std::move(u_actor));
+    abstract_actor::init(std::move(u_actor));
     this->create_internal_queue_thread();
 }
 

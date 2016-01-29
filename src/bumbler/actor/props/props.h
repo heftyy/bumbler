@@ -25,7 +25,7 @@ public:
         return network_actor_ref_set_;
     }
 
-    virtual std::unique_ptr<actor> create_actor_instance(const std::shared_ptr<actor_system>& actor_system, const std::string name) = 0;
+    virtual std::unique_ptr<abstract_actor> create_actor_instance(const std::shared_ptr<actor_system>& actor_system, const std::string name) = 0;
 
 protected:
     bool router_pool_set_;

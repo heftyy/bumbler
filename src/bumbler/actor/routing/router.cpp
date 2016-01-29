@@ -2,7 +2,7 @@
 
 void router::stop_actor(bool wait) {
     router_pool_->stop(wait);
-    actor::stop_actor(wait);
+    abstract_actor::stop_actor(wait);
 }
 
 void router::set_router_pool(std::unique_ptr<router_pool> pool) {

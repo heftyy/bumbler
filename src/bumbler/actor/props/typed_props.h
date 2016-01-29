@@ -60,15 +60,15 @@ public:
         return *this;
     }
 
-    virtual std::unique_ptr<actor> create_actor_instance(const std::shared_ptr<actor_system>& actor_system,
-														 const std::string name) override {
+    virtual std::unique_ptr<abstract_actor> create_actor_instance(const std::shared_ptr<actor_system>& actor_system,
+                                                                  const std::string name) override {
 		if(!get_mailbox_function_) {
 			get_mailbox_function_ = []() -> std::unique_ptr<mailbox> {
 				return utility::make_unique<DefaultMailbox>();
 			};
 		}
 
-        return init_actor_instance(std::move(utility::make_unique<ActorType>(actor_system, name)),
+        return init_actor_instance(utility::make_unique<ActorType>(actor_system, name),
                                    actor_system,
                                    name);
     }
@@ -80,7 +80,7 @@ private:
     actor_ref network_actor_ref_;
 
     // router instance
-    std::unique_ptr<actor> init_actor_instance(std::unique_ptr<router>&& actor,
+    std::unique_ptr<abstract_actor> init_actor_instance(std::unique_ptr<router>&& actor,
                                                const std::shared_ptr<actor_system>& actor_system,
                                                const std::string name) const {
         auto pool = get_router_pool_function_();
@@ -91,18 +91,18 @@ private:
     }
 
     // remote actor instance
-    std::unique_ptr<actor> init_actor_instance(std::unique_ptr<remote_actor>&& actor,
+    std::unique_ptr<abstract_actor> init_actor_instance(std::unique_ptr<remote_actor>&& actor,
                                                const std::shared_ptr<actor_system>& actor_system,
                                                const std::string name) const {
 		actor->set_mailbox(get_mailbox_function_());
         actor->init(get_typed_actor_function_());
-        actor->set_network__actor_ref(network_actor_ref_);
+        actor->set_network_actor_ref(network_actor_ref_);
 
         return std::move(actor);
     }
 
     // promise actor instance
-    std::unique_ptr<actor> init_actor_instance(std::unique_ptr<promise_actor>&& actor,
+    std::unique_ptr<abstract_actor> init_actor_instance(std::unique_ptr<promise_actor>&& actor,
                                                const std::shared_ptr<actor_system>& actor_system,
                                                const std::string name) const {
         actor->init(get_typed_actor_function_());
@@ -110,7 +110,7 @@ private:
     }
 
     // local actor instance
-    std::unique_ptr<actor> init_actor_instance(std::unique_ptr<local_actor>&& actor,
+    std::unique_ptr<abstract_actor> init_actor_instance(std::unique_ptr<local_actor>&& actor,
                                                const std::shared_ptr<actor_system>& actor_system,
                                                const std::string name) const {
 		actor->set_mailbox(get_mailbox_function_());

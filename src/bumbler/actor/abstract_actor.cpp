@@ -1,18 +1,18 @@
-#include "actor.h"
+#include "abstract_actor.h"
 #include "../actor_system/actor_system.h"
 
-actor::actor(const std::shared_ptr<actor_system>& actor_system, const std::string name)
+abstract_actor::abstract_actor(const std::shared_ptr<actor_system>& actor_system, const std::string name)
         : actor_system_(actor_system), actor_name_(name) {
-    stop_flag_.store(false);
+    stop_flag_ = false;
     self_ = actor_ref(actor_name(), system_name());
 }
 
-actor::~actor() {
+abstract_actor::~abstract_actor() {
     BOOST_LOG_TRIVIAL(debug) << "[ACTOR] destructor";
     this->stop_actor();
 }
 
-void actor::init(std::unique_ptr<untyped_actor> u_actor) {
+void abstract_actor::init(std::unique_ptr<untyped_actor> u_actor) {
     this->untyped_actor_ = std::move(u_actor);
     this->untyped_actor_->set_self(this->get_self());
     this->untyped_actor_->set_reply_message_function([this] (std::unique_ptr<message> msg) {
@@ -20,8 +20,7 @@ void actor::init(std::unique_ptr<untyped_actor> u_actor) {
     });
 }
 
-void actor::create_internal_queue_thread() {
-//    queue_thread_ = utility::make_unique<interruptible_thread>();
+void abstract_actor::create_internal_queue_thread() {
     queue_thread_future_ = std::async(std::launch::async ,[this]() {
         bool isPopped = false;
 
@@ -44,16 +43,16 @@ void actor::create_internal_queue_thread() {
     });
 }
 
-std::string actor::actor_name() const {
+std::string abstract_actor::actor_name() const {
     return this->actor_name_;
 }
 
-std::string actor::system_name() const {
+std::string abstract_actor::system_name() const {
     return actor_system_.lock()->system_name();
 }
 
-void actor::send_reply_message(std::unique_ptr<message> msg) const {
-    if (stop_flag_.load()) return;
+void abstract_actor::send_reply_message(std::unique_ptr<message> msg) const {
+    if (stop_flag_) return;
 
     //actor is not none and local
     if(!msg->get_target().is_none() && !msg->get_target().is_remote()) {
@@ -77,7 +76,7 @@ void actor::send_reply_message(std::unique_ptr<message> msg) const {
 	        auto p = packet(std::move(msg));
 
             auto remote_actor_endpoint = boost::asio::ip::udp::endpoint(
-                    boost::asio::ip::address().from_string(ip), port
+                    boost::asio::ip::address().from_string(ip), static_cast<unsigned short>(port)
             );
 
             actor_system_.lock()->get_server()->do_send(p.get_serialized(), remote_actor_endpoint);
@@ -88,7 +87,7 @@ void actor::send_reply_message(std::unique_ptr<message> msg) const {
     }
 }
 
-void actor::pass_message(std::unique_ptr<message> msg, bool remote) {
+void abstract_actor::pass_message(std::unique_ptr<message> msg, bool remote) {
     if(msg->is_kill_actor()) {
         this->actor_system_.lock()->stop_actor(this->actor_name_, false);
     }
@@ -100,7 +99,7 @@ void actor::pass_message(std::unique_ptr<message> msg, bool remote) {
     }
 }
 
-void actor::stop_actor(bool wait) {
+void abstract_actor::stop_actor(bool wait) {
     if(stop_flag_) return;
 
     stop_flag_ = true;
@@ -115,7 +114,7 @@ void actor::stop_actor(bool wait) {
     }
 }
 
-void actor::read_messages() {
+void abstract_actor::read_messages() {
     while (!this->mailbox_->empty()) {
         auto msg = this->mailbox_->pop_message();
 
@@ -134,8 +133,9 @@ void actor::read_messages() {
     }
 }
 
-void actor::add_message(std::unique_ptr<message> msg) {
+void abstract_actor::add_message(std::unique_ptr<message> msg) {
     if(this->stop_flag_) return;
+
     BOOST_LOG_TRIVIAL(debug) << "[ACTOR] queueing new task";
     this->mailbox_->push_message(std::move(msg));
     cv_.notify_one();

@@ -34,7 +34,7 @@ public:
 	    auto ret_cancellable = std::make_shared<cancellable>();
 		std::weak_ptr<cancellable> ret_cancellable_weak_ptr = ret_cancellable;
 
-        dispatcher_->push([this, initial_delay_ms, interval_ms](const typed_message<T> msg_copy, std::weak_ptr<cancellable> cancellable) -> int {
+        dispatcher_->push([initial_delay_ms, interval_ms](const typed_message<T> msg_copy, std::weak_ptr<cancellable> cancellable) -> int {
 			if (cancellable.expired()) return 2;
 			else {
 				cancellable.lock()->thread_id = std::this_thread::get_id();
@@ -71,7 +71,7 @@ public:
 				cancellable.lock()->cancelled();
 				return 0;
 			}
-        }, std::move(msg), ret_cancellable_weak_ptr);
+        }, msg, ret_cancellable_weak_ptr);
 
         return ret_cancellable;
     }

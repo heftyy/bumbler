@@ -7,7 +7,7 @@
 #include "../messages/typed_message.h"
 #include "../messages/commands/commands.h"
 
-class actor;
+class abstract_actor;
 
 class untyped_actor {
 public:

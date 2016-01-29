@@ -3,7 +3,7 @@
 #include <memory>
 #include <vector>
 #include "../untyped_actor.h"
-#include "../actor.h"
+#include "../abstract_actor.h"
 #include "router_logic.h"
 
 class router_pool {
@@ -38,8 +38,8 @@ public:
                      TypedActorFunc&& get_typed_actor_func) {
         for(int i = 0; i < this->pool_size_; i++) {
             auto actor = std::unique_ptr<ActorType>(new ActorType(actor_system, router_name));
-            actor->set_mailbox(std::move(get_mailbox_func()));
-            actor->init(std::move(get_typed_actor_func()));
+            actor->set_mailbox(get_mailbox_func());
+            actor->init(get_typed_actor_func());
             this->routees_.emplace_back(std::move(actor));
         }
     }
@@ -53,7 +53,7 @@ public:
 protected:
     int pool_size_;
     router_logic logic_;
-    std::vector<std::unique_ptr<actor>> routees_;
+    std::vector<std::unique_ptr<abstract_actor>> routees_;
 
     router_pool(int pool_size, const router_logic &logic)
             : pool_size_(pool_size), logic_(logic) {

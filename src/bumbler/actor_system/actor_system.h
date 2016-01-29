@@ -11,7 +11,7 @@
 #include "actor_system_storage.h"
 #include "typed_promise_actor.h"
 #include "../messages/typed_message.h"
-#include "../actor/actor.h"
+#include "../actor/abstract_actor.h"
 #include "../actor/promise_actor.h"
 #include "../packet/packet.h"
 #include "../scheduler/scheduler.h"
@@ -44,14 +44,14 @@ public:
 
     template<typename Props, typename ...ActorArgs>
     actor_ref actor_of(Props&& props, ActorArgs&&... actor_args) {
-        std::unique_ptr<actor> actor_ptr = props.create_actor_instance(shared_from_this(), std::forward<ActorArgs>(actor_args)...);
+        std::unique_ptr<abstract_actor> actor_ptr = props.create_actor_instance(shared_from_this(), std::forward<ActorArgs>(actor_args)...);
         actor_ref ref = actor_ptr->get_self();
         add_actor(std::move(actor_ptr));
 
         return ref;
     }
 
-    int add_actor(std::unique_ptr<actor> actor);
+    int add_actor(std::unique_ptr<abstract_actor> actor);
 
 	template<typename T>
 	std::shared_ptr<cancellable> schedule(T&& data, const actor_ref& target, long initial_delay_ms, long interval_ms = 0) const {
@@ -108,7 +108,7 @@ private:
     std::atomic<bool> started_;
     std::atomic<bool> stopped_;
     std::string system_name_;
-    std::map<std::string, std::unique_ptr<actor>> actors_;
+    std::map<std::string, std::unique_ptr<abstract_actor>> actors_;
     std::mutex actors_write_mutex_;
     std::mutex actors_read_mutex_;
     std::shared_ptr<udp_server> server_;

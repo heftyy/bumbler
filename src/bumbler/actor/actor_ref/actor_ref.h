@@ -61,12 +61,12 @@ public:
     void tell(T&& data, actor_ref sender = actor_ref::none()) const {
         auto tm = typed_message_factory::create(*this, sender, std::forward<T>(data));
 		auto tm_ptr = utility::make_unique<decltype(tm)>(std::move(tm));
-        actor_tell(std::move(tm_ptr));
+        tell_impl(std::move(tm_ptr));
     }
 
     template<typename T>
     void tell(const typed_message<T>& msg) const {
-        actor_tell(std::move(utility::make_unique<typed_message<T>>(std::move(msg))));
+        tell_impl(std::move(utility::make_unique<typed_message<T>>(std::move(msg))));
     }
 
     template<typename Result>
@@ -81,7 +81,7 @@ public:
 
 	    auto future_type_hashcode = typeid(Result).hash_code();
 
-        std::function<void(boost::any)> fn = [future_type_hashcode, promise_ptr](boost::any response) {
+        std::function<void(boost::any)> future_func = [future_type_hashcode, promise_ptr](boost::any response) {
             if(response.type().hash_code() == future_type_hashcode) {
                 Result value = boost::any_cast<Result>(response);
                 promise_ptr->set_value(value);
@@ -95,7 +95,7 @@ public:
         auto tm = typed_message_factory::create(*this, none(), std::forward<T>(data));
         auto tm_ptr = utility::make_unique<decltype(tm)>(std::move(tm));
 
-        actor_ask_system(std::move(tm_ptr), fn);
+        ask_impl(std::move(tm_ptr), future_func);
 
         return f;
     }
@@ -138,7 +138,7 @@ private:
         this->port = 0;
     }
 
-    void actor_ask_system(std::unique_ptr<message> msg, const std::function<void(boost::any)>& response_fn) const;
-    void actor_tell(std::unique_ptr<message> msg) const;
+    void tell_impl(std::unique_ptr<message> msg) const;
+    void ask_impl(std::unique_ptr<message> msg, const std::function<void(boost::any)> &response_fn) const;
 
 };

@@ -89,11 +89,11 @@ BOOST_AUTO_TEST_SUITE( actor_suite )
         la1.tell(std::string("msg2"));
 
         //clear the queue ( 1 message left ) and stop the actor
-//        la1.tell(::kill_actor<int>(5));
+        la1.tell(::kill_actor<int>(5));
 
         system1->stop(false);
 
-        BOOST_CHECK_EQUAL(test_actor::message_count.load(), 1);
+        BOOST_CHECK_LE(test_actor::message_count.load(), 1);
     }
 
 

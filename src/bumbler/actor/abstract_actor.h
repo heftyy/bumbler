@@ -21,15 +21,15 @@
 
 class actor_system;
 
-class actor {
+class abstract_actor {
 public:
-    actor(const std::shared_ptr<actor_system>& actor_system, const std::string name);
+    abstract_actor(const std::shared_ptr<actor_system>& actor_system, const std::string name);
 
-    actor(actor&& rhs) = delete;
-    actor(const actor& rhs) = delete;
-    actor& operator=(actor&& rhs) = delete;
-    actor& operator=(const actor& rhs) = delete;
-    virtual ~actor();
+    abstract_actor(abstract_actor && rhs) = delete;
+    abstract_actor(const abstract_actor & rhs) = delete;
+    abstract_actor & operator=(abstract_actor && rhs) = delete;
+    abstract_actor & operator=(const abstract_actor & rhs) = delete;
+    virtual ~abstract_actor();
 
     virtual void init(std::unique_ptr<untyped_actor> u_actor);
     virtual void stop_actor(bool wait = false);
@@ -78,7 +78,7 @@ protected:
 
 private:
     void run_task(const actor_ref& sender, const boost::any& data) {
-        busy_.store(true);
+        busy_ = true;
         BOOST_LOG_TRIVIAL(debug) << "[ACTOR] starting new task";
         this->untyped_actor_->set_sender(sender);
 
@@ -90,7 +90,7 @@ private:
         }
 
         this->untyped_actor_->set_sender(actor_ref::none());
-        busy_.store(false);
+        busy_ = false;
     }
 
     void clear_queue() {
