@@ -2,6 +2,8 @@
 
 #include <stdexcept>
 
+namespace bumbler {
+
 enum {
     bumbler_ACTOR_NOT_FOUND = 1000,
     bumbler_ACTOR_ALREADY_EXISTS,
@@ -65,4 +67,6 @@ static int bumbler_error(int error_code, const std::string& msg) {
     }
     BOOST_LOG_TRIVIAL(error) << error_code << ":" << error_name << " " << msg;
     return error_code;
+}
+
 }

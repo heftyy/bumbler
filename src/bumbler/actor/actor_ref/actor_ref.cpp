@@ -2,6 +2,8 @@
 #include "../promise_actor.h"
 #include "../../actor_system/actor_system.h"
 
+namespace bumbler {
+
 void actor_ref::stop() {
     this->tell(stop_actor<int>(0));
 }
@@ -22,4 +24,6 @@ void actor_ref::ask_impl(std::unique_ptr<message> msg, const std::function<void(
     if (result == ACTOR_SYSTEM_STOPPED) {
         BOOST_LOG_TRIVIAL(warning) << "[ACTOR_REF] actor system doesn't exist";
     }
+}
+
 }

@@ -7,6 +7,8 @@
 #include "packet_structs.h"
 #include "packet_exceptions.h"
 
+namespace bumbler {
+
 class packet {
 public:
     friend class boost::serialization::access;
@@ -59,3 +61,5 @@ public:
     }
 
 };
+
+}

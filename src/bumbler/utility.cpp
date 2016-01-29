@@ -1,5 +1,7 @@
 #include "utility.h"
 
+namespace bumbler {
+
 std::string utility::get_current_time() {
     boost::posix_time::ptime now = boost::posix_time::second_clock::universal_time();
     std::string time = utility::format_time(now);
@@ -13,4 +15,6 @@ std::string utility::format_time(boost::posix_time::ptime time) {
     wss.imbue(loc);
     wss << time;
     return wss.str();
+}
+
 }

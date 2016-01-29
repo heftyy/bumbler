@@ -3,6 +3,8 @@
 #include <queue>
 #include "mailbox.h"
 
+namespace bumbler {
+
 class standard_mailbox : public mailbox {
 public:
     standard_mailbox() : mailbox() { }
@@ -52,3 +54,4 @@ private:
 
 };
 
+}

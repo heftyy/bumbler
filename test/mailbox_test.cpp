@@ -10,6 +10,8 @@
 #include <bumbler/utility.h>
 #include "test_actor.h"
 
+using namespace bumbler;
+
 using msgPtr = std::unique_ptr<message>;
 using priorityMsg = priority_message<int>;
 

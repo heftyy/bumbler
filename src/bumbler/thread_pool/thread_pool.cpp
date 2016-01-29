@@ -1,5 +1,7 @@
 #include "thread_pool.h"
 
+namespace bumbler {
+
 thread_pool::thread_pool(std::size_t pool_size)
         : work_(utility::make_unique<boost::asio::io_service::work>(io_service_)) {
     for (std::size_t i = 0; i < pool_size; ++i) {
@@ -21,4 +23,6 @@ void thread_pool::stop(bool wait) {
         threads_.join_all();
     }
     catch (...) { }
+}
+
 }

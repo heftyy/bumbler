@@ -1,6 +1,8 @@
 #include "actor_system_storage.h"
 #include "actor_system.h"
 
+namespace bumbler {
+
 actor_system_storage::~actor_system_storage() {
     this->destroy();
 }
@@ -31,4 +33,6 @@ std::shared_ptr<actor_system> actor_system_storage::get_system(std::string syste
     }
 
     return nullptr;
+}
+
 }

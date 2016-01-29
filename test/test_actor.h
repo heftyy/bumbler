@@ -7,6 +7,8 @@
 #include <bumbler/actor/untyped_actor.h>
 #include "typed_data.h"
 
+using namespace bumbler;
+
 class test_actor : public untyped_actor {
 public:
     static std::atomic<int> message_count;

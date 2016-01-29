@@ -3,6 +3,8 @@
 #include <queue>
 #include "standard_mailbox.h"
 
+namespace bumbler {
+
 class lifo_mailbox : public standard_mailbox {
 public:
     lifo_mailbox() : standard_mailbox() {}
@@ -33,3 +35,4 @@ protected:
     }
 };
 
+}

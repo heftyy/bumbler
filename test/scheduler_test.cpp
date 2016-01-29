@@ -7,6 +7,8 @@
 #include "test_actor.h"
 #include "typed_data.h"
 
+using namespace bumbler;
+
 BOOST_AUTO_TEST_SUITE(scheduler_test_suite)
 
     BOOST_AUTO_TEST_CASE(SchedulerSingleMessageTest) {

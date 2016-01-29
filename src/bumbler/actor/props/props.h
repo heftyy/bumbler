@@ -4,11 +4,13 @@
 #include "../routing/router_pool.h"
 #include "../mailbox/mailbox.h"
 
+namespace bumbler {
+
 class props {
 public:
-	props() : 
+	props() :
 		router_pool_set_(false),
-		mailbox_set_(false), 
+		mailbox_set_(false),
 		network_actor_ref_set_(false) { }
 
 	virtual ~props() {}
@@ -32,3 +34,5 @@ protected:
     bool mailbox_set_;
     bool network_actor_ref_set_;
 };
+
+}

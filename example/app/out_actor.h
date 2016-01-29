@@ -6,7 +6,7 @@
 #include <bumbler/messages/commands/commands.h>
 #include <communication/message_settings.h>
 
-class out_actor : public untyped_actor {
+class out_actor : public bumbler::untyped_actor {
 public:
     out_actor() {}
 

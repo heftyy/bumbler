@@ -9,6 +9,8 @@
 #include "../../utility.h"
 #include "props.h"
 
+namespace bumbler {
+
 template<typename ActorType, typename TypedActor>
 class typed_props : public props {
 public:
@@ -119,3 +121,5 @@ private:
         return std::move(actor);
     }
 };
+
+}

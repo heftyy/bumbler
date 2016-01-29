@@ -1,5 +1,7 @@
 #include "actor_system.h"
 
+namespace bumbler {
+
 void actor_system::init() {
     actor_system_storage::instance().add_system(shared_from_this());
 
@@ -38,7 +40,7 @@ void actor_system::init() {
 }
 
 void actor_system::stop(bool wait) {
-    if (stopped_) return;    
+    if (stopped_) return;
 
     for (auto iter = actors_.begin(); iter != actors_.end();) {
         iter->second->stop_actor(wait);
@@ -203,4 +205,6 @@ int actor_system::add_actor(std::unique_ptr<abstract_actor> actor) {
 
     actors_.emplace(actor->actor_name(), std::move(actor));
     return 0;
+}
+
 }

@@ -6,6 +6,8 @@
 #include <communication/message_settings.h>
 #include <bumbler/actor/remote_actor.h>
 
+using namespace bumbler;
+
 class remote_test_actor : public untyped_actor {
 public:
     remote_test_actor() {}

@@ -1,5 +1,7 @@
 #include "smallest_mailbox_pool.h"
 
+namespace bumbler {
+
 void smallest_mailbox_pool::tell_one(std::unique_ptr<message> msg) {
     std::lock_guard<std::mutex> lock(this->mailbox_mutex_);
 
@@ -14,4 +16,6 @@ void smallest_mailbox_pool::tell_one(std::unique_ptr<message> msg) {
     }
 
     this->routees_[actor_number]->add_message(std::move(msg));
+}
+
 }

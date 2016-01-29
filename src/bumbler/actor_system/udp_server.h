@@ -10,6 +10,8 @@
 
 #define PACKET_MAX_LENGTH 4096
 
+namespace bumbler {
+
 using boost::asio::ip::udp;
 
 class udp_server {
@@ -139,3 +141,5 @@ private:
                 });
     }
 };
+
+}

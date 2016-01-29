@@ -6,6 +6,8 @@
 #include "../abstract_actor.h"
 #include "router_logic.h"
 
+namespace bumbler {
+
 class router_pool {
 public:
     router_pool(router_pool&& rhs) = default; // support moving
@@ -82,3 +84,5 @@ protected:
         }
     }
 };
+
+}

@@ -4,6 +4,8 @@ namespace attrs   = boost::log::attributes;
 namespace expr    = boost::log::expressions;
 namespace logging = boost::log;
 
+namespace bumbler {
+
 //Defines a global logger initialization routine
 BOOST_LOG_GLOBAL_LOGGER_INIT(my_logger, logger_t)
 {
@@ -35,4 +37,6 @@ logging::core::get()->set_filter
 );
 
 return lg;
+}
+
 }

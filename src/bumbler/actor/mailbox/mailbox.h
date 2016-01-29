@@ -3,6 +3,8 @@
 #include <mutex>
 #include "../../messages/message.h"
 
+namespace bumbler {
+
 class mailbox {
 public:
     virtual void push_message(std::unique_ptr<message> msg) = 0;
@@ -29,3 +31,4 @@ protected:
     }
 };
 
+}

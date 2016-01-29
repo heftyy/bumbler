@@ -6,7 +6,7 @@
 #include <bumbler/actor_system/actor_system.h>
 #include <communication/message_settings.h>
 
-class out_router : public untyped_actor
+class out_router : public bumbler::untyped_actor
 {
 public:
     out_router() : messages_(0) { }

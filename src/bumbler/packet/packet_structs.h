@@ -10,6 +10,8 @@
 #include "../actor/actor_ref/actor_ref.h"
 #include "../messages/typed_message.h"
 
+namespace bumbler {
+
 enum packet_type {
     PACKET_CONNECT, PACKET_DISCONNECT, PACKET_COMMAND, PACKET_RESULT, PACKET_DATA
 };
@@ -51,3 +53,4 @@ private:
     }
 };
 
+}

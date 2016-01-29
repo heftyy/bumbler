@@ -9,6 +9,8 @@
 #include "../../messages/commands/commands.h"
 #include "../../utility.h"
 
+namespace bumbler {
+
 class actor_ref {
 public:
     std::string actor_name;
@@ -142,3 +144,5 @@ private:
     void ask_impl(std::unique_ptr<message> msg, const std::function<void(boost::any)> &response_fn) const;
 
 };
+
+}

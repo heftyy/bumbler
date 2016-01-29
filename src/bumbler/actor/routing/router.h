@@ -7,6 +7,8 @@
 #include "../local_actor.h"
 #include "router_pool.h"
 
+namespace bumbler {
+
 class actor_system;
 class untyped_actor;
 
@@ -25,3 +27,4 @@ protected:
     virtual void tell(std::unique_ptr<message> msg, bool remote = false) override;
 };
 
+}

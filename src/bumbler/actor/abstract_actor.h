@@ -19,6 +19,8 @@
 #include "untyped_actor.h"
 #include "mailbox/fifo_mailbox.h"
 
+namespace bumbler {
+
 class actor_system;
 
 class abstract_actor {
@@ -100,3 +102,5 @@ private:
     void send_reply_message(std::unique_ptr<message> msg) const;
 
 };
+
+}

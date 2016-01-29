@@ -10,6 +10,8 @@
 #include <bumbler/actor/remote_actor.h>
 #include "test_actor.h"
 
+using namespace bumbler;
+
 BOOST_AUTO_TEST_SUITE(props_test_suite)
 
     BOOST_AUTO_TEST_CASE(PropsLocalActorTest) {

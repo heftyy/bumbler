@@ -3,6 +3,8 @@
 #include <bumbler/messages/typed_message.h>
 #include <bumbler/messages/commands/commands.h>
 
+using namespace bumbler;
+
 BOOST_CLASS_EXPORT(typed_message<std::string>)
 BOOST_CLASS_EXPORT(typed_message<double>)
 BOOST_CLASS_EXPORT(typed_message<float>)

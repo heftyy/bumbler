@@ -7,6 +7,8 @@
 #include <bumbler/actor/actor_ref/actor_ref.h>
 #include <bumbler/utility.h>
 
+using namespace bumbler;
+
 using intMsg = typed_message<int>;
 
 BOOST_AUTO_TEST_SUITE( message_test_suite )

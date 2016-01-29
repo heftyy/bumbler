@@ -3,6 +3,8 @@
 #include <thread>
 #include <atomic>
 
+namespace bumbler {
+
 class scheduler;
 
 class cancellable {
@@ -41,3 +43,5 @@ private:
     std::atomic<bool> cancel_;
     std::atomic<bool> cancelled_;
 };
+
+}

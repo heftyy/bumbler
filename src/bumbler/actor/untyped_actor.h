@@ -7,6 +7,8 @@
 #include "../messages/typed_message.h"
 #include "../messages/commands/commands.h"
 
+namespace bumbler {
+
 class abstract_actor;
 
 class untyped_actor {
@@ -82,3 +84,5 @@ private:
         return std::move(tm_ptr);
     }
 };
+
+}

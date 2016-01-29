@@ -4,6 +4,8 @@
 #include <queue>
 #include "mailbox.h"
 
+namespace bumbler {
+
 class message_wrapper {
 public:
     std::unique_ptr<message> msg;
@@ -89,3 +91,5 @@ private:
     }
 
 };
+
+}

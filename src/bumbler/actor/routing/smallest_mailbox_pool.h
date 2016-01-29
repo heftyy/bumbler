@@ -4,6 +4,8 @@
 #include <memory>
 #include "router_pool.h"
 
+namespace bumbler {
+
 class smallest_mailbox_pool : public router_pool {
 public:
     smallest_mailbox_pool(int pool_size)
@@ -35,3 +37,4 @@ private:
     std::mutex mailbox_mutex_;
 };
 
+}

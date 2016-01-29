@@ -14,6 +14,8 @@
 #include "commands/commands.h"
 #include "../utility.h"
 
+namespace bumbler {
+
 BOOST_SERIALIZATION_ASSUME_ABSTRACT(message)
 
 enum class message_type {
@@ -151,3 +153,5 @@ public:
         return typed_message<T>(target, sender, cmd.data, message_type::priority_message, cmd.priority);
     }
 };
+
+}

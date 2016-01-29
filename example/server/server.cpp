@@ -9,7 +9,7 @@
 
 int main(int argc, char *argv[]) {
     try {
-        std::shared_ptr<actor_system> system1 = actor_system::create_system("server_system", 4445);
+        auto system1 = actor_system::create_system("server_system", 4445);
 
         auto p = typed_props<router, out_router>();
         p.with_mailbox<fifo_mailbox>().with_router<round_robin_pool>(2);

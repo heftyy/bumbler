@@ -6,6 +6,8 @@
 #include <bumbler/thread_pool/thread_pool.h>
 #include <bumbler/logger/logger.h>
 
+using namespace bumbler;
+
 BOOST_AUTO_TEST_SUITE( thread_pool_suite )
 
     BOOST_AUTO_TEST_CASE(ThreadPollWait) {

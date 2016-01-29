@@ -8,6 +8,8 @@
 #include "remote_test_actor.h"
 #include "typed_data.h"
 
+using namespace bumbler;
+
 BOOST_CLASS_EXPORT(typed_message<typed_data<int>>)
 
 BOOST_AUTO_TEST_SUITE( future_test_suite )

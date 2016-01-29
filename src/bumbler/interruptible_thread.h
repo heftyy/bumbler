@@ -10,6 +10,8 @@
 #include <atomic>
 #include <boost/log/trivial.hpp>
 
+namespace bumbler {
+
 class interrupt_thread_error : public std::runtime_error {
 public:
     interrupt_thread_error(const std::string& message) : std::runtime_error(message) { };
@@ -91,3 +93,5 @@ private:
     std::unique_ptr<std::thread> thread_;
     cancellation_point cpoint_;
 };
+
+}

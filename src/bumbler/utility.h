@@ -4,6 +4,8 @@
 #include <sstream>
 #include <boost/date_time/posix_time/posix_time.hpp>
 
+namespace bumbler {
+
 namespace utility {
     std::string get_current_time();
 
@@ -24,5 +26,7 @@ namespace utility {
         }
         return std::unique_ptr<To, Deleter>(nullptr); // or throw std::bad_cast() if you prefer
     }
+
+}
 
 }

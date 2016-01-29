@@ -1,6 +1,8 @@
 #include "remote_actor.h"
 #include "../actor_system/actor_system.h"
 
+namespace bumbler {
+
 void remote_actor::init(std::unique_ptr<untyped_actor> u_actor) {
     abstract_actor::init(std::move(u_actor));
     this->create_internal_queue_thread();
@@ -29,4 +31,6 @@ void remote_actor::tell_(packet& p) {
 	auto serialized_packet = p.get_serialized();
 
     actor_system_.lock()->get_server()->do_send(serialized_packet, network_actor_endpoint_);
+}
+
 }

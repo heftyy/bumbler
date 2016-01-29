@@ -3,6 +3,8 @@
 #include "abstract_actor.h"
 #include "../actor_system/actor_system_errors.h"
 
+namespace bumbler {
+
 class actor_system;
 class untyped_actor;
 
@@ -17,3 +19,5 @@ public:
 protected:
     void tell(std::unique_ptr<message> msg, bool remote = false) override;
 };
+
+}

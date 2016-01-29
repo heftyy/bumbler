@@ -3,6 +3,8 @@
 #include <future>
 #include "abstract_actor.h"
 
+namespace bumbler {
+
 class promise_actor : public abstract_actor {
 public:
     promise_actor(const std::shared_ptr<actor_system>& actor_system, const std::string name)
@@ -12,3 +14,5 @@ public:
 protected:
     void tell(std::unique_ptr<message> msg, bool remote = false) override;
 };
+
+}

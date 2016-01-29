@@ -9,6 +9,8 @@
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
 
+namespace bumbler {
+
 template<typename T>
 class command {
 public:
@@ -27,3 +29,5 @@ private:
         ar & this->priority;
     }
 };
+
+}

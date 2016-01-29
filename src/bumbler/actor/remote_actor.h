@@ -7,6 +7,8 @@
 #include "actor_ref/actor_ref.h"
 #include "../packet/packet.h"
 
+namespace bumbler {
+
 class actor_system;
 class untyped_actor;
 
@@ -33,3 +35,5 @@ private:
 
     void tell_(packet& p);
 };
+
+}

@@ -5,6 +5,8 @@
 #include <random>
 #include "router_pool.h"
 
+namespace bumbler {
+
 class random_pool : public router_pool {
 public:
     random_pool(int pool_size)
@@ -45,3 +47,4 @@ private:
     std::uniform_int_distribution<> distribution_;
 };
 
+}

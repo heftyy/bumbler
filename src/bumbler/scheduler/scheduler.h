@@ -9,6 +9,8 @@
 #include "../actor/actor_ref/actor_ref.h"
 #include "../utility.h"
 
+namespace bumbler {
+
 class actor_system;
 
 class scheduler {
@@ -86,3 +88,5 @@ private:
     std::shared_ptr<dispatcher> dispatcher_;
 
 };
+
+}

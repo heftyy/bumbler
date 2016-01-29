@@ -6,6 +6,8 @@
 #include <boost/any.hpp>
 #include <boost/serialization/access.hpp>
 
+namespace bumbler {
+
 class actor_ref;
 class message;
 
@@ -46,3 +48,5 @@ private:
     }
 
 };
+
+}

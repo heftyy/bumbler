@@ -5,6 +5,8 @@
 #include <iostream>
 #include <mutex>
 
+namespace bumbler {
+
 class actor_system;
 
 class actor_system_storage {
@@ -37,3 +39,5 @@ private:
     std::map<std::string, std::shared_ptr<actor_system>> systems_;
     std::mutex systems_mutex_;
 };
+
+}

@@ -3,6 +3,8 @@
 #include "../utility.h"
 #include "../thread_pool/thread_pool.h"
 
+namespace bumbler {
+
 class dispatcher {
 public:
     dispatcher(int size) {
@@ -30,3 +32,5 @@ public:
 private:
     std::unique_ptr<thread_pool> thread_pool_;
 };
+
+}

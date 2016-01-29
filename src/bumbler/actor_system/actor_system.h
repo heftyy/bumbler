@@ -19,6 +19,8 @@
 #include "../dispatcher/dispatcher.h"
 #include "../actor/props/typed_props.h"
 
+namespace bumbler {
+
 class actor_system : public std::enable_shared_from_this<actor_system> {
 public:
     static std::shared_ptr<actor_system> create_system(const std::string& name, int port, int thread_pool_size = 5);
@@ -139,3 +141,5 @@ struct concrete_actor_system : public actor_system {
     concrete_actor_system(const std::string &name, int port, int thread_pool_size)
             : actor_system(name, port, thread_pool_size) { }
 };
+
+}

@@ -9,6 +9,8 @@
 #include "test_actor.h"
 #include "remote_test_actor.h"
 
+using namespace bumbler;
+
 BOOST_AUTO_TEST_SUITE( actor_suite )
 
     BOOST_AUTO_TEST_CASE(ActorRefTest) {
@@ -69,7 +71,7 @@ BOOST_AUTO_TEST_SUITE( actor_suite )
 
         //stop the actor after all the messages from the queue are read
         //this will block for 1000ms+
-        la1.tell(::stop_actor<int>(5));
+        la1.tell(bumbler::stop_actor<int>(5));
 
         system1->stop(false);
 
@@ -89,7 +91,7 @@ BOOST_AUTO_TEST_SUITE( actor_suite )
         la1.tell(std::string("msg2"));
 
         //clear the queue ( 1 message left ) and stop the actor
-        la1.tell(::kill_actor<int>(5));
+        la1.tell(bumbler::kill_actor<int>(5));
 
         system1->stop(false);
 

@@ -4,6 +4,8 @@
 #include <memory>
 #include "router_pool.h"
 
+namespace bumbler {
+
 class round_robin_pool : public router_pool {
 public:
     round_robin_pool(int pool_size)
@@ -37,3 +39,4 @@ private:
     std::atomic<int> next_actor_to_message_;
 };
 
+}

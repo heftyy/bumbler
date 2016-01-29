@@ -1,6 +1,8 @@
 #include "abstract_actor.h"
 #include "../actor_system/actor_system.h"
 
+namespace bumbler {
+
 abstract_actor::abstract_actor(const std::shared_ptr<actor_system>& actor_system, const std::string name)
         : actor_system_(actor_system), actor_name_(name) {
     stop_flag_ = false;
@@ -39,7 +41,7 @@ void abstract_actor::create_internal_queue_thread() {
 
             if (!isPopped)
                 return;  // if the queue is empty and this->stop_flag_ is set to true
-        }		
+        }
     });
 }
 
@@ -139,4 +141,6 @@ void abstract_actor::add_message(std::unique_ptr<message> msg) {
     BOOST_LOG_TRIVIAL(debug) << "[ACTOR] queueing new task";
     this->mailbox_->push_message(std::move(msg));
     cv_.notify_one();
+}
+
 }

@@ -7,6 +7,8 @@
 #include <boost/asio.hpp>
 #include "../utility.h"
 
+namespace bumbler {
+
 class thread_pool {
 public:
     thread_pool(std::size_t pool_size);
@@ -50,3 +52,5 @@ private:
     std::unique_ptr<boost::asio::io_service::work> work_;
     boost::thread_group threads_;
 };
+
+}
