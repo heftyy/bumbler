@@ -41,7 +41,7 @@ public:
         this->priority = rhs.priority;
     }
 
-	typed_message& operator=(const typed_message& rhs){
+	typed_message& operator=(const typed_message& rhs) {
 		std::cout << "typed_message assign ctor\n";
 		this->data = rhs.data;
 		this->target = utility::make_unique<actor_ref>(*rhs.target);
@@ -111,6 +111,10 @@ public:
         return std::unique_ptr<message>(new typed_message(*this));
     }
 
+    std::unique_ptr<typed_message<T>> clone_typed() const {
+        return std::unique_ptr<typed_message<T>>(new typed_message(*this));
+    }
+
 private:
     message_type message_type_ = message_type::regular;
 
@@ -129,28 +133,28 @@ private:
 class typed_message_factory {
 public:
     template<typename T>
-    static auto create(const actor_ref& target, const actor_ref& sender, const T& data) -> const typed_message<T> {
-        return typed_message<T>(target, sender, data);
+    static auto create(const actor_ref& target, const actor_ref& sender, const T& data) -> std::unique_ptr<typed_message<T>> {
+        return utility::make_unique<typed_message<T>>(target, sender, data);
     }
 
     template<typename T>
-    static auto create(const actor_ref& target, const actor_ref& sender, const broadcast<T>& cmd) -> const typed_message<T> {
-        return typed_message<T>(target, sender, cmd.data, message_type::broadcast);
+    static auto create(const actor_ref& target, const actor_ref& sender, const broadcast<T>& cmd) -> std::unique_ptr<typed_message<T>> {
+        return utility::make_unique<typed_message<T>>(target, sender, cmd.data, message_type::broadcast);
     }
 
     template<typename T>
-    static auto create(const actor_ref& target, const actor_ref& sender, const stop_actor<T>& cmd) -> const typed_message<T> {
-        return typed_message<T>(target, sender, cmd.data, message_type::stop_actor);
+    static auto create(const actor_ref& target, const actor_ref& sender, const stop_actor<T>& cmd) -> std::unique_ptr<typed_message<T>> {
+        return utility::make_unique<typed_message<T>>(target, sender, cmd.data, message_type::stop_actor);
     }
 
     template<typename T>
-    static auto create(const actor_ref& target, const actor_ref& sender, const kill_actor<T>& cmd) -> const typed_message<T> {
-        return typed_message<T>(target, sender, cmd.data, message_type::kill_actor);
+    static auto create(const actor_ref& target, const actor_ref& sender, const kill_actor<T>& cmd) -> std::unique_ptr<typed_message<T>> {
+        return utility::make_unique<typed_message<T>>(target, sender, cmd.data, message_type::kill_actor);
     }
 
     template<typename T>
-    static auto create(const actor_ref& target, const actor_ref& sender, const priority_message<T>& cmd) -> const typed_message<T> {
-        return typed_message<T>(target, sender, cmd.data, message_type::priority_message, cmd.priority);
+    static auto create(const actor_ref& target, const actor_ref& sender, const priority_message<T>& cmd) -> std::unique_ptr<typed_message<T>> {
+        return utility::make_unique<typed_message<T>>(target, sender, cmd.data, message_type::priority_message, cmd.priority);
     }
 };
 

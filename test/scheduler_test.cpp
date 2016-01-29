@@ -58,7 +58,7 @@ BOOST_AUTO_TEST_SUITE(scheduler_test_suite)
 
         const actor_ref r1 = system1->actor_of(p, "test_actor1");
 
-        auto c1 = system1->schedule(::broadcast<int>(5), r1, actor_ref::none(), 200, 0);
+        auto c1 = system1->schedule(broadcast<int>(5), r1, actor_ref::none(), 200, 0);
 
         std::this_thread::sleep_for(std::chrono::seconds(1));
 

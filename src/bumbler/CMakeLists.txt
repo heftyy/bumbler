@@ -58,7 +58,7 @@ set(bumbler_SOURCES
         logger/logger.h
         logger/logger.cpp
         utility.h
-        utility.cpp actor/messaging/messaging_service.cpp actor/messaging/messaging_service.h)
+        utility.cpp actor/messaging/messaging_service.cpp actor/messaging/messaging_service.h actor/channels/abstract_channel.h)
 
 if (${WIN32})
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")

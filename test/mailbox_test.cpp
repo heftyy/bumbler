@@ -21,9 +21,8 @@ BOOST_AUTO_TEST_SUITE( mailbox_test_suite )
         std::unique_ptr<mailbox> mailbox = utility::make_unique<fifo_mailbox>();
 
         auto tm = typed_message_factory::create(actor_ref::none(), actor_ref::none(), 5);
-        auto tm_ptr = utility::make_unique<decltype(tm)>(std::move(tm));
 
-        mailbox->push_message(std::move(tm_ptr));
+        mailbox->push_message(std::move(tm));
 
         BOOST_CHECK_EQUAL(mailbox->empty(), false);
 
@@ -38,9 +37,8 @@ BOOST_AUTO_TEST_SUITE( mailbox_test_suite )
 
         // add one message without a priority set ( uses default 0 )
         auto tm = typed_message_factory::create(actor_ref::none(), actor_ref::none(), 4);
-        auto tm_ptr = utility::make_unique<decltype(tm)>(std::move(tm));
 
-        mailbox->push_message(std::move(tm_ptr));
+        mailbox->push_message(std::move(tm));
 
         const std::map<int, int> map {
                 {5, 100},
@@ -52,9 +50,8 @@ BOOST_AUTO_TEST_SUITE( mailbox_test_suite )
         for(auto const &entry : map) {
             // add 4 messages with priority from the map
             auto tm = typed_message_factory::create(actor_ref::none(), actor_ref::none(), priority_message<int>(entry.first, entry.second));
-            auto tm_ptr = utility::make_unique<decltype(tm)>(std::move(tm));
 
-            mailbox->push_message(std::move(tm_ptr));
+            mailbox->push_message(std::move(tm));
         }
 
         BOOST_CHECK_EQUAL(mailbox->empty(), false);
@@ -101,7 +98,7 @@ BOOST_AUTO_TEST_SUITE( mailbox_test_suite )
 
         // stop the actor after all the messages from the queue are read
         // this will block for 1000ms+
-        la1.tell(::stop_actor<int>(5));
+        la1.tell(bumbler::stop_actor<int>(5));
 
         system1->stop(false);
 

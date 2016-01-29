@@ -10,6 +10,7 @@
 using namespace bumbler;
 
 using intMsg = typed_message<int>;
+using intMsgPtr = std::unique_ptr<intMsg>;
 
 BOOST_AUTO_TEST_SUITE( message_test_suite )
 
@@ -20,46 +21,46 @@ BOOST_AUTO_TEST_SUITE( message_test_suite )
         auto tm = typed_message_factory::create(target, sender, 11);
 
         {
-            bool is_same = std::is_same<decltype(tm), intMsg>::value;
+            bool is_same = std::is_same<decltype(tm), intMsgPtr>::value;
             BOOST_CHECK(is_same);
 
-            BOOST_CHECK_EQUAL(tm.data, 11);
+            BOOST_CHECK_EQUAL(tm->data, 11);
 
-            boost::any data = tm.get_data();
+            boost::any data = tm->get_data();
             BOOST_CHECK_EQUAL(boost::any_cast<int>(data), 11);
 
-            BOOST_CHECK(target == tm.get_target());
-            BOOST_CHECK(sender == tm.get_sender());
+            BOOST_CHECK(target == tm->get_target());
+            BOOST_CHECK(sender == tm->get_sender());
         }
 
         {
-            auto tm_copy = tm;
+            auto tm_copy = tm->clone_typed();
 
             bool is_same = std::is_same<decltype(tm), decltype(tm_copy)>::value;
             BOOST_CHECK(is_same);
 
-            BOOST_CHECK_EQUAL(tm_copy.data, 11);
+            BOOST_CHECK_EQUAL(tm_copy->data, 11);
 
-            boost::any data = tm_copy.get_data();
+            boost::any data = tm_copy->get_data();
             BOOST_CHECK_EQUAL(boost::any_cast<int>(data), 11);
 
-            BOOST_CHECK(target == tm_copy.get_target());
-            BOOST_CHECK(sender == tm_copy.get_sender());
+            BOOST_CHECK(target == tm_copy->get_target());
+            BOOST_CHECK(sender == tm_copy->get_sender());
         }
 
         {
-            auto tm_copy(tm);
+            auto tm_copy = tm->clone_typed();
 
             bool is_same = std::is_same<decltype(tm), decltype(tm_copy)>::value;
             BOOST_CHECK(is_same);
 
-            BOOST_CHECK_EQUAL(tm_copy.data, 11);
+            BOOST_CHECK_EQUAL(tm_copy->data, 11);
 
-            boost::any data = tm_copy.get_data();
+            boost::any data = tm_copy->get_data();
             BOOST_CHECK_EQUAL(boost::any_cast<int>(data), 11);
 
-            BOOST_CHECK(target == tm_copy.get_target());
-            BOOST_CHECK(sender == tm_copy.get_sender());
+            BOOST_CHECK(target == tm_copy->get_target());
+            BOOST_CHECK(sender == tm_copy->get_sender());
         }
     }
 

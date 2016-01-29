@@ -32,7 +32,7 @@ public:
     }
 
     template<typename T>
-    std::shared_ptr<cancellable> schedule(const typed_message<T>& msg, long initial_delay_ms, long interval_ms) {
+    std::shared_ptr<cancellable> schedule(std::unique_ptr<typed_message<T>> msg, long initial_delay_ms, long interval_ms) {
 	    auto ret_cancellable = std::make_shared<cancellable>();
 		std::weak_ptr<cancellable> ret_cancellable_weak_ptr = ret_cancellable;
 
@@ -73,14 +73,14 @@ public:
 				cancellable.lock()->cancelled();
 				return 0;
 			}
-        }, msg, ret_cancellable_weak_ptr);
+        }, *msg, ret_cancellable_weak_ptr);
 
         return ret_cancellable;
     }
 
     template<typename T>
-    std::shared_ptr<cancellable> schedule_once(const typed_message<T>& msg, long initial_delay_ms) {
-        return schedule<T>(msg, initial_delay_ms, 0);
+    std::shared_ptr<cancellable> schedule_once(std::unique_ptr<typed_message<T>> msg, long initial_delay_ms) {
+        return schedule<T>(std::move(msg), initial_delay_ms, 0);
     }
 
 private:

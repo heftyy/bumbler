@@ -80,8 +80,7 @@ private:
     template<typename T>
     std::unique_ptr<message> construct_reply_message(T&& data) {
         auto tm = typed_message_factory::create(get_sender(), get_self(), std::forward<T>(data));
-        auto tm_ptr = utility::make_unique<decltype(tm)>(std::move(tm));
-        return std::move(tm_ptr);
+        return std::move(tm);
     }
 };
 

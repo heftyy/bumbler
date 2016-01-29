@@ -62,8 +62,7 @@ public:
     template<typename T>
     void tell(T&& data, actor_ref sender = actor_ref::none()) const {
         auto tm = typed_message_factory::create(*this, sender, std::forward<T>(data));
-		auto tm_ptr = utility::make_unique<decltype(tm)>(std::move(tm));
-        tell_impl(std::move(tm_ptr));
+        tell_impl(std::move(tm));
     }
 
     template<typename T>
@@ -95,9 +94,8 @@ public:
         };
 
         auto tm = typed_message_factory::create(*this, none(), std::forward<T>(data));
-        auto tm_ptr = utility::make_unique<decltype(tm)>(std::move(tm));
 
-        ask_impl(std::move(tm_ptr), future_func);
+        ask_impl(std::move(tm), future_func);
 
         return f;
     }
