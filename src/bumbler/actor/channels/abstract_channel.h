@@ -3,7 +3,7 @@
 #include <functional>
 
 #include "../actor_ref/actor_ref.h"
-#include "../abstract_actor.h""
+#include "../abstract_actor.h"
 #include "../../messages/typed_message.h"
 
 namespace bumbler {
@@ -17,8 +17,8 @@ public:
 
     template<typename T>
     void tell(T&& data, actor_ref sender = actor_ref::none()) const {
-        auto tm = typed_message_factory::create(*this, sender, std::forward<T>(data));
-        tell_impl(utility::make_unique<decltype(tm)>(tm));
+        auto tm = typed_message_factory::create(actor_ref_, sender, std::forward<T>(data));
+        tell_impl(std::move(tm));
     }
 
     template<typename T>
@@ -49,12 +49,18 @@ public:
             }
         };
 
-        auto tm = typed_message_factory::create(*this, actor_ref::none(), std::forward<T>(data));
+        auto tm = typed_message_factory::create(actor_ref_, actor_ref::none(), std::forward<T>(data));
 
         ask_impl(std::move(tm), future_func);
 
         return f;
     }
+
+protected:
+    abstract_channel() { }
+
+    abstract_channel(const actor_ref& actor_ref_, const std::shared_ptr<abstract_actor>& actor_ptr_) :
+            actor_ref_(actor_ref_), actor_ptr_(actor_ptr_) { }
 
 private:
     actor_ref actor_ref_;

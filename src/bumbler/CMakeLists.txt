@@ -12,6 +12,13 @@ set(bumbler_SOURCES
         messages/commands/commands.h
         actor/actor_ref/actor_ref.h
         actor/actor_ref/actor_ref.cpp
+        actor/messaging/messaging_service.cpp
+        actor/messaging/messaging_service.h
+        actor/channels/abstract_channel.h
+        actor/channels/actor_channel.h
+        actor/channels/local_actor_channel.h
+        actor/channels/invalid_channel.h
+        actor/channels/local_actor_channel.cpp
         actor/remote_actor.h
         actor/remote_actor.cpp
         actor/local_actor.h
@@ -58,7 +65,7 @@ set(bumbler_SOURCES
         logger/logger.h
         logger/logger.cpp
         utility.h
-        utility.cpp actor/messaging/messaging_service.cpp actor/messaging/messaging_service.h actor/channels/abstract_channel.h)
+        utility.cpp)
 
 if (${WIN32})
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")

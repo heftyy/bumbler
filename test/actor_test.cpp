@@ -48,8 +48,8 @@ BOOST_AUTO_TEST_SUITE( actor_suite )
         const actor_ref la1 = system1->actor_of(props_local, "test_actor1");
         const actor_ref ra1 = system1->actor_of(props_remote, "remote_test_actor1");
 
-        actor_ref from_system1 = system1->get_actor("test_actor1");
-        actor_ref from_system2 = system1->get_actor("remote_test_actor1");
+        actor_ref from_system1 = system1->get_actor_ref("test_actor1");
+        actor_ref from_system2 = system1->get_actor_ref("remote_test_actor1");
 
         BOOST_CHECK_EQUAL(from_system1.to_string(), la1.to_string());
         BOOST_CHECK_EQUAL(from_system2.to_string(), ra1.to_string());

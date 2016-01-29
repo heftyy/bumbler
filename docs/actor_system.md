@@ -19,7 +19,7 @@ int stop_actor(std::string actor_name, bool wait = false);
 int tell_actor(std::unique_ptr<message> msg, bool from_remote = false);
 int future_tell_actor(std::unique_ptr<message> msg, std::function<void(boost::any)>& response_fn);
 
-const actor_ref get_actor(std::string actor_name);
+const actor_ref get_actor_ref(std::string actor_name);
 
 template<typename T>
 std::shared_ptr<cancellable> schedule(T&& data, const actor_ref& target, long initial_delay_ms, long interval_ms = 0) const;

@@ -20,7 +20,7 @@ BOOST_AUTO_TEST_SUITE( future_test_suite )
         auto props_local = typed_props<local_actor, test_actor>();
         const actor_ref la1 = system1->actor_of(props_local, "test_actor1");
 
-        actor_ref from_system1 = system1->get_actor("test_actor1");
+        actor_ref from_system1 = system1->get_actor_ref("test_actor1");
         BOOST_CHECK_EQUAL(from_system1.to_string(), la1.to_string());
 
         std::future<std::string> f1 = la1.ask<std::string>(1);

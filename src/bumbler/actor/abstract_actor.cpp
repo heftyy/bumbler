@@ -61,7 +61,7 @@ void abstract_actor::send_reply_message(std::unique_ptr<message> msg) const {
         auto ac = actor_system_storage::instance().get_system(msg->get_target().system_name);
 
         if(ac != nullptr) {
-	        auto actor_from_system = ac->get_actor(msg->get_target().actor_name);
+	        auto actor_from_system = ac->get_actor_ref(msg->get_target().actor_name);
             if(!actor_from_system.is_none()) {
                 ac->tell_actor(std::move(msg));
                 return;

@@ -11,6 +11,7 @@
 #include "actor_system_storage.h"
 #include "typed_promise_actor.h"
 #include "../messages/typed_message.h"
+#include "../actor/channels/local_actor_channel.h"
 #include "../actor/abstract_actor.h"
 #include "../actor/promise_actor.h"
 #include "../packet/packet.h"
@@ -42,7 +43,8 @@ public:
     int tell_actor(std::unique_ptr<message> msg, bool from_remote = false);
     int ask_actor(std::unique_ptr<message> msg, const std::function<void(boost::any)>& response_fn);
 
-    const actor_ref get_actor(std::string actor_name);
+    const actor_ref get_actor_ref(std::string actor_name);
+    const local_actor_channel get_actor_channel(std::string actor_name);
 
     template<typename Props, typename ...ActorArgs>
     actor_ref actor_of(Props&& props, ActorArgs&&... actor_args) {

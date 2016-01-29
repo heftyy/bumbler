@@ -24,7 +24,7 @@ public:
         );
 
         get_typed_actor_function_ = [args...]() -> std::unique_ptr<untyped_actor> {
-            return utility::make_unique<TypedActor>(args...);
+            return utility::make_unique<TypedActor>(std::forward<Args>(args)...);
         };
     }
 

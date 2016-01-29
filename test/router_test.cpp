@@ -23,7 +23,7 @@ BOOST_AUTO_TEST_SUITE( router_test_suite )
 
         auto r1 = system1->actor_of(p, "test_router1");
 
-        const actor_ref from_system1 = system1->get_actor("test_router1");
+        const actor_ref from_system1 = system1->get_actor_ref("test_router1");
 
         BOOST_CHECK_EQUAL(from_system1.to_string(), r1.to_string());
 

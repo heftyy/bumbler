@@ -141,7 +141,7 @@ int actor_system::ask_actor(std::unique_ptr<message> msg, const std::function<vo
     //throw new actor_not_found(message.target.actor_name);
 }
 
-const actor_ref actor_system::get_actor(std::string actor_name) {
+const actor_ref actor_system::get_actor_ref(std::string actor_name) {
     if (stopped_) nullptr;
     std::lock_guard<std::mutex> guard(actors_read_mutex_);
 
@@ -152,6 +152,12 @@ const actor_ref actor_system::get_actor(std::string actor_name) {
     else {
         return actor_ref::none();
     }
+}
+
+const local_actor_channel actor_system::get_actor_channel(std::string actor_name) {
+    if (stopped_) nullptr;
+
+    return local_actor_channel();
 }
 
 void actor_system::receive(std::unique_ptr<packet> packet, boost::asio::ip::udp::endpoint& sender_endpoint) {
