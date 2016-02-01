@@ -21,6 +21,8 @@ public:
 	message(const message& msg) = default;
 	message& operator=(const message& msg) = default;
 
+    virtual ~message() {}
+
     virtual boost::any get_data() const = 0;
     virtual actor_ref& get_sender() const = 0;
     virtual actor_ref& get_target() const = 0;
@@ -29,8 +31,6 @@ public:
 
     virtual void set_sender(const actor_ref& sender) = 0;
     virtual void set_target(const actor_ref& target) = 0;
-
-    virtual ~message() {}
 
     virtual int get_priority() const = 0;
 

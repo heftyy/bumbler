@@ -22,11 +22,11 @@ void remote_actor::tell(std::unique_ptr<message> msg, bool remote) {
     }
 
 	auto p = packet(std::move(msg));
-    tell_(p);
+    tell_impl(p);
 }
 
-void remote_actor::tell_(packet& p) {
-    if (!actor_system_.lock()->get_server()) bumbler_error(bumbler_SERVER_DOESNT_EXIST, "server doesn't exist");
+void remote_actor::tell_impl(packet& p) {
+    if (!actor_system_.lock()->get_server()) throw new server_doesnt_exist("server doesn't exist for " + actor_name());
 
 	auto serialized_packet = p.get_serialized();
 

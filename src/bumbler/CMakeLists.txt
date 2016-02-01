@@ -15,10 +15,13 @@ set(bumbler_SOURCES
         actor/messaging/messaging_service.cpp
         actor/messaging/messaging_service.h
         actor/channels/abstract_channel.h
+        actor/channels/actor_channel.cpp
         actor/channels/actor_channel.h
-        actor/channels/local_actor_channel.h
         actor/channels/invalid_channel.h
         actor/channels/local_actor_channel.cpp
+        actor/channels/local_actor_channel.h
+        actor/channels/remote_actor_channel.cpp
+        actor/channels/remote_actor_channel.h
         actor/remote_actor.h
         actor/remote_actor.cpp
         actor/local_actor.h

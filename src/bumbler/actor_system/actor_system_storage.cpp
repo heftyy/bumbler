@@ -35,4 +35,14 @@ std::shared_ptr<actor_system> actor_system_storage::get_system(std::string syste
     return nullptr;
 }
 
+std::shared_ptr<actor_system> actor_system_storage::any() {
+    std::lock_guard<std::mutex> guard(this->systems_mutex_);
+
+    if(systems_.size() > 0) {
+        return systems_.begin()->second;
+    }
+
+    return nullptr;
+}
+
 }

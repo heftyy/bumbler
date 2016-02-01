@@ -4,6 +4,7 @@
 #include <iostream>
 #include <sstream>
 #include <future>
+#include "../channels/abstract_channel.h"
 #include "../../logger/logger.h"
 #include "../../messages/typed_message.h"
 #include "../../messages/commands/commands.h"
@@ -41,64 +42,62 @@ public:
     virtual ~actor_ref() = default; // make dtor virtual
     actor_ref(actor_ref&&) = default; // support moving
     actor_ref& operator=(actor_ref&&) = default;
-    actor_ref(const actor_ref&) = default; // support copying
-    actor_ref& operator=(const actor_ref&) = default;
-
-    std::string to_string() const {
-        std::stringstream ss;
-        ss << actor_name << "$" << system_name << "@" << ip << ":" << port;
-        return ss.str();
+    actor_ref(const actor_ref& rhs) {
+        this->actor_name = rhs.actor_name;
+        this->system_name = rhs.system_name;
+        this->ip = rhs.ip;
+        this->port = rhs.port;
     }
+    actor_ref& operator=(const actor_ref& rhs) {
+        this->actor_name = rhs.actor_name;
+        this->system_name = rhs.system_name;
+        this->ip = rhs.ip;
+        this->port = rhs.port;
+        return *this;
+    }
+
+    std::string to_string() const;
 
     static actor_ref none() {
         return actor_ref();
     }
 
     //if a string literal is passed to tell change it to std::string
-    void tell(char* data, actor_ref sender = actor_ref::none()) {
+    void tell(const char* data, actor_ref sender = actor_ref::none()) {
         this->tell(std::string(data), sender);
     }
 
     template<typename T>
-    void tell(T&& data, actor_ref sender = actor_ref::none()) const {
+    void tell(T&& data, const actor_ref& sender = actor_ref::none()) {
         auto tm = typed_message_factory::create(*this, sender, std::forward<T>(data));
-        tell_impl(std::move(tm));
+        if(!channel_) resolve();
+
+        channel_->tell(std::move(tm));
     }
 
     template<typename T>
-    void tell(const typed_message<T>& msg) const {
-        tell_impl(std::move(utility::make_unique<typed_message<T>>(std::move(msg))));
+    void tell(const typed_message<T>& msg) {
+        if(!channel_) resolve();
+        channel_->tell(std::move(utility::make_unique<typed_message<T>>(std::move(msg))));
     }
 
     template<typename Result>
-    std::future<Result> ask(const char* data) const {
+    std::future<Result> ask(const char* data) {
         return ask<Result>(std::string(data));
     }
 
     template<typename Result, typename T>
-    std::future<Result> ask(T && data) const {
-        auto promise_ptr = std::make_shared<std::promise<Result>>();
-        auto f = promise_ptr->get_future();
-
-	    auto future_type_hashcode = typeid(Result).hash_code();
-
-        std::function<void(boost::any)> future_func = [future_type_hashcode, promise_ptr](boost::any response) {
-            if(response.type().hash_code() == future_type_hashcode) {
-                Result value = boost::any_cast<Result>(response);
-                promise_ptr->set_value(value);
-            }
-            else {
-                BOOST_LOG_TRIVIAL(error) << "[FUTURE] expected type for the future didn't match the replied type";
-                promise_ptr->set_value(Result());
-            }
-        };
-
+    std::future<Result> ask(T && data) {
         auto tm = typed_message_factory::create(*this, none(), std::forward<T>(data));
+        if(!channel_) resolve();
 
-        ask_impl(std::move(tm), future_func);
-
-        return f;
+        return channel_->ask<Result>(std::move(tm));
     }
+
+    /*
+     * Creates the underlying abstract_channel
+     */
+    void resolve();
 
     /*
      * Stops the actor after all the received message are read.
@@ -118,6 +117,10 @@ public:
         return actor_name.length() > 0 && system_name.length() > 0 && ip.length() > 0 && port > 0;
     }
 
+    bool is_resolved() const {
+        return channel_ != nullptr;
+    }
+
     bool operator==(const actor_ref& ref) const {
         return this->to_string().compare(ref.to_string()) == 0;
     }
@@ -131,15 +134,14 @@ public:
     }
 
 private:
+    std::unique_ptr<abstract_channel> channel_;
+
     void reset() {
         this->actor_name = "";
         this->system_name = "";
         this->ip = "";
         this->port = 0;
     }
-
-    void tell_impl(std::unique_ptr<message> msg) const;
-    void ask_impl(std::unique_ptr<message> msg, const std::function<void(boost::any)> &response_fn) const;
 
 };
 

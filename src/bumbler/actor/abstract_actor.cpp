@@ -3,11 +3,11 @@
 
 namespace bumbler {
 
-abstract_actor::abstract_actor(const std::shared_ptr<actor_system>& actor_system, const std::string name)
-        : actor_system_(actor_system), actor_name_(name) {
-    stop_flag_ = false;
-    self_ = actor_ref(actor_name(), system_name());
-}
+abstract_actor::abstract_actor(const std::shared_ptr<actor_system>& actor_system, const std::string name) :
+        actor_system_(actor_system),
+        actor_name_(name),
+        self_(actor_name(), system_name()),
+        stop_flag_(false) { }
 
 abstract_actor::~abstract_actor() {
     BOOST_LOG_TRIVIAL(debug) << "[ACTOR] destructor";

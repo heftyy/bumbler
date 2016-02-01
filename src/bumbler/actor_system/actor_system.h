@@ -46,10 +46,15 @@ public:
     const actor_ref get_actor_ref(std::string actor_name);
     const local_actor_channel get_actor_channel(std::string actor_name);
 
+    /*
+     * generate a new name for a temporary actor
+     */
+    std::string get_next_temporary_actor_name() const;
+
     template<typename Props, typename ...ActorArgs>
     actor_ref actor_of(Props&& props, ActorArgs&&... actor_args) {
         std::unique_ptr<abstract_actor> actor_ptr = props.create_actor_instance(shared_from_this(), std::forward<ActorArgs>(actor_args)...);
-        actor_ref ref = actor_ptr->get_self();
+        auto ref = actor_ptr->get_self();
         add_actor(std::move(actor_ptr));
 
         return ref;
@@ -77,15 +82,15 @@ public:
         return scheduler_->schedule(typed_message_factory::create(target, sender, std::forward<T>(data)), initial_delay_ms, 0);
     }
 
-    const std::shared_ptr<udp_server> get_server() const {
+    std::shared_ptr<udp_server> get_server() const {
         return server_;
     }
 
-    const std::shared_ptr<scheduler> get_scheduler() const {
+    std::shared_ptr<scheduler> get_scheduler() const {
         return scheduler_;
     }
 
-    const std::shared_ptr<dispatcher> get_dispatcher() const {
+    std::shared_ptr<dispatcher> get_dispatcher() const {
         return dispatcher_;
     }
 
@@ -130,12 +135,6 @@ private:
      * callback used by the udp server when a message is received
      */
     void receive(std::unique_ptr<packet> packet, boost::asio::ip::udp::endpoint& sender_endpoint);
-
-
-    /*
-     * generate a new name for a temporary actort
-     */
-    const std::string get_next_temporary_actor_name() const;
 };
 
 //workaround for std::make_shared and protected constructor

@@ -24,6 +24,8 @@ public:
 
     std::shared_ptr<actor_system> get_system(std::string system_name);
 
+    std::shared_ptr<actor_system> any();
+
 private:
     actor_system_storage() { }
 

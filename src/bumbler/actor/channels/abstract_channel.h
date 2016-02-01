@@ -1,38 +1,21 @@
 #pragma once
 
 #include <functional>
+#include <future>
 
-#include "../actor_ref/actor_ref.h"
-#include "../abstract_actor.h"
+#include "../../logger/logger.h"
 #include "../../messages/typed_message.h"
 
 namespace bumbler {
 
 class abstract_channel {
 public:
-    //if a string literal is passed to tell change it to std::string
-    void tell(char* data, actor_ref sender = actor_ref::none()) {
-        this->tell(std::string(data), sender);
-    }
-
-    template<typename T>
-    void tell(T&& data, actor_ref sender = actor_ref::none()) const {
-        auto tm = typed_message_factory::create(actor_ref_, sender, std::forward<T>(data));
-        tell_impl(std::move(tm));
-    }
-
-    template<typename T>
-    void tell(const typed_message<T>& msg) const {
-        tell_impl(utility::make_unique<typed_message<T>>(std::move(msg)));
+    void tell(std::unique_ptr<message> msg) {
+        tell_impl(std::move(msg));
     }
 
     template<typename Result>
-    std::future<Result> ask(const char* data) const {
-        return ask<Result>(std::string(data));
-    }
-
-    template<typename Result, typename T>
-    std::future<Result> ask(T && data) const {
+    std::future<Result> ask(std::unique_ptr<message> msg) {
         auto promise_ptr = std::make_shared<std::promise<Result>>();
         auto f = promise_ptr->get_future();
 
@@ -49,25 +32,19 @@ public:
             }
         };
 
-        auto tm = typed_message_factory::create(actor_ref_, actor_ref::none(), std::forward<T>(data));
-
-        ask_impl(std::move(tm), future_func);
+        ask_impl(std::move(msg), future_func);
 
         return f;
     }
 
+    virtual ~abstract_channel() = default;
+
 protected:
     abstract_channel() { }
 
-    abstract_channel(const actor_ref& actor_ref_, const std::shared_ptr<abstract_actor>& actor_ptr_) :
-            actor_ref_(actor_ref_), actor_ptr_(actor_ptr_) { }
-
 private:
-    actor_ref actor_ref_;
-    std::shared_ptr<abstract_actor> actor_ptr_;
-
-    virtual void tell_impl(std::unique_ptr<message> msg) const = 0;
-    virtual void ask_impl(std::unique_ptr<message> msg, const std::function<void(boost::any)> &response_fn) const = 0;
+    virtual void tell_impl(std::unique_ptr<message> msg) = 0;
+    virtual void ask_impl(std::unique_ptr<message> msg, const std::function<void(boost::any)> &response_fn) = 0;
 };
 
 }

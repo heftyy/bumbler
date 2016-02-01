@@ -33,7 +33,7 @@ private:
     boost::asio::ip::udp::endpoint network_actor_endpoint_;
     actor_ref network_actor_ref_;
 
-    void tell_(packet& p);
+    void tell_impl(packet& p);
 };
 
 }

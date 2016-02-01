@@ -51,7 +51,10 @@ public:
 		return *this;
 	}
 
-    typed_message(const actor_ref& target, const actor_ref& sender, const T& data, message_type msg_type = message_type::regular, int priority = 0) {
+    typed_message(const actor_ref& target,
+                  const actor_ref& sender,
+                  const T& data, message_type msg_type = message_type::regular,
+                  int priority = 0) {
         this->data = data;
         this->target = utility::make_unique<actor_ref>(target);
         this->sender = utility::make_unique<actor_ref>(sender);

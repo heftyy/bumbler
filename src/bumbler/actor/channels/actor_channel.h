@@ -4,12 +4,16 @@
 
 namespace bumbler {
 
+class actor_ref;
+
 class actor_channel : public abstract_channel {
 protected:
     actor_channel() : abstract_channel() { }
 
-    actor_channel(const actor_ref& actor_ref_, const std::shared_ptr<abstract_actor>& actor_ptr_) :
-            abstract_channel(actor_ref_, actor_ptr_) { }
+    actor_channel(const actor_ref& target_actor_ref);
+
+private:
+    std::unique_ptr<actor_ref> actor_ref_;
 };
 
 }

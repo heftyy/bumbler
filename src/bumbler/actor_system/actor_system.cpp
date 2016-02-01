@@ -81,7 +81,7 @@ std::shared_ptr<actor_system> actor_system::create_system(const std::string& nam
 }
 
 int actor_system::stop_actor(std::string actor_name, bool wait) {
-    if (stopped_) return bumbler_error(ACTOR_SYSTEM_STOPPED, system_name_);
+    if (stopped_.load()) throw new actor_system_stopped(system_name());
     std::lock_guard<std::mutex> guard(actors_write_mutex_);
 
     auto search = actors_.find(actor_name);
@@ -90,16 +90,15 @@ int actor_system::stop_actor(std::string actor_name, bool wait) {
         actors_.erase(search);
         return 0;
     }
-    else {
-        return bumbler_error(bumbler_ACTOR_NOT_FOUND, actor_name);
-    }
+
+    throw new actor_not_found(actor_name);
 }
 
 int actor_system::tell_actor(std::unique_ptr<message> msg, bool from_remote) {
-    if (stopped_.load()) return bumbler_error(ACTOR_SYSTEM_STOPPED, system_name_);
+    if (stopped_.load()) throw new actor_system_stopped(system_name());
 
     if (msg->get_target().system_name.compare(system_name_) != 0)
-        return bumbler_error(bumbler_WRONG_ACTOR_SYSTEM, msg->get_target().system_name);
+        throw new wrong_actor_system(msg->get_target().system_name);
 
     std::lock_guard<std::mutex> guard(actors_read_mutex_);
     std::string actor_name = msg->get_target().actor_name;
@@ -109,17 +108,15 @@ int actor_system::tell_actor(std::unique_ptr<message> msg, bool from_remote) {
         actors_[actor_name]->pass_message(std::move(msg), from_remote);
         return 0;
     }
-    else {
-        return bumbler_error(bumbler_ACTOR_NOT_FOUND, msg->get_target().actor_name);
-    }
-    //throw new actor_not_found(message.target.actor_name);
+
+    throw new actor_not_found(msg->get_target().actor_name);
 }
 
 int actor_system::ask_actor(std::unique_ptr<message> msg, const std::function<void(boost::any)>& response_fn) {
-    if (stopped_.load()) return bumbler_error(ACTOR_SYSTEM_STOPPED, system_name_);
+    if (stopped_.load()) throw new actor_system_stopped(system_name());
 
     if (msg->get_target().system_name.compare(system_name_) != 0)
-        return bumbler_error(bumbler_WRONG_ACTOR_SYSTEM, msg->get_target().system_name);
+        throw new wrong_actor_system(msg->get_target().system_name);
 
     std::lock_guard<std::mutex> guard(actors_read_mutex_);
 
@@ -135,10 +132,8 @@ int actor_system::ask_actor(std::unique_ptr<message> msg, const std::function<vo
         actors_[actor_name]->pass_message(std::move(msg), false);
         return 0;
     }
-    else {
-        return bumbler_error(bumbler_ACTOR_NOT_FOUND, msg->get_target().actor_name);
-    }
-    //throw new actor_not_found(message.target.actor_name);
+
+    throw new actor_not_found(msg->get_target().actor_name);
 }
 
 const actor_ref actor_system::get_actor_ref(std::string actor_name) {
@@ -186,7 +181,7 @@ void actor_system::receive(std::unique_ptr<packet> packet, boost::asio::ip::udp:
     return;
 }
 
-const std::string actor_system::get_next_temporary_actor_name() const {
+std::string actor_system::get_next_temporary_actor_name() const {
     std::string temp_name = "temp/a";
 
     while(actors_.find(temp_name) != actors_.end()) {
@@ -202,11 +197,12 @@ const std::string actor_system::get_next_temporary_actor_name() const {
 }
 
 int actor_system::add_actor(std::unique_ptr<abstract_actor> actor) {
-    if (stopped_) return bumbler_error(ACTOR_SYSTEM_STOPPED, system_name_);
+    if (stopped_.load()) throw new actor_system_stopped(system_name());
+
     std::lock_guard<std::mutex> guard(actors_write_mutex_);
     auto search = actors_.find(actor->actor_name());
     if (search != actors_.end()) {
-        return bumbler_error(bumbler_ACTOR_ALREADY_EXISTS, actor->actor_name());
+        throw new actor_already_exists(actor->actor_name());
     }
 
     actors_.emplace(actor->actor_name(), std::move(actor));
