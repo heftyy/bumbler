@@ -3,7 +3,6 @@
 #include <memory>
 #include <boost/any.hpp>
 #include "../local_actor.h"
-#include "../remote_actor.h"
 #include "../promise_actor.h"
 #include "../routing/router.h"
 #include "../../utility.h"
@@ -52,16 +51,6 @@ public:
         return *this;
     }
 
-    typed_props& with_network_actor(const std::string network_actor_ref) {
-        return with_network_actor(actor_ref(network_actor_ref));
-    }
-
-    typed_props& with_network_actor(const actor_ref& network_actor_ref) {
-        network_actor_ref_ = network_actor_ref;
-        network_actor_ref_set_ = true;
-        return *this;
-    }
-
     virtual std::unique_ptr<abstract_actor> create_actor_instance(const std::shared_ptr<actor_system>& actor_system,
                                                                   const std::string name) override {
 		if(!get_mailbox_function_) {
@@ -88,17 +77,6 @@ private:
         auto pool = get_router_pool_function_();
         pool->template create_pool<local_actor>(actor_system, name, get_mailbox_function_, get_typed_actor_function_);
         actor->set_router_pool(std::move(pool));
-
-        return std::move(actor);
-    }
-
-    // remote actor instance
-    std::unique_ptr<abstract_actor> init_actor_instance(std::unique_ptr<remote_actor>&& actor,
-                                               const std::shared_ptr<actor_system>& actor_system,
-                                               const std::string name) const {
-		actor->set_mailbox(get_mailbox_function_());
-        actor->init(get_typed_actor_function_());
-        actor->set_network_actor_ref(network_actor_ref_);
 
         return std::move(actor);
     }

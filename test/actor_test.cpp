@@ -7,7 +7,6 @@
 #include <bumbler/actor_system/actor_system.h>
 #include <bumbler/actor/local_actor.h>
 #include "test_actor.h"
-#include "remote_test_actor.h"
 
 using namespace bumbler;
 
@@ -26,17 +25,12 @@ BOOST_AUTO_TEST_CASE(ActorInitTest) {
     auto system1 = actor_system::create_system("test_system1", 4555);
 
     auto props_local = typed_props<local_actor, test_actor>();
-    auto props_remote = typed_props<remote_actor, test_actor>();
-    props_remote.with_network_actor("test_actor1$test_system1@localhost:4555");
 
     auto la1 = system1->actor_of(props_local, "test_actor1");
-    auto ra1 = system1->actor_of(props_remote, "remote_test_actor1");
 
     auto from_system1 = system1->get_actor_ref("test_actor1");
-    auto from_system2 = system1->get_actor_ref("remote_test_actor1");
 
     BOOST_CHECK_EQUAL(from_system1.to_string(), la1.to_string());
-    BOOST_CHECK_EQUAL(from_system2.to_string(), ra1.to_string());
 
     system1->stop(false);
 }

@@ -4,10 +4,8 @@
 #include <map>
 #include <boost/test/unit_test.hpp>
 #include <bumbler/actor/props/typed_props.h>
-#include <bumbler/actor/routing/router.h>
 #include <bumbler/actor/routing/round_robin_pool.h>
 #include <bumbler/actor_system/actor_system.h>
-#include <bumbler/actor/remote_actor.h>
 #include "test_actor.h"
 
 using namespace bumbler;
@@ -34,23 +32,6 @@ BOOST_AUTO_TEST_CASE(PropsLocalActorTest) {
     system1->stop(true);
 
     BOOST_CHECK_EQUAL(test_actor::message_count.load(), 1);
-}
-
-BOOST_AUTO_TEST_CASE(PropsRemoteActorTest) {
-    using test_props = typed_props<remote_actor, test_actor>;
-
-    auto p = test_props();
-    p.with_mailbox<fifo_mailbox>().with_network_actor("actor2$test_system2@localhost:4556");
-
-    BOOST_CHECK_EQUAL(p.has_router(), false);
-    BOOST_CHECK_EQUAL(p.has_mailbox(), true);
-    BOOST_CHECK_EQUAL(p.has_network_actor(), true);
-
-    auto system1 = actor_system::create_system("test_system1", 4555);
-
-    actor_ref ref1 = system1->actor_of(p, "actor1");
-
-    system1->stop(true);
 }
 
 BOOST_AUTO_TEST_CASE(PropsRouterTest) {

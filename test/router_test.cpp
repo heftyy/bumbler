@@ -139,11 +139,9 @@ BOOST_AUTO_TEST_CASE(RouterRemoteTellAllTest) {
 
     auto r1 = system1->actor_of(p, "test_router1");
 
-    auto props_remote = typed_props<remote_actor, remote_test_actor>();
-    props_remote.with_network_actor("test_router1$test_system1@localhost:4555");
-    auto ra1 = system2->actor_of(props_remote, "remote_test_actor1");
+    auto ra1 = actor_ref("test_router1$test_system1@localhost:4555");
 
-    ra1.tell(broadcast < int > (123));
+    ra1.tell(broadcast<int>(123));
 
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
 

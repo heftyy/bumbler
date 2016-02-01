@@ -4,7 +4,6 @@
 #include <atomic>
 #include <bumbler/messages/commands/commands.h>
 #include <communication/message_settings.h>
-#include <bumbler/actor/remote_actor.h>
 
 using namespace bumbler;
 

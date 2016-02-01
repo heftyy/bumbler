@@ -22,8 +22,6 @@ set(bumbler_SOURCES
         actor/channels/local_actor_channel.h
         actor/channels/remote_actor_channel.cpp
         actor/channels/remote_actor_channel.h
-        actor/remote_actor.h
-        actor/remote_actor.cpp
         actor/local_actor.h
         actor/local_actor.cpp
         actor/promise_actor.h
