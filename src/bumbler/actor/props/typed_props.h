@@ -68,7 +68,6 @@ private:
     std::function<std::unique_ptr<untyped_actor>(void)> get_typed_actor_function_;
     std::function<std::unique_ptr<router_pool>(void)> get_router_pool_function_;
     std::function<std::unique_ptr<mailbox>(void)> get_mailbox_function_;
-    actor_ref network_actor_ref_;
 
     // router instance
     std::unique_ptr<abstract_actor> init_actor_instance(std::unique_ptr<router>&& actor,

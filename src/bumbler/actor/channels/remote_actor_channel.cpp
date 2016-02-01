@@ -17,7 +17,7 @@ void remote_actor_channel::tell_impl(std::unique_ptr<message> msg) {
 }
 
 void remote_actor_channel::ask_impl(std::unique_ptr<message> msg,
-                                             const std::function<void(boost::any)>& response_fn) {
+                                    const std::function<void(boost::any)>& response_fn) {
     auto target_system = get_actor_system(msg->get_sender());
     if (!target_system) {
         throw new server_doesnt_exist("can't send messages to remote actors w/o an active actor system");
