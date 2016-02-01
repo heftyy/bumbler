@@ -18,10 +18,6 @@ public:
     virtual void on_receive(boost::any data) = 0;
     virtual void on_error(boost::any data, std::exception ex) { BOOST_LOG_TRIVIAL(error) << "[UNTYPED_ACTOR] " << ex.what(); };
 
-    void set_reply_message_function(std::function<void(std::unique_ptr<message>)> func) {
-        this->send_reply_message_func_ = std::move(func);
-    }
-
     void set_sender(const actor_ref& sender) {
         this->sender_ = sender;
     }
@@ -42,11 +38,7 @@ protected:
             return;
         }
 
-        auto typed_msg = construct_reply_message(std::forward<T>(data));
-
-        if(send_reply_message_func_) {
-            send_reply_message_func_(std::move(typed_msg));
-        }
+        get_sender().tell(data);
     }
 
     template<typename T>
@@ -76,12 +68,6 @@ private:
     actor_ref sender_;
     actor_ref self_;
     std::function<void(std::unique_ptr<message>)> send_reply_message_func_;
-
-    template<typename T>
-    std::unique_ptr<message> construct_reply_message(T&& data) {
-        auto tm = typed_message_factory::create(get_sender(), get_self(), std::forward<T>(data));
-        return std::move(tm);
-    }
 };
 
 }

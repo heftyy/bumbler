@@ -99,8 +99,6 @@ private:
         if(this->mailbox_) this->mailbox_->clear();
     }
 
-    void send_reply_message(std::unique_ptr<message> msg) const;
-
 };
 
 }

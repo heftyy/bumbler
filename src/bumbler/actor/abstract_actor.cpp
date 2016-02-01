@@ -17,9 +17,6 @@ abstract_actor::~abstract_actor() {
 void abstract_actor::init(std::unique_ptr<untyped_actor> u_actor) {
     this->untyped_actor_ = std::move(u_actor);
     this->untyped_actor_->set_self(this->get_self());
-    this->untyped_actor_->set_reply_message_function([this] (std::unique_ptr<message> msg) {
-        this->send_reply_message(std::move(msg));
-    });
 }
 
 void abstract_actor::create_internal_queue_thread() {
@@ -51,42 +48,6 @@ std::string abstract_actor::actor_name() const {
 
 std::string abstract_actor::system_name() const {
     return actor_system_.lock()->system_name();
-}
-
-void abstract_actor::send_reply_message(std::unique_ptr<message> msg) const {
-    if (stop_flag_) return;
-
-    //actor is not none and local
-    if(!msg->get_target().is_none() && !msg->get_target().is_remote()) {
-        auto ac = actor_system_storage::instance().get_system(msg->get_target().system_name);
-
-        if(ac != nullptr) {
-	        auto actor_from_system = ac->get_actor_ref(msg->get_target().actor_name);
-            if(!actor_from_system.is_none()) {
-                ac->tell_actor(std::move(msg));
-                return;
-            }
-        }
-    }
-    //actor is remote
-    else if(!msg->get_target().is_none() && msg->get_target().is_remote()) {
-        try {
-	        auto ip = msg->get_target().ip;
-	        auto port = msg->get_target().port;
-
-            BOOST_LOG_TRIVIAL(debug) << "[ACTOR] replying to " << msg->get_target().to_string();
-	        auto p = packet(std::move(msg));
-
-            auto remote_actor_endpoint = boost::asio::ip::udp::endpoint(
-                    boost::asio::ip::address().from_string(ip), static_cast<unsigned short>(port)
-            );
-
-            actor_system_.lock()->get_server()->do_send(p.get_serialized(), remote_actor_endpoint);
-        }
-        catch(std::exception e) {
-            BOOST_LOG_TRIVIAL(error) << "[ACTOR] reply has failed: " << e.what();
-        }
-    }
 }
 
 void abstract_actor::pass_message(std::unique_ptr<message> msg, bool remote) {
