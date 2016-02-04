@@ -4,6 +4,11 @@
 
 namespace bumbler {
 
+bool remote_actor_channel::expired() {
+    //TODO: implement remote check alive mechanism
+    return false;
+}
+
 void remote_actor_channel::tell_impl(std::unique_ptr<message> msg) {
     auto target_system = get_actor_system(msg->get_sender());
     if (!target_system) {

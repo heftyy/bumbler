@@ -51,7 +51,7 @@ public:
         return *this;
     }
 
-    virtual std::unique_ptr<abstract_actor> create_actor_instance(const std::shared_ptr<actor_system>& actor_system,
+    virtual std::shared_ptr<abstract_actor> create_actor_instance(const std::shared_ptr<actor_system>& actor_system,
                                                                   const std::string name) override {
 		if(!get_mailbox_function_) {
 			get_mailbox_function_ = []() -> std::unique_ptr<mailbox> {
@@ -59,7 +59,7 @@ public:
 			};
 		}
 
-        return init_actor_instance(utility::make_unique<ActorType>(actor_system, name),
+        return init_actor_instance(std::make_shared<ActorType>(actor_system, name),
                                    actor_system,
                                    name);
     }
@@ -70,7 +70,7 @@ private:
     std::function<std::unique_ptr<mailbox>(void)> get_mailbox_function_;
 
     // router instance
-    std::unique_ptr<abstract_actor> init_actor_instance(std::unique_ptr<router>&& actor,
+    std::shared_ptr<abstract_actor> init_actor_instance(std::shared_ptr<router>&& actor,
                                                const std::shared_ptr<actor_system>& actor_system,
                                                const std::string name) const {
         auto pool = get_router_pool_function_();
@@ -81,7 +81,7 @@ private:
     }
 
     // promise actor instance
-    std::unique_ptr<abstract_actor> init_actor_instance(std::unique_ptr<promise_actor>&& actor,
+    std::shared_ptr<abstract_actor> init_actor_instance(std::shared_ptr<promise_actor>&& actor,
                                                const std::shared_ptr<actor_system>& actor_system,
                                                const std::string name) const {
         actor->init(get_typed_actor_function_());
@@ -89,7 +89,7 @@ private:
     }
 
     // local actor instance
-    std::unique_ptr<abstract_actor> init_actor_instance(std::unique_ptr<local_actor>&& actor,
+    std::shared_ptr<abstract_actor> init_actor_instance(std::shared_ptr<local_actor>&& actor,
                                                const std::shared_ptr<actor_system>& actor_system,
                                                const std::string name) const {
 		actor->set_mailbox(get_mailbox_function_());

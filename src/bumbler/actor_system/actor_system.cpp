@@ -94,7 +94,7 @@ int actor_system::stop_actor(std::string actor_name, bool wait) {
     throw new actor_not_found(actor_name);
 }
 
-int actor_system::tell_actor(std::unique_ptr<message> msg, bool from_remote) {
+int actor_system::tell_actor(std::unique_ptr<message> msg) {
     if (stopped_.load()) throw new actor_system_stopped(system_name());
 
     if (msg->get_target().system_name.compare(system_name_) != 0)
@@ -105,7 +105,7 @@ int actor_system::tell_actor(std::unique_ptr<message> msg, bool from_remote) {
 
     auto search = actors_.find(actor_name);
     if (search != actors_.end()) {
-        actors_[actor_name]->pass_message(std::move(msg), from_remote);
+        actors_[actor_name]->pass_message(std::move(msg));
         return 0;
     }
 
@@ -129,7 +129,7 @@ int actor_system::ask_actor(std::unique_ptr<message> msg, const std::function<vo
 
     auto search = actors_.find(actor_name);
     if (search != actors_.end()) {
-        actors_[actor_name]->pass_message(std::move(msg), false);
+        actors_[actor_name]->pass_message(std::move(msg));
         return 0;
     }
 
@@ -149,10 +149,17 @@ const actor_ref actor_system::get_actor_ref(std::string actor_name) {
     }
 }
 
-const local_actor_channel actor_system::get_actor_channel(std::string actor_name) {
+std::unique_ptr<actor_channel> actor_system::get_actor_channel(std::string actor_name) {
     if (stopped_) nullptr;
+    std::lock_guard<std::mutex> guard(actors_read_mutex_);
 
-    return local_actor_channel();
+    auto search = actors_.find(actor_name);
+    if (search != actors_.end()) {
+        auto actor_ptr = actors_[actor_name];
+        return utility::make_unique<local_actor_channel>(actor_ptr->get_self(), actor_ptr);
+    }
+
+    return nullptr;
 }
 
 void actor_system::receive(std::unique_ptr<packet> packet, boost::asio::ip::udp::endpoint& sender_endpoint) {
@@ -171,7 +178,7 @@ void actor_system::receive(std::unique_ptr<packet> packet, boost::asio::ip::udp:
         try {
             auto target_system = actor_system_storage::instance().get_system(msg->get_target().system_name);
             if(target_system != nullptr) {
-                target_system->tell_actor(std::move(msg), true);
+                target_system->tell_actor(std::move(msg));
             }
         }
         catch (std::runtime_error& e) {
@@ -196,7 +203,7 @@ std::string actor_system::get_next_temporary_actor_name() const {
     return temp_name;
 }
 
-int actor_system::add_actor(std::unique_ptr<abstract_actor> actor) {
+int actor_system::add_actor(std::shared_ptr<abstract_actor> actor) {
     if (stopped_.load()) throw new actor_system_stopped(system_name());
 
     std::lock_guard<std::mutex> guard(actors_write_mutex_);

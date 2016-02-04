@@ -24,7 +24,7 @@ public:
 protected:
     std::unique_ptr<router_pool> router_pool_;
 
-    virtual void tell(std::unique_ptr<message> msg, bool remote = false) override;
+    virtual void tell(std::unique_ptr<message> msg) override;
 };
 
 }

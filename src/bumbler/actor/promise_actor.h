@@ -12,7 +12,7 @@ public:
     }
 
 protected:
-    void tell(std::unique_ptr<message> msg, bool remote = false) override;
+    void tell(std::unique_ptr<message> msg) override;
 };
 
 }

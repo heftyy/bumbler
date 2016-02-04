@@ -38,6 +38,14 @@ BOOST_AUTO_TEST_CASE(ActorRefResolveTest) {
     ref1.resolve();
     BOOST_CHECK_EQUAL(ref1.is_resolved(), true);
 
+    system1->stop_actor("actor1");
+
+    BOOST_CHECK_EQUAL(ref1.is_resolved(), false);
+
+    auto ref2 = system1->actor_of(p, "actor1");
+    ref2.resolve();
+    BOOST_CHECK_EQUAL(ref2.is_resolved(), true);
+
     system1->stop(false);
 }
 

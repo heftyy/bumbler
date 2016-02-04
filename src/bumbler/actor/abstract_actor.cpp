@@ -50,7 +50,7 @@ std::string abstract_actor::system_name() const {
     return actor_system_.lock()->system_name();
 }
 
-void abstract_actor::pass_message(std::unique_ptr<message> msg, bool remote) {
+void abstract_actor::pass_message(std::unique_ptr<message> msg) {
     if(msg->is_kill_actor()) {
         this->actor_system_.lock()->stop_actor(this->actor_name_, false);
     }
@@ -58,7 +58,7 @@ void abstract_actor::pass_message(std::unique_ptr<message> msg, bool remote) {
         this->actor_system_.lock()->stop_actor(this->actor_name_, true);
     }
     else {
-        this->tell(std::move(msg), remote);
+        this->tell(std::move(msg));
     }
 }
 

@@ -37,6 +37,7 @@ public:
         return f;
     }
 
+    virtual bool expired() = 0;
     virtual ~abstract_channel() = default;
 
 protected:

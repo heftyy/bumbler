@@ -10,7 +10,7 @@
 
 using namespace bumbler;
 
-int ACTORS_TO_CREATE = 10000;
+int ACTORS_TO_CREATE = 1000;
 
 BOOST_AUTO_TEST_SUITE(actor_benchmark)
 

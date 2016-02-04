@@ -8,7 +8,7 @@ void local_actor::init(std::unique_ptr<untyped_actor> u_actor) {
     this->create_internal_queue_thread();
 }
 
-void local_actor::tell(std::unique_ptr<message> msg, bool remote) {
+void local_actor::tell(std::unique_ptr<message> msg) {
     add_message(std::move(msg));
 }
 

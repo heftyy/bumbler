@@ -4,11 +4,12 @@
 
 namespace bumbler {
 
+bool local_actor_channel::expired() {
+    return actor_ptr_.expired();
+}
+
 void local_actor_channel::tell_impl(std::unique_ptr<message> msg) {
-    auto target_system = actor_system_storage::instance().get_system(msg->get_target().system_name);
-    if (target_system != nullptr) {
-        target_system->tell_actor(std::move(msg));
-    }
+    actor_ptr_.lock()->pass_message(std::move(msg));
 }
 
 void local_actor_channel::ask_impl(std::unique_ptr<message> msg,
@@ -21,7 +22,7 @@ void local_actor_channel::ask_impl(std::unique_ptr<message> msg,
 
         msg->set_sender(p_actor);
 
-        target_system->tell_actor(std::move(msg));
+        actor_ptr_.lock()->pass_message(std::move(msg));
     }
 
 }

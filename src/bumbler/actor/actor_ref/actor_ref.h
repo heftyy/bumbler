@@ -70,14 +70,14 @@ public:
     template<typename T>
     void tell(T&& data, const actor_ref& sender = actor_ref::none()) {
         auto tm = typed_message_factory::create(*this, sender, std::forward<T>(data));
-        if(!channel_) resolve();
+        if(!channel_ || channel_->expired()) resolve();
 
         channel_->tell(std::move(tm));
     }
 
     template<typename T>
     void tell(const typed_message<T>& msg) {
-        if(!channel_) resolve();
+        if(!channel_ || channel_->expired()) resolve();
         channel_->tell(std::move(utility::make_unique<typed_message<T>>(std::move(msg))));
     }
 
@@ -89,7 +89,7 @@ public:
     template<typename Result, typename T>
     std::future<Result> ask(T && data) {
         auto tm = typed_message_factory::create(*this, none(), std::forward<T>(data));
-        if(!channel_) resolve();
+        if(!channel_ || channel_->expired()) resolve();
 
         return channel_->ask<Result>(std::move(tm));
     }
@@ -118,7 +118,7 @@ public:
     }
 
     bool is_resolved() const {
-        return channel_ != nullptr;
+        return channel_ != nullptr && !channel_->expired();
     }
 
     bool operator==(const actor_ref& ref) const {

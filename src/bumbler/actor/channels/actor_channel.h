@@ -12,7 +12,6 @@ protected:
 
     actor_channel(const actor_ref& target_actor_ref);
 
-private:
     std::unique_ptr<actor_ref> actor_ref_;
 };
 

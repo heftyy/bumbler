@@ -6,7 +6,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -lpthread")
 file(GLOB TEST_SRCS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.cpp)
 
 #Run through each source
-foreach(testSrc ${TEST_SRCS})
+foreach (testSrc ${TEST_SRCS})
     #Extract the filename without an extension (NAME_WE)
     get_filename_component(testName ${testSrc} NAME_WE)
 
@@ -18,11 +18,11 @@ foreach(testSrc ${TEST_SRCS})
 
     #I like to move testing binaries into a testBin directory
     set_target_properties(${testName} PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/testBin)
+            RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/testBin)
 
     #Finally add it to test execution -
     #Notice the WORKING_DIRECTORY and COMMAND
     add_test(NAME ${testName}
-             WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/testBin
-             COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/testBin/${testName} )
-endforeach(testSrc)
+            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/testBin
+            COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/testBin/${testName})
+endforeach (testSrc)

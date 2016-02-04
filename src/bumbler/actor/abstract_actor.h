@@ -37,7 +37,7 @@ public:
     virtual void stop_actor(bool wait = false);
 
     void read_messages();
-    void pass_message(std::unique_ptr<message> msg, bool remote = false);
+    void pass_message(std::unique_ptr<message> msg);
     void add_message(std::unique_ptr<message> msg);
 
     bool is_busy() const { return busy_; }
@@ -66,7 +66,7 @@ protected:
     std::condition_variable cv_;
     actor_ref self_;
 
-    virtual void tell(std::unique_ptr<message> msg, bool remote = false) = 0;
+    virtual void tell(std::unique_ptr<message> msg) = 0;
 
     virtual void on_receive(boost::any data) {
         this->untyped_actor_->on_receive(data);

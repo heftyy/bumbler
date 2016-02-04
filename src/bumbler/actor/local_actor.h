@@ -17,7 +17,7 @@ public:
     void init(std::unique_ptr<untyped_actor> u_actor) override;
 
 protected:
-    void tell(std::unique_ptr<message> msg, bool remote = false) override;
+    void tell(std::unique_ptr<message> msg) override;
 };
 
 }
