@@ -4,7 +4,7 @@ compiler:
   - gcc
 
 sudo: required
-dist: trusty
+dist: precise
 
 addons:
   apt:
@@ -14,7 +14,7 @@ addons:
     packages:
       - g++-5
       - gcc-5
-      - libboost1.55-dev
+      - libboost1.60-dev
 
 before_install:
   - if [ "$CXX" = "g++" ]; then export CXX="g++-5" CC="gcc-5"; fi
