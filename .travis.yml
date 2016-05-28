@@ -26,7 +26,7 @@ before_install:
     ln -s /usr/lib/x86_64-linux-gnu $BOOST_ROOT/stage/lib
     ln -s /usr/include/boost $BOOST_ROOT/boost
   - sudo updatedb
-  - sudo locate libboost_unit_test
+  - locate libboost_unit_test
 
 before_script:
   - mkdir build
