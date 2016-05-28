@@ -69,8 +69,7 @@ set(bumbler_SOURCES
         utility.cpp)
 
 if (${WIN32})
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-    add_definitions(-D_WIN32_WINNT=0x0501)
+    add_definitions(-D_WIN32_WINNT=0x0601)
     add_library(bumbler STATIC ${bumbler_SOURCES})
     target_link_libraries(bumbler ${Boost_LIBRARIES})
 ELSE ()
