@@ -9,12 +9,12 @@ dist: trusty
 addons:
   apt:
     sources:
-      - boost-latest
+      - debian-sid
       - ubuntu-toolchain-r-test
     packages:
       - g++-5
       - gcc-5
-      - libboost1.55-all-dev
+      - libboost1.60-all-dev
 
 before_install:
   - export BOOST_ROOT_DIR=
