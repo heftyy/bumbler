@@ -17,8 +17,16 @@ addons:
       - libboost1.55-dev
 
 before_install:
+  - export BOOST_ROOT_DIR=
   - if [ "$CXX" = "g++" ]; then export CXX="g++-5" CC="gcc-5"; fi
   - if [ "$CXX" = "clang++" ]; then export CXX="clang++-3.7" CC="clang-3.7"; fi
+  - | # Setup the BOOST_ROOT
+    export BOOST_ROOT=$HOME/boost_root
+    mkdir -p $BOOST_ROOT/stage
+    ln -s /usr/lib/x86_64-linux-gnu $BOOST_ROOT/stage/lib
+    ln -s /usr/include/boost $BOOST_ROOT/boost
+  - sudo updatedb
+  - sudo locate libboost | grep /lib | grep -e ".a$"
 
 before_script:
   - mkdir build
@@ -27,3 +35,6 @@ before_script:
 
 script:
   - make && ctest
+
+notifications:
+  email: false
