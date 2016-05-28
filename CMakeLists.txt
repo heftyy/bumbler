@@ -20,7 +20,7 @@ if(${WIN32})
   SET(Boost_USE_MULTITHREADED     ON)
   SET(Boost_USE_STATIC_RUNTIME    OFF)
 
-  find_package(Boost 1.55 COMPONENTS atomic system thread chrono date_time regex filesystem log log_setup serialization unit_test_framework REQUIRED)
+  find_package(Boost 1.60 COMPONENTS atomic system thread chrono date_time regex filesystem log log_setup serialization unit_test_framework REQUIRED)
   find_library(ws2_32_LIBRARY_PATH ws2_32)
 ELSE()
   #linux
@@ -30,7 +30,7 @@ ELSE()
   SET(Boost_USE_STATIC_RUNTIME  OFF)
   #set(Boost_USE_STATIC_LIBS    ON)
   set(Boost_USE_MULTITHREADED   ON)
-  find_package(Boost 1.55 COMPONENTS system thread chrono date_time regex filesystem log log_setup serialization unit_test_framework REQUIRED)
+  find_package(Boost 1.60 COMPONENTS system thread chrono date_time regex filesystem log log_setup serialization unit_test_framework REQUIRED)
 ENDIF()
 
 include_directories(src)
