@@ -9,12 +9,12 @@ dist: trusty
 addons:
   apt:
     sources:
-      - boost-latest
+      - debian-sid
       - ubuntu-toolchain-r-test
     packages:
       - g++-5
       - gcc-5
-      - libboost1.55-dev
+      - libboost1.60-all-dev
 
 before_install:
   - export BOOST_ROOT_DIR=
@@ -25,8 +25,6 @@ before_install:
     mkdir -p $BOOST_ROOT/stage
     ln -s /usr/lib/x86_64-linux-gnu $BOOST_ROOT/stage/lib
     ln -s /usr/include/boost $BOOST_ROOT/boost
-  - sudo updatedb
-  - sudo locate libboost_unit_test
 
 before_script:
   - mkdir build
