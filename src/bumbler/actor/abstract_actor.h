@@ -25,7 +25,7 @@ class actor_system;
 
 class abstract_actor {
 public:
-    abstract_actor(const std::shared_ptr<actor_system>& actor_system, const std::string name);
+    abstract_actor(const std::shared_ptr<actor_system>& actor_system, const std::string& name);
 
     abstract_actor(abstract_actor && rhs) = delete;
     abstract_actor(const abstract_actor & rhs) = delete;
@@ -34,11 +34,11 @@ public:
     virtual ~abstract_actor();
 
     virtual void init(std::unique_ptr<untyped_actor> u_actor);
-    virtual void stop_actor(bool wait = false);
+    virtual void stop_actor(bool wait = false) = 0;
 
-    void read_messages();
+    virtual void tell(std::unique_ptr<message> msg) = 0;
+
     void pass_message(std::unique_ptr<message> msg);
-    void add_message(std::unique_ptr<message> msg);
 
     bool is_busy() const { return busy_; }
     size_t mailbox_size() const { return this->mailbox_->size(); }
@@ -55,18 +55,13 @@ public:
     }
 
 protected:
-    std::mutex actor_thread_mutex_;
-    std::future<void> queue_thread_future_;
     std::unique_ptr<untyped_actor> untyped_actor_;
     std::unique_ptr<mailbox> mailbox_;
     std::atomic<bool> busy_;
     std::atomic<bool> stop_flag_;
     std::string actor_name_;
     std::weak_ptr<actor_system> actor_system_;
-    std::condition_variable cv_;
     actor_ref self_;
-
-    virtual void tell(std::unique_ptr<message> msg) = 0;
 
     virtual void on_receive(boost::any data) {
         this->untyped_actor_->on_receive(data);
@@ -76,9 +71,6 @@ protected:
         this->untyped_actor_->on_error(data, ex);
     }
 
-    void create_internal_queue_thread();
-
-private:
     void run_task(const actor_ref& sender, const boost::any& data) {
         busy_ = true;
         BOOST_LOG_TRIVIAL(debug) << "[ACTOR] starting new task";

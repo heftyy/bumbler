@@ -7,7 +7,6 @@
 #include <bumbler/actor/mailbox/fifo_mailbox.h>
 #include <bumbler/actor/local_actor.h>
 #include <bumbler/actor_system/actor_system.h>
-#include <bumbler/utility.h>
 #include "test_actor.h"
 
 using namespace bumbler;
@@ -18,7 +17,7 @@ using priorityMsg = priority_message<int>;
 BOOST_AUTO_TEST_SUITE(mailbox_test_suite)
 
 BOOST_AUTO_TEST_CASE(StandardMailboxTest) {
-    std::unique_ptr<mailbox> mailbox = utility::make_unique<fifo_mailbox>();
+    std::unique_ptr<mailbox> mailbox = std::make_unique<fifo_mailbox>();
 
     auto tm = typed_message_factory::create(actor_ref::none(), actor_ref::none(), 5);
 
@@ -33,7 +32,7 @@ BOOST_AUTO_TEST_CASE(StandardMailboxTest) {
 }
 
 BOOST_AUTO_TEST_CASE(PriorityMailboxTest) {
-    std::unique_ptr<mailbox> mailbox = utility::make_unique<priority_mailbox>();
+    std::unique_ptr<mailbox> mailbox = std::make_unique<priority_mailbox>();
 
     // add one message without a priority set ( uses default 0 )
     auto tm = typed_message_factory::create(actor_ref::none(), actor_ref::none(), 4);

@@ -11,11 +11,6 @@ namespace utility {
 
     std::string format_time(boost::posix_time::ptime time);
 
-    template<typename T, typename... Args>
-    std::unique_ptr<T> make_unique(Args&&... args) {
-        return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
-    }
-
     template <typename To, typename From, typename Deleter>
     std::unique_ptr<To, Deleter> dynamic_unique_cast(std::unique_ptr<From, Deleter>&& p) {
         if (To* cast = dynamic_cast<To*>(p.get()))

@@ -22,7 +22,7 @@ void local_actor_channel::ask_impl(std::unique_ptr<message> msg,
 
         msg->set_sender(p_actor);
 
-        actor_ptr_.lock()->pass_message(std::move(msg));
+        actor_ptr_.lock()->tell(std::move(msg));
     }
 
 }

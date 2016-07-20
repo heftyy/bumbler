@@ -3,6 +3,10 @@
 
 namespace bumbler {
 
+void promise_actor::stop_actor(bool wait) {
+
+}
+
 void promise_actor::tell(std::unique_ptr<message> msg) {
     on_receive(msg->get_data());
 

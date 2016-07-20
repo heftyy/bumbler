@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <sstream>
+#include <memory>
 #include <boost/serialization/serialization.hpp>
 #include <boost/serialization/type_info_implementation.hpp>
 #include <boost/serialization/unique_ptr.hpp>
@@ -35,8 +36,8 @@ public:
     typed_message(const typed_message& rhs) : message(rhs) {
         std::cout << "typed_message copy ctor\n";
         this->data = rhs.data;
-        this->target = utility::make_unique<actor_ref>(*rhs.target);
-        this->sender = utility::make_unique<actor_ref>(*rhs.sender);
+        this->target = std::make_unique<actor_ref>(*rhs.target);
+        this->sender = std::make_unique<actor_ref>(*rhs.sender);
         this->message_type_ = rhs.message_type_;
         this->priority = rhs.priority;
     }
@@ -44,8 +45,8 @@ public:
 	typed_message& operator=(const typed_message& rhs) {
 		std::cout << "typed_message assign ctor\n";
 		this->data = rhs.data;
-		this->target = utility::make_unique<actor_ref>(*rhs.target);
-		this->sender = utility::make_unique<actor_ref>(*rhs.sender);
+		this->target = std::make_unique<actor_ref>(*rhs.target);
+		this->sender = std::make_unique<actor_ref>(*rhs.sender);
 		this->message_type_ = rhs.message_type_;
         this->priority = rhs.priority;
 		return *this;
@@ -56,8 +57,8 @@ public:
                   const T& data, message_type msg_type = message_type::regular,
                   int priority = 0) {
         this->data = data;
-        this->target = utility::make_unique<actor_ref>(target);
-        this->sender = utility::make_unique<actor_ref>(sender);
+        this->target = std::make_unique<actor_ref>(target);
+        this->sender = std::make_unique<actor_ref>(sender);
         this->message_type_ = msg_type;
         this->priority = priority;
     }
@@ -103,11 +104,11 @@ public:
     }
 
     void set_sender(const actor_ref& sender) override {
-        this->sender = utility::make_unique<actor_ref>(sender);
+        this->sender = std::make_unique<actor_ref>(sender);
     }
 
     void set_target(const actor_ref& target) override {
-        this->target = utility::make_unique<actor_ref>(target);
+        this->target = std::make_unique<actor_ref>(target);
     }
 
     std::unique_ptr<message> clone() const override {
@@ -137,27 +138,27 @@ class typed_message_factory {
 public:
     template<typename T>
     static auto create(const actor_ref& target, const actor_ref& sender, const T& data) -> std::unique_ptr<typed_message<T>> {
-        return utility::make_unique<typed_message<T>>(target, sender, data);
+        return std::make_unique<typed_message<T>>(target, sender, data);
     }
 
     template<typename T>
     static auto create(const actor_ref& target, const actor_ref& sender, const broadcast<T>& cmd) -> std::unique_ptr<typed_message<T>> {
-        return utility::make_unique<typed_message<T>>(target, sender, cmd.data, message_type::broadcast);
+        return std::make_unique<typed_message<T>>(target, sender, cmd.data, message_type::broadcast);
     }
 
     template<typename T>
     static auto create(const actor_ref& target, const actor_ref& sender, const stop_actor<T>& cmd) -> std::unique_ptr<typed_message<T>> {
-        return utility::make_unique<typed_message<T>>(target, sender, cmd.data, message_type::stop_actor);
+        return std::make_unique<typed_message<T>>(target, sender, cmd.data, message_type::stop_actor);
     }
 
     template<typename T>
     static auto create(const actor_ref& target, const actor_ref& sender, const kill_actor<T>& cmd) -> std::unique_ptr<typed_message<T>> {
-        return utility::make_unique<typed_message<T>>(target, sender, cmd.data, message_type::kill_actor);
+        return std::make_unique<typed_message<T>>(target, sender, cmd.data, message_type::kill_actor);
     }
 
     template<typename T>
     static auto create(const actor_ref& target, const actor_ref& sender, const priority_message<T>& cmd) -> std::unique_ptr<typed_message<T>> {
-        return utility::make_unique<typed_message<T>>(target, sender, cmd.data, message_type::priority_message, cmd.priority);
+        return std::make_unique<typed_message<T>>(target, sender, cmd.data, message_type::priority_message, cmd.priority);
     }
 };
 

@@ -23,7 +23,7 @@ public:
         );
 
         get_typed_actor_function_ = [args...]() -> std::unique_ptr<untyped_actor> {
-            return utility::make_unique<TypedActor>(std::forward<Args>(args)...);
+            return std::make_unique<TypedActor>(std::forward<Args>(args)...);
         };
     }
 
@@ -36,7 +36,7 @@ public:
     template<typename RouterPool, typename ...RouterPoolArgs>
     typed_props& with_router(RouterPoolArgs&&... pool_args) {
         get_router_pool_function_ = [pool_args...]() -> std::unique_ptr<router_pool> {
-            return utility::make_unique<RouterPool>(pool_args...);
+            return std::make_unique<RouterPool>(pool_args...);
         };
         router_pool_set_ = true;
         return *this;
@@ -45,7 +45,7 @@ public:
     template<typename Mailbox, typename ...MailboxArgs>
     typed_props& with_mailbox(MailboxArgs&&... mailbox_args) {
         get_mailbox_function_ = [mailbox_args...]() -> std::unique_ptr<mailbox> {
-            return utility::make_unique<Mailbox>(mailbox_args...);
+            return std::make_unique<Mailbox>(mailbox_args...);
         };
         mailbox_set_ = true;
         return *this;
@@ -55,7 +55,7 @@ public:
                                                                   const std::string name) override {
 		if(!get_mailbox_function_) {
 			get_mailbox_function_ = []() -> std::unique_ptr<mailbox> {
-				return utility::make_unique<DefaultMailbox>();
+				return std::make_unique<DefaultMailbox>();
 			};
 		}
 

@@ -15,7 +15,7 @@ void smallest_mailbox_pool::tell_one(std::unique_ptr<message> msg) {
         }
     }
 
-    this->routees_[actor_number]->add_message(std::move(msg));
+    this->routees_[actor_number]->pass_message(std::move(msg));
 }
 
 }

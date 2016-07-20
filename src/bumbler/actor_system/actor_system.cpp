@@ -5,7 +5,7 @@ namespace bumbler {
 void actor_system::init() {
     actor_system_storage::instance().add_system(shared_from_this());
 
-    work_ = utility::make_unique<boost::asio::io_service::work>(io_service_);
+    work_ = std::make_unique<boost::asio::io_service::work>(io_service_);
 
     server_ = std::make_shared<udp_server>(io_service_, port_);
     server_->send_completed_function = [&]() { send_completed(); };
@@ -80,7 +80,7 @@ std::shared_ptr<actor_system> actor_system::create_system(const std::string& nam
     return system;
 }
 
-int actor_system::stop_actor(std::string actor_name, bool wait) {
+int actor_system::stop_actor(const std::string& actor_name, bool wait) {
     if (stopped_.load()) throw new actor_system_stopped(system_name());
     std::lock_guard<std::mutex> guard(actors_write_mutex_);
 
@@ -136,7 +136,7 @@ int actor_system::ask_actor(std::unique_ptr<message> msg, const std::function<vo
     throw new actor_not_found(msg->get_target().actor_name);
 }
 
-const actor_ref actor_system::get_actor_ref(std::string actor_name) {
+const actor_ref actor_system::get_actor_ref(const std::string& actor_name) {
     if (stopped_) nullptr;
     std::lock_guard<std::mutex> guard(actors_read_mutex_);
 
@@ -149,20 +149,20 @@ const actor_ref actor_system::get_actor_ref(std::string actor_name) {
     }
 }
 
-std::unique_ptr<actor_channel> actor_system::get_actor_channel(std::string actor_name) {
+std::unique_ptr<actor_channel> actor_system::get_actor_channel(const std::string& actor_name) {
     if (stopped_) nullptr;
     std::lock_guard<std::mutex> guard(actors_read_mutex_);
 
     auto search = actors_.find(actor_name);
     if (search != actors_.end()) {
         auto actor_ptr = actors_[actor_name];
-        return utility::make_unique<local_actor_channel>(actor_ptr->get_self(), actor_ptr);
+        return std::make_unique<local_actor_channel>(actor_ptr->get_self(), actor_ptr);
     }
 
     return nullptr;
 }
 
-void actor_system::receive(std::unique_ptr<packet> packet, boost::asio::ip::udp::endpoint& sender_endpoint) {
+void actor_system::receive(std::unique_ptr<packet> packet, const boost::asio::ip::udp::endpoint& sender_endpoint) {
     std::stringstream ss(packet->data.data);
     boost::archive::text_iarchive ia(ss);
 

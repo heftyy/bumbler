@@ -84,7 +84,6 @@ public:
     }
 
 private:
-	std::mutex cancellable_vector_mutex_;
     std::shared_ptr<dispatcher> dispatcher_;
 
 };

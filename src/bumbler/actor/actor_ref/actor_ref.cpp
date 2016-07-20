@@ -22,7 +22,7 @@ void actor_ref::kill() {
 
 void actor_ref::resolve() {
     if(is_remote()) {
-        channel_ = utility::make_unique<remote_actor_channel>(*this);
+        channel_ = std::make_unique<remote_actor_channel>(*this);
     } else {
         channel_ = actor_system_storage::instance().get_system(system_name)->get_actor_channel(actor_name);
     }

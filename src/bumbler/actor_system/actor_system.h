@@ -38,13 +38,13 @@ public:
      */
     void stop(bool wait = false);
 
-    int stop_actor(std::string actor_name, bool wait = false);
+    int stop_actor(const std::string& actor_name, bool wait = false);
 
     int tell_actor(std::unique_ptr<message> msg);
     int ask_actor(std::unique_ptr<message> msg, const std::function<void(boost::any)>& response_fn);
 
-    const actor_ref get_actor_ref(std::string actor_name);
-    std::unique_ptr<actor_channel> get_actor_channel(std::string actor_name);
+    const actor_ref get_actor_ref(const std::string& actor_name);
+    std::unique_ptr<actor_channel> get_actor_channel(const std::string& actor_name);
 
     /*
      * generate a new name for a temporary actor
@@ -134,7 +134,7 @@ private:
     /*
      * callback used by the udp server when a message is received
      */
-    void receive(std::unique_ptr<packet> packet, boost::asio::ip::udp::endpoint& sender_endpoint);
+    void receive(std::unique_ptr<packet> packet, const boost::asio::ip::udp::endpoint& sender_endpoint);
 };
 
 //workaround for std::make_shared and protected constructor

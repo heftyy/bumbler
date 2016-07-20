@@ -14,7 +14,7 @@
 using namespace bumbler;
 
 //int MESSAGES_TO_SEND = 5 * 1000 * 1000;
-int MESSAGES_TO_SEND = 100 * 1000;
+int MESSAGES_TO_SEND = 1000 * 1000;
 
 BOOST_AUTO_TEST_SUITE(messages_benchmark)
 
@@ -38,7 +38,7 @@ BOOST_AUTO_TEST_CASE(MessagesActorBenchmark) {
 
     auto end = std::chrono::steady_clock::now();
 
-    std::cout << "local_actor " << std::chrono::duration <double, std::milli> (end - start).count() << " ms" << std::endl;
+    std::cout << "local_actor " << std::chrono::duration <double, std::milli> (end - start).count() << " ms, " << MESSAGES_TO_SEND << " messages" << std::endl;
 
     BOOST_CHECK_EQUAL(MESSAGES_TO_SEND, benchmark_actor::message_count.load());
 }
@@ -48,11 +48,12 @@ BOOST_AUTO_TEST_CASE(MessagesRouterBenchmark) {
     boost::log::core::get()->set_filter(
             boost::log::trivial::severity >= boost::log::trivial::info);
     benchmark_actor::message_count = 0;
+    int router_size = 5;
 
-    auto system1 = actor_system::create_system("test_system1", 4555, 10);
+    auto system1 = actor_system::create_system("test_system1", 4555, router_size);
 
     auto props_router = typed_props<router, benchmark_actor>();
-    props_router.with_router<round_robin_pool>(10);
+    props_router.with_router<round_robin_pool>(router_size);
 
     auto r1 = system1->actor_of(props_router, "benchmark_actor");
 
@@ -66,7 +67,7 @@ BOOST_AUTO_TEST_CASE(MessagesRouterBenchmark) {
 
     auto end = std::chrono::steady_clock::now();
 
-    std::cout << "router(5)   " << std::chrono::duration <double, std::milli> (end - start).count() << " ms" << std::endl;
+    std::cout << "router(" << router_size << ")   " << std::chrono::duration <double, std::milli> (end - start).count() << " ms, " << MESSAGES_TO_SEND << " messages" << std::endl;
 
     BOOST_CHECK_EQUAL(MESSAGES_TO_SEND, benchmark_actor::message_count.load());
 }

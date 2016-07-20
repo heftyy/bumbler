@@ -5,7 +5,6 @@
 #include <boost/test/unit_test.hpp>
 #include <bumbler/messages/typed_message.h>
 #include <bumbler/actor/actor_ref/actor_ref.h>
-#include <bumbler/utility.h>
 
 using namespace bumbler;
 

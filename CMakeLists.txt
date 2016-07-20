@@ -3,7 +3,7 @@ project(bumbler)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/modules/")
 
-set(CMAKE_BUILD_TYPE Debug)
+#set(CMAKE_BUILD_TYPE Debug)
 set(Boost_DEBUG 1)
 
 include_directories(${BOOST_ROOT})
@@ -24,9 +24,11 @@ if(${WIN32})
   find_library(ws2_32_LIBRARY_PATH ws2_32)
 ELSE()
   #linux
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -lpthread")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lpthread")
 
+  add_definitions(-std=c++14)
   add_definitions(-DBOOST_ALL_DYN_LINK)
+
   SET(Boost_USE_STATIC_RUNTIME  OFF)
   #set(Boost_USE_STATIC_LIBS    ON)
   set(Boost_USE_MULTITHREADED   ON)

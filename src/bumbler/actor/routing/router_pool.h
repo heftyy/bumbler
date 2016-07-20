@@ -80,7 +80,7 @@ protected:
         for(int i = 0; i < this->routees_.size(); i++) {
             auto msg_copy = std::move(msg->clone());
 
-            routees_[i]->add_message(std::move(msg_copy));
+            routees_[i]->pass_message(std::move(msg_copy));
         }
     }
 };

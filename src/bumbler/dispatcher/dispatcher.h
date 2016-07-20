@@ -8,7 +8,7 @@ namespace bumbler {
 class dispatcher {
 public:
     dispatcher(int size) {
-        this->thread_pool_ = utility::make_unique<thread_pool>(size);
+        this->thread_pool_ = std::make_unique<thread_pool>(size);
     }
 
     ~dispatcher() {

@@ -27,6 +27,8 @@ protected:
 
         if(is_type<int>(data)) {
             int in = cast_message<int>(data);
+            in += 5;
+            x = in;
         }
     }
 };

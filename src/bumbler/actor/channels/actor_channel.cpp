@@ -4,6 +4,6 @@
 namespace bumbler {
 
 actor_channel::actor_channel(const actor_ref& target_actor_ref) :
-        actor_ref_(utility::make_unique<actor_ref>(target_actor_ref)) { }
+        actor_ref_(std::make_unique<actor_ref>(target_actor_ref)) { }
 
 }
