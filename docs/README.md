@@ -13,5 +13,6 @@ Basic concepts
 
 TODO
 ---
- * add namespaces
  * supervision strategy
+ * reduce number of threads
+ * reduce number of condition_variable.wait calls for messages send to local actors
