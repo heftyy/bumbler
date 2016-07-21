@@ -17,7 +17,7 @@ addons:
 before_install:
   - | 
     wget http://downloads.conan.io/latest_debian -O conan.deb
-    dpkg -i conan.deb
+    sudo dpkg -i conan.deb
   - export BOOST_ROOT_DIR=
   - if [ "$CXX" = "g++" ]; then export CXX="g++-5" CC="gcc-5"; fi
   - if [ "$CXX" = "clang++" ]; then export CXX="clang++-3.7" CC="clang-3.7"; fi
