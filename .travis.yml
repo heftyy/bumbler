@@ -13,12 +13,7 @@ addons:
     packages:
       - g++-5
       - gcc-5
-#      - libboost1.60-all-dev
-
-env:
-  - COMPILER=g++-5
-  - CXX=g++-5
-  - CC=gcc-5
+      - libboost1.60-all-dev
 
 before_install:
   - export BOOST_ROOT_DIR=
