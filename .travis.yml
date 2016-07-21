@@ -4,19 +4,20 @@ compiler:
   - gcc
 
 sudo: required
-dist: precise
+dist: trusty
 
 addons:
   apt:
     sources:
       - ubuntu-toolchain-r-test
-      - debian-sid
     packages:
       - g++-5
       - gcc-5
-      - libboost1.60-all-dev
 
 before_install:
+  - | 
+    wget http://downloads.conan.io/latest_debian -O conan.deb
+    dpkg -i conan.deb
   - export BOOST_ROOT_DIR=
   - if [ "$CXX" = "g++" ]; then export CXX="g++-5" CC="gcc-5"; fi
   - if [ "$CXX" = "clang++" ]; then export CXX="clang++-3.7" CC="clang-3.7"; fi
@@ -29,6 +30,7 @@ before_install:
 before_script:
   - mkdir build
   - cd build
+  - conan install ..
   - cmake ..
 
 script:
