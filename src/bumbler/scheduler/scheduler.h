@@ -4,8 +4,8 @@
 #include <mutex>
 #include <memory>
 #include <iostream>
-#include <bumbler/dispatcher/dispatcher.h>
 #include "cancellable.h"
+#include "../dispatcher/dispatcher.h"
 #include "../actor/actor_ref/actor_ref.h"
 #include "../utility.h"
 

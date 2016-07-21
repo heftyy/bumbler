@@ -6,8 +6,13 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/modules/")
 #set(CMAKE_BUILD_TYPE Debug)
 set(Boost_DEBUG 1)
 
+set(CMAKE_BINARY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/build")
+
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup()
+
+find_package(Boost 1.60 COMPONENTS system chrono date_time regex log log_setup serialization unit_test_framework REQUIRED)
+include_directories(${Boost_INCLUDE_DIRS})
 
 if(${WIN32})
   #windows
@@ -26,21 +31,18 @@ ELSE()
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lpthread")
 
   add_definitions(-std=c++14)
-  add_definitions(-DBOOST_ALL_DYN_LINK)
+  #add_definitions(-DBOOST_ALL_DYN_LINK)
 
-  SET(Boost_USE_STATIC_RUNTIME  OFF)
+  #SET(Boost_USE_STATIC_RUNTIME  OFF)
   #set(Boost_USE_STATIC_LIBS    ON)
-  set(Boost_USE_MULTITHREADED   ON)
+  #set(Boost_USE_MULTITHREADED   ON)
 ENDIF()
 
-find_package(Boost 1.60 COMPONENTS atomic system thread chrono date_time regex filesystem log log_setup serialization unit_test_framework REQUIRED)
-include_directories(${Boost_INCLUDE_DIRS})
-
-include_directories(src)
 add_subdirectory(src/bumbler)
 
 enable_testing()
 
+include_directories(src)
 include_directories(example/shared)
 add_subdirectory(example/shared)
 add_subdirectory(example/app)
