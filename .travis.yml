@@ -4,12 +4,13 @@ compiler:
   - gcc
 
 sudo: required
-dist: trusty
+dist: precise
 
 addons:
   apt:
     sources:
       - ubuntu-toolchain-r-test
+      - debian-sid
     packages:
       - g++-5
       - gcc-5
