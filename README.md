@@ -1,4 +1,4 @@
-# bumbler [![Build Status](https://travis-ci.org/heftyy/bumbler.svg?branch=channels)](https://travis-ci.org/heftyy/bumbler)
+# bumbler [![Build Status](https://travis-ci.org/heftyy/bumbler.svg?branch=master)](https://travis-ci.org/heftyy/bumbler)
 
 This project was created with intentions of learning c++11 and boost.
 I also wanted to write a message driven library for multithreading and networking after i used Akka for java.
