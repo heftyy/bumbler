@@ -60,13 +60,10 @@ void local_actor::read_messages() {
 
         if(msg == nullptr) return;
 
-        auto fun = [this] (const actor_ref& sender, const boost::any& data) -> int {
-            this->run_task(sender, data);
-            return 0;
-        };
-
         // run the task in the thread pool supplied by the dispatcher
-        auto future_result = this->actor_system_.lock()->get_dispatcher()->push(fun, msg->get_sender(), msg->get_data());
+        auto future_result = this->actor_system_.lock()->get_dispatcher()->push(dispatcher_fun_,
+                                                                                msg->get_sender(),
+                                                                                msg->get_data());
 
         // wait for the task to finish
         future_result.wait();
@@ -76,9 +73,24 @@ void local_actor::read_messages() {
 void local_actor::add_message(std::unique_ptr<message> msg) {
     if(this->stop_flag_) return;
 
-    BOOST_LOG_TRIVIAL(debug) << "[ACTOR] queueing new task";
+//    BOOST_LOG_TRIVIAL(debug) << "[ACTOR] queueing new task";
     this->mailbox_->push_message(std::move(msg));
     cv_.notify_one();
 }
 
+void local_actor::run_task(const actor_ref& sender, const boost::any& data) {
+    busy_ = true;
+//    BOOST_LOG_TRIVIAL(debug) << "[ACTOR] starting new task";
+    this->untyped_actor_->set_sender(sender);
+
+    try {
+        on_receive(data);
+    }
+    catch(const std::exception& ex) {
+        on_error(data, ex);
+    }
+
+    this->untyped_actor_->set_sender(actor_ref::none());
+    busy_ = false;
+}
 }

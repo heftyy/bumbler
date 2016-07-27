@@ -86,7 +86,7 @@ private:
                 cpoint_.wait(std::chrono::milliseconds(period));
             }
         } catch (...) {
-            BOOST_LOG_TRIVIAL(debug) << "thread canelled";
+            BOOST_LOG_TRIVIAL(debug) << "thread cancelled";
         }
     }
 

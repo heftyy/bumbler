@@ -20,7 +20,11 @@ namespace bumbler {
 BOOST_SERIALIZATION_ASSUME_ABSTRACT(message)
 
 enum class message_type {
-    regular, broadcast, stop_actor, kill_actor, priority_message
+    regular,
+    broadcast,
+    stop_actor,
+    kill_actor,
+    priority_message
 };
 
 template<typename T>
@@ -54,7 +58,8 @@ public:
 
     typed_message(const actor_ref& target,
                   const actor_ref& sender,
-                  const T& data, message_type msg_type = message_type::regular,
+                  const T& data,
+                  message_type msg_type = message_type::regular,
                   int priority = 0) {
         this->data = data;
         this->target = std::make_unique<actor_ref>(target);

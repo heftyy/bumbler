@@ -2,12 +2,9 @@
 
 #include <memory>
 #include <future>
-#include <chrono>
 #include <boost/test/unit_test.hpp>
 #include <bumbler/thread_pool/thread_pool.h>
 #include <bumbler/actor_system/actor_system.h>
-#include <bumbler/actor/local_actor.h>
-#include <bumbler/logger/logger.h>
 #include <bumbler/actor/routing/round_robin_pool.h>
 #include "benchmark_actor.h"
 
@@ -17,6 +14,25 @@ using namespace bumbler;
 int MESSAGES_TO_SEND = 100 * 1000;
 
 BOOST_AUTO_TEST_SUITE(messages_benchmark)
+
+BOOST_AUTO_TEST_CASE(LoopBenchmark) {
+    benchmark_actor::message_count = 0;
+
+    auto start = std::chrono::steady_clock::now();
+
+    int x = 5;
+
+    for (int i = 0; i < MESSAGES_TO_SEND; i++) {
+        benchmark_actor::message_count++;
+        x += 7 + 3;
+    }
+
+    auto end = std::chrono::steady_clock::now();
+
+    std::cout << "loop " << std::chrono::duration <double, std::milli> (end - start).count() << " ms, " << MESSAGES_TO_SEND << " messages" << x << std::endl;
+
+    BOOST_CHECK_EQUAL(MESSAGES_TO_SEND, benchmark_actor::message_count.load());
+}
 
 BOOST_AUTO_TEST_CASE(MessagesActorBenchmark) {
     boost::log::core::get()->set_filter(
@@ -42,7 +58,6 @@ BOOST_AUTO_TEST_CASE(MessagesActorBenchmark) {
 
     BOOST_CHECK_EQUAL(MESSAGES_TO_SEND, benchmark_actor::message_count.load());
 }
-
 
 BOOST_AUTO_TEST_CASE(MessagesRouterBenchmark) {
     boost::log::core::get()->set_filter(
@@ -71,5 +86,4 @@ BOOST_AUTO_TEST_CASE(MessagesRouterBenchmark) {
 
     BOOST_CHECK_EQUAL(MESSAGES_TO_SEND, benchmark_actor::message_count.load());
 }
-
 BOOST_AUTO_TEST_SUITE_END()

@@ -75,10 +75,9 @@ public:
         channel_->tell(std::move(tm));
     }
 
-    template<typename T>
-    void tell(const typed_message<T>& msg) {
+    void tell(std::unique_ptr<message> msg) {
         if(!channel_ || channel_->expired()) resolve();
-        channel_->tell(std::move(std::make_unique<typed_message<T>>(std::move(msg))));
+        channel_->tell(std::move(msg));
     }
 
     template<typename Result>

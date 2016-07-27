@@ -15,8 +15,8 @@ class untyped_actor {
 public:
 	virtual ~untyped_actor() { }
 
-    virtual void on_receive(boost::any data) = 0;
-    virtual void on_error(boost::any data, std::exception ex) { BOOST_LOG_TRIVIAL(error) << "[UNTYPED_ACTOR] " << ex.what(); };
+    virtual void on_receive(const boost::any& data) = 0;
+    virtual void on_error(const boost::any& data, std::exception ex) { BOOST_LOG_TRIVIAL(error) << "[UNTYPED_ACTOR] " << ex.what(); };
 
     void set_sender(const actor_ref& sender) {
         this->sender_ = sender;
@@ -42,7 +42,7 @@ protected:
     }
 
     template<typename T>
-    T cast_message(boost::any& data) {
+    T cast_message(const boost::any& data) {
         if(data.type().hash_code() == typeid(T).hash_code()) {
             return boost::any_cast<T>(data);
         }
@@ -52,7 +52,7 @@ protected:
     }
 
     template<typename T>
-    bool is_type(boost::any& data) {
+    bool is_type(const boost::any& data) {
         return data.type().hash_code() == typeid(T).hash_code();
     }
 
@@ -67,7 +67,6 @@ protected:
 private:
     actor_ref sender_;
     actor_ref self_;
-    std::function<void(std::unique_ptr<message>)> send_reply_message_func_;
 };
 
 }

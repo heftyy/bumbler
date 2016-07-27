@@ -22,7 +22,7 @@ public:
     }
 
 protected:
-    void on_receive(boost::any data) override {
+    void on_receive(const boost::any& data) override {
 	    ++message_count;
 
         if(is_type<int>(data)) {

@@ -16,11 +16,11 @@ foreach (testSrc ${TEST_SRCS})
 
     #I like to move testing binaries into a testBin directory
     set_target_properties(${testName} PROPERTIES
-            RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/testBin)
+            RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 
     #Finally add it to test execution -
     #Notice the WORKING_DIRECTORY and COMMAND
     add_test(NAME ${testName}
-            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/testBin
-            COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/testBin/${testName})
+            WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+            COMMAND ${CMAKE_CURRENT_BINARY_DIR}/${testName})
 endforeach (testSrc)

@@ -63,28 +63,12 @@ protected:
     std::weak_ptr<actor_system> actor_system_;
     actor_ref self_;
 
-    virtual void on_receive(boost::any data) {
+    virtual void on_receive(const boost::any& data) {
         this->untyped_actor_->on_receive(data);
     }
 
-    virtual void on_error(boost::any data, std::exception& ex) {
+    virtual void on_error(const boost::any& data, const std::exception& ex) {
         this->untyped_actor_->on_error(data, ex);
-    }
-
-    void run_task(const actor_ref& sender, const boost::any& data) {
-        busy_ = true;
-        BOOST_LOG_TRIVIAL(debug) << "[ACTOR] starting new task";
-        this->untyped_actor_->set_sender(sender);
-
-        try {
-            on_receive(data);
-        }
-        catch(std::exception ex) {
-            on_error(data, ex);
-        }
-
-        this->untyped_actor_->set_sender(actor_ref::none());
-        busy_ = false;
     }
 
     void clear_queue() {

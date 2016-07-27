@@ -9,7 +9,7 @@ public:
     typed_promise_actor(const std::function<void(boost::any)> &response_fn_) : response_fn_(response_fn_) { }
 
 protected:
-    void on_receive(boost::any data) {
+    void on_receive(const boost::any& data) {
         response_fn_(data);
     }
 

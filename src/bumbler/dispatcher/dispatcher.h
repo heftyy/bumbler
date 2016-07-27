@@ -20,12 +20,12 @@ public:
     }
 
     template<typename F, typename ...Rest>
-    auto push(F && f, Rest&&... rest) -> std::future<decltype(f(rest...))> {
+    auto push(F&& f, Rest&&... rest) -> std::future<decltype(f(rest...))> {
         return this->thread_pool_->push(std::forward<F>(f), std::forward<Rest>(rest)...);
     }
 
     template<typename F>
-    auto push(F && f) -> std::future<decltype(f())> {
+    auto push(F&& f) -> std::future<decltype(f())> {
         return this->thread_pool_->push(std::forward<F>(f));
     }
 

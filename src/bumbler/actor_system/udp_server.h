@@ -123,8 +123,6 @@ private:
                 boost::asio::buffer(data_, PACKET_MAX_LENGTH), sender_endpoint_,
                 [this](boost::system::error_code ec, std::size_t bytes_recvd) {
                     if (!ec && bytes_recvd > 0) {
-                        BOOST_LOG_TRIVIAL(debug) << "do_receive thread id = " << std::this_thread::get_id() <<
-                                                 " received bytes " << bytes_recvd;
                         std::string string_data(data_.begin(), data_.begin() + bytes_recvd * sizeof(char));
                         try {
 	                        auto received_packet = packet::parse(string_data);

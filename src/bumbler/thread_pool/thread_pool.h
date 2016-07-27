@@ -18,8 +18,10 @@ public:
     void stop(bool wait = false);
 
     template<typename F, typename... Rest>
-    auto push(F &&f, Rest &&... rest) -> std::future<decltype(f(rest...))> {
-        auto pck = std::make_shared<std::packaged_task<decltype(f(rest...))()>>(
+    auto push(F&& f, Rest&& ... rest) -> std::future<decltype(f(rest...))> {
+        using taskType = decltype(f(rest...))();
+
+        auto pck = std::make_shared<std::packaged_task<taskType>>(
                 std::bind(std::forward<F>(f), std::forward<Rest>(rest)...)
         );
 
@@ -27,21 +29,23 @@ public:
             // Suppress all exceptions.
             try {
                 (*pck)();
-            } catch(...) {}
+            } catch (...) { }
         });
 
         return pck->get_future();
     }
 
     template<typename F>
-    auto push(F && f) ->std::future<decltype(f())> {
-        auto pck = std::make_shared<std::packaged_task<decltype(f())()>>(std::forward<F>(f));
+    auto push(F&& f) -> std::future<decltype(f())> {
+        using taskType = decltype(f())();
+
+        auto pck = std::make_shared<std::packaged_task<taskType>>(std::forward<F>(f));
 
         io_service_.post([pck]() {
             // Suppress all exceptions.
             try {
                 (*pck)();
-            } catch(...) {}
+            } catch (...) { }
         });
 
         return pck->get_future();
