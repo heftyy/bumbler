@@ -67,7 +67,7 @@ set(bumbler_SOURCES
         logger/logger.cpp
         utility.h
         utility.cpp
-        bumbler.h)
+        internal/bumbler.h)
 
 if (${WIN32})
     add_library(bumbler STATIC ${bumbler_SOURCES})
