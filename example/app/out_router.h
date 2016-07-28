@@ -2,7 +2,6 @@
 
 #include <iostream>
 #include <atomic>
-#include <bumbler/actor/routing/round_robin_router.h>
 #include <bumbler/actor_system/actor_system.h>
 #include <communication/message_settings.h>
 
@@ -16,7 +15,7 @@ public:
     }
 
 protected:
-    void on_receive(boost::any data) {
+    void on_receive(const boost::any& data) {
         messages_++;
 
         BOOST_LOG_TRIVIAL(debug) << "[OUT_ROUTER] on_receive thread id = " << std::this_thread::get_id();
