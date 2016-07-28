@@ -28,9 +28,7 @@ public:
         ar & data;
     }
 
-    packet(packet_header& h, packet_data& d) {
-        header = h;
-        data = d;
+    packet(packet_header& h, packet_data& d) : header(h), data(d) {
     }
 
     packet(std::unique_ptr<message> msg) {
@@ -45,7 +43,6 @@ public:
         std::ostringstream archive_stream;
         boost::archive::text_oarchive out_archive(archive_stream);
         out_archive << *this;
-        std::string serialized_data;
         return archive_stream.str();
         //serialized_data = archive_stream.str();
         //return std::unique_ptr<std::vector<char>>(new std::vector<char>(serialized_data.begin(), serialized_data.end()));

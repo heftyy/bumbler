@@ -1,10 +1,12 @@
 #pragma once
 
-#include "../untyped_actor.h"
-#include "../routing/router_pool.h"
-#include "../mailbox/mailbox.h"
+#include <memory>
+#include <string>
 
 namespace bumbler {
+
+class actor_system;
+class abstract_actor;
 
 class props {
 public:
@@ -28,7 +30,7 @@ public:
     }
 
     virtual std::shared_ptr<abstract_actor> create_actor_instance(const std::shared_ptr<actor_system>& actor_system,
-                                                                  const std::string name) = 0;
+                                                                  const std::string& name) = 0;
 
 protected:
     bool router_pool_set_;

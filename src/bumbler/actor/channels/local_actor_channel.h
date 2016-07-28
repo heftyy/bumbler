@@ -23,7 +23,7 @@ private:
 
     virtual bool expired() override;
     virtual void tell_impl(std::unique_ptr<message> msg) override;
-    virtual void ask_impl(std::unique_ptr<message> msg, const std::function<void(boost::any)>& response_fn) override;
+    virtual void ask_impl(std::unique_ptr<message> msg, const ResponseFun& response_fun) override;
 };
 
 }

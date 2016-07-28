@@ -3,6 +3,7 @@
 #include <memory>
 #include <future>
 #include <boost/test/unit_test.hpp>
+#include <bumbler/actor/props/typed_props.h>
 #include <bumbler/thread_pool/thread_pool.h>
 #include <bumbler/actor_system/actor_system.h>
 #include <bumbler/actor/routing/round_robin_pool.h>
@@ -11,7 +12,7 @@
 using namespace bumbler;
 
 //int MESSAGES_TO_SEND = 5 * 1000 * 1000;
-int MESSAGES_TO_SEND = 100 * 1000;
+int MESSAGES_TO_SEND = 50 * 1000;
 
 BOOST_AUTO_TEST_SUITE(messages_benchmark)
 
@@ -29,7 +30,7 @@ BOOST_AUTO_TEST_CASE(LoopBenchmark) {
 
     auto end = std::chrono::steady_clock::now();
 
-    std::cout << "loop " << std::chrono::duration <double, std::milli> (end - start).count() << " ms, " << MESSAGES_TO_SEND << " messages" << x << std::endl;
+    std::cout << "loop " << std::chrono::duration<double, std::milli>(end - start).count() << " ms, " << MESSAGES_TO_SEND << " messages " << x << std::endl;
 
     BOOST_CHECK_EQUAL(MESSAGES_TO_SEND, benchmark_actor::message_count.load());
 }
@@ -54,7 +55,7 @@ BOOST_AUTO_TEST_CASE(MessagesActorBenchmark) {
 
     auto end = std::chrono::steady_clock::now();
 
-    std::cout << "local_actor " << std::chrono::duration <double, std::milli> (end - start).count() << " ms, " << MESSAGES_TO_SEND << " messages" << std::endl;
+    std::cout << "local_actor " << std::chrono::duration<double, std::milli>(end - start).count() << " ms, " << MESSAGES_TO_SEND << " messages" << std::endl;
 
     BOOST_CHECK_EQUAL(MESSAGES_TO_SEND, benchmark_actor::message_count.load());
 }
@@ -82,7 +83,7 @@ BOOST_AUTO_TEST_CASE(MessagesRouterBenchmark) {
 
     auto end = std::chrono::steady_clock::now();
 
-    std::cout << "router(" << router_size << ")   " << std::chrono::duration <double, std::milli> (end - start).count() << " ms, " << MESSAGES_TO_SEND << " messages" << std::endl;
+    std::cout << "router(" << router_size << ")   " << std::chrono::duration<double, std::milli>(end - start).count() << " ms, " << MESSAGES_TO_SEND << " messages" << std::endl;
 
     BOOST_CHECK_EQUAL(MESSAGES_TO_SEND, benchmark_actor::message_count.load());
 }

@@ -5,10 +5,7 @@
 #include <sstream>
 #include <future>
 #include "../channels/abstract_channel.h"
-#include "../../logger/logger.h"
 #include "../../messages/typed_message.h"
-#include "../../messages/commands/commands.h"
-#include "../../utility.h"
 
 namespace bumbler {
 
@@ -69,7 +66,7 @@ public:
 
     template<typename T>
     void tell(T&& data, const actor_ref& sender = actor_ref::none()) {
-        auto tm = typed_message_factory::create(*this, sender, std::forward<T>(data));
+        std::unique_ptr<message> tm = typed_message_factory::create(*this, sender, std::forward<T>(data));
         if(!channel_ || channel_->expired()) resolve();
 
         channel_->tell(std::move(tm));
@@ -87,7 +84,7 @@ public:
 
     template<typename Result, typename T>
     std::future<Result> ask(T && data) {
-        auto tm = typed_message_factory::create(*this, none(), std::forward<T>(data));
+        std::unique_ptr<message> tm = typed_message_factory::create(*this, none(), std::forward<T>(data));
         if(!channel_ || channel_->expired()) resolve();
 
         return channel_->ask<Result>(std::move(tm));

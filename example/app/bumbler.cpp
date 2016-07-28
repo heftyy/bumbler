@@ -1,7 +1,8 @@
 #include <boost/log/trivial.hpp>
 #include <bumbler/actor_system/actor_system.h>
-#include <communication/serializable_types.h>
+#include <bumbler/actor/props/typed_props.h>
 #include <bumbler/logger/logger.h>
+#include <communication/serializable_types.h>
 
 #include "out_actor.h"
 #include "remote_server_actor.h"

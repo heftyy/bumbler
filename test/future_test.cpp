@@ -1,6 +1,7 @@
 #define BOOST_TEST_MODULE FUTURE_TEST
 
 #include <boost/test/unit_test.hpp>
+#include <bumbler/actor/props/typed_props.h>
 #include <bumbler/actor_system/actor_system.h>
 #include <communication/serializable_types.h>
 #include <bumbler/actor/local_actor.h>

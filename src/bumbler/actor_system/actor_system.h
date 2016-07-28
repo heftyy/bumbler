@@ -6,21 +6,18 @@
 #include <memory>
 #include <chrono>
 #include <future>
-#include "udp_server.h"
-#include "actor_system_errors.h"
-#include "actor_system_storage.h"
-#include "typed_promise_actor.h"
+#include "../internal/bumbler.h"
 #include "../messages/typed_message.h"
-#include "../actor/channels/local_actor_channel.h"
-#include "../actor/abstract_actor.h"
-#include "../actor/promise_actor.h"
-#include "../packet/packet.h"
 #include "../scheduler/scheduler.h"
-#include "../scheduler/cancellable.h"
-#include "../dispatcher/dispatcher.h"
-#include "../actor/props/typed_props.h"
 
 namespace bumbler {
+
+class dispatcher;
+class udp_server;
+class actor_channel;
+class abstract_actor;
+class packet;
+class cancellable;
 
 class actor_system : public std::enable_shared_from_this<actor_system> {
 public:
@@ -41,7 +38,7 @@ public:
     int stop_actor(const std::string& actor_name, bool wait = false);
 
     int tell_actor(std::unique_ptr<message> msg);
-    int ask_actor(std::unique_ptr<message> msg, const std::function<void(boost::any)>& response_fn);
+    int ask_actor(std::unique_ptr<message> msg, const ResponseFun& response_fn);
 
     const actor_ref get_actor_ref(const std::string& actor_name);
     std::unique_ptr<actor_channel> get_actor_channel(const std::string& actor_name);
@@ -107,10 +104,7 @@ public:
     }
 
 protected:
-    actor_system(const std::string& name, int port, int thread_pool_size = 5) : port_(port), system_name_(name) {
-        dispatcher_ = std::make_shared<dispatcher>(thread_pool_size);
-        scheduler_ = std::make_shared<scheduler>(dispatcher_);
-    }
+    actor_system(const std::string& name, int port, int thread_pool_size = 5);
 
 private:
     int port_;

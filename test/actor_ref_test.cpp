@@ -4,6 +4,7 @@
 #include <future>
 #include <boost/test/unit_test.hpp>
 #include <bumbler/actor/local_actor.h>
+#include <bumbler/actor/props/typed_props.h>
 #include <bumbler/actor/actor_ref/actor_ref.h>
 #include <bumbler/actor_system/actor_system.h>
 #include "test_actor.h"

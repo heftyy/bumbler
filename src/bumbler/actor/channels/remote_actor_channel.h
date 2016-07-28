@@ -19,7 +19,7 @@ private:
 
     virtual bool expired() override;
     virtual void tell_impl(std::unique_ptr<message> msg) override;
-    virtual void ask_impl(std::unique_ptr<message> msg, const std::function<void(boost::any)>& response_fn) override;
+    virtual void ask_impl(std::unique_ptr<message> msg, const ResponseFun& response_fun) override;
 
     std::shared_ptr<actor_system> get_actor_system(const actor_ref& sender) const;
     boost::asio::ip::udp::endpoint get_remote_endpoint(const actor_ref& network_actor_ref) const;

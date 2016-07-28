@@ -5,6 +5,8 @@
 
 namespace bumbler {
 
+class message;
+
 class mailbox {
 public:
     virtual void push_message(std::unique_ptr<message> msg) = 0;

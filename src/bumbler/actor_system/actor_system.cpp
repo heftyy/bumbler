@@ -1,4 +1,14 @@
 #include "actor_system.h"
+#include "udp_server.h"
+#include "actor_system_errors.h"
+#include "actor_system_storage.h"
+#include "../dispatcher/dispatcher.h"
+#include "../actor/typed_promise_actor.h"
+#include "../actor/channels/local_actor_channel.h"
+#include "../actor/abstract_actor.h"
+#include "../actor/promise_actor.h"
+#include "../packet/packet.h"
+#include "../actor/props/typed_props.h"
 
 namespace bumbler {
 
@@ -66,8 +76,8 @@ void actor_system::stop(bool wait) {
     if (io_service_thread_->joinable()) io_service_thread_->join();
 
 #ifdef WIN32
-    //workaround for windows
-    //wait for the udp server to properly shutdown, otherwise it SIGSEGVs
+    // workaround for windows
+    // wait for the udp server to properly shutdown, otherwise it SIGSEGVs
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
 #endif
     server_.reset();
@@ -112,7 +122,7 @@ int actor_system::tell_actor(std::unique_ptr<message> msg) {
     throw new actor_not_found(msg->get_target().actor_name);
 }
 
-int actor_system::ask_actor(std::unique_ptr<message> msg, const std::function<void(boost::any)>& response_fn) {
+int actor_system::ask_actor(std::unique_ptr<message> msg, const ResponseFun& response_fn) {
     if (stopped_.load()) throw new actor_system_stopped(system_name());
 
     if (msg->get_target().system_name.compare(system_name_) != 0)
@@ -214,6 +224,12 @@ int actor_system::add_actor(std::shared_ptr<abstract_actor> actor) {
 
     actors_.emplace(actor->actor_name(), std::move(actor));
     return 0;
+}
+
+actor_system::actor_system(const std::string& name, int port, int thread_pool_size)
+        : port_(port), system_name_(name),
+          dispatcher_(std::make_shared<dispatcher>(thread_pool_size)) {
+    scheduler_ = std::make_shared<scheduler>(dispatcher_);
 }
 
 }

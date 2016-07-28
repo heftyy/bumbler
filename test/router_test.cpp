@@ -3,6 +3,7 @@
 #include <boost/test/unit_test.hpp>
 #include <bumbler/actor_system/actor_system.h>
 #include <communication/serializable_types.h>
+#include <bumbler/actor/props/typed_props.h>
 #include <bumbler/actor/routing/round_robin_pool.h>
 #include <bumbler/actor/routing/smallest_mailbox_pool.h>
 #include <bumbler/actor/routing/random_pool.h>

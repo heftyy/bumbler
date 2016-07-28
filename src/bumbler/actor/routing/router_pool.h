@@ -2,7 +2,6 @@
 
 #include <memory>
 #include <vector>
-#include "../untyped_actor.h"
 #include "../abstract_actor.h"
 #include "router_logic.h"
 

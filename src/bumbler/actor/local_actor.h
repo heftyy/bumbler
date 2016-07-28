@@ -11,13 +11,12 @@ class untyped_actor;
 class local_actor : public abstract_actor {
 public:
     local_actor(const std::shared_ptr<actor_system>& actor_system, const std::string& name) :
-            abstract_actor(actor_system, name)
-    {
-        dispatcher_fun_ = [this] (const actor_ref& sender, const boost::any& data) -> int {
-            this->run_task(sender, data);
-            return 0;
-        };
-    }
+            abstract_actor(actor_system, name),
+            dispatcher_fun_([this] (const actor_ref& sender, const boost::any& data) -> int {
+                this->run_task(sender, data);
+                return 0;
+            })
+    { }
 
     virtual ~local_actor();
 

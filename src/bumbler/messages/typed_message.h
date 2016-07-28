@@ -20,11 +20,11 @@ namespace bumbler {
 BOOST_SERIALIZATION_ASSUME_ABSTRACT(message)
 
 enum class message_type {
-    regular,
-    broadcast,
-    stop_actor,
-    kill_actor,
-    priority_message
+    REGULAR,
+    BROADCAST,
+    STOP_ACTOR,
+    KILL_ACTOR,
+    PRIORITY_MESSAGE
 };
 
 template<typename T>
@@ -59,7 +59,7 @@ public:
     typed_message(const actor_ref& target,
                   const actor_ref& sender,
                   const T& data,
-                  message_type msg_type = message_type::regular,
+                  message_type msg_type = message_type::REGULAR,
                   int priority = 0) {
         this->data = data;
         this->target = std::make_unique<actor_ref>(target);
@@ -81,19 +81,19 @@ public:
     }
 
     bool is_broadcast() const override {
-        return message_type_ == message_type::broadcast;
+        return message_type_ == message_type::BROADCAST;
     }
 
     bool is_stop_actor() const override {
-        return message_type_ == message_type::stop_actor;
+        return message_type_ == message_type::STOP_ACTOR;
     }
 
     bool is_kill_actor() const override {
-        return message_type_ == message_type::kill_actor;
+        return message_type_ == message_type::KILL_ACTOR;
     }
 
     bool is_priority_message() const override {
-        return message_type_ == message_type::priority_message;
+        return message_type_ == message_type::PRIORITY_MESSAGE;
     }
 
     boost::any get_data() const override {
@@ -125,7 +125,7 @@ public:
     }
 
 private:
-    message_type message_type_ = message_type::regular;
+    message_type message_type_ = message_type::REGULAR;
 
     friend class boost::serialization::access;
     template<class Archive>
@@ -148,22 +148,22 @@ public:
 
     template<typename T>
     static auto create(const actor_ref& target, const actor_ref& sender, const broadcast<T>& cmd) -> std::unique_ptr<typed_message<T>> {
-        return std::make_unique<typed_message<T>>(target, sender, cmd.data, message_type::broadcast);
+        return std::make_unique<typed_message<T>>(target, sender, cmd.data, message_type::BROADCAST);
     }
 
     template<typename T>
     static auto create(const actor_ref& target, const actor_ref& sender, const stop_actor<T>& cmd) -> std::unique_ptr<typed_message<T>> {
-        return std::make_unique<typed_message<T>>(target, sender, cmd.data, message_type::stop_actor);
+        return std::make_unique<typed_message<T>>(target, sender, cmd.data, message_type::STOP_ACTOR);
     }
 
     template<typename T>
     static auto create(const actor_ref& target, const actor_ref& sender, const kill_actor<T>& cmd) -> std::unique_ptr<typed_message<T>> {
-        return std::make_unique<typed_message<T>>(target, sender, cmd.data, message_type::kill_actor);
+        return std::make_unique<typed_message<T>>(target, sender, cmd.data, message_type::KILL_ACTOR);
     }
 
     template<typename T>
     static auto create(const actor_ref& target, const actor_ref& sender, const priority_message<T>& cmd) -> std::unique_ptr<typed_message<T>> {
-        return std::make_unique<typed_message<T>>(target, sender, cmd.data, message_type::priority_message, cmd.priority);
+        return std::make_unique<typed_message<T>>(target, sender, cmd.data, message_type::PRIORITY_MESSAGE, cmd.priority);
     }
 };
 

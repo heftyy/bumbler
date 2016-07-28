@@ -5,7 +5,6 @@
 #include "../local_actor.h"
 #include "../promise_actor.h"
 #include "../routing/router.h"
-#include "../../utility.h"
 #include "props.h"
 
 namespace bumbler {
@@ -52,7 +51,7 @@ public:
     }
 
     virtual std::shared_ptr<abstract_actor> create_actor_instance(const std::shared_ptr<actor_system>& actor_system,
-                                                                  const std::string name) override {
+                                                                  const std::string& name) override {
         if (!get_mailbox_function_) {
             get_mailbox_function_ = []() -> std::unique_ptr<mailbox> {
                 return std::make_unique<DefaultMailbox>();
@@ -71,10 +70,10 @@ private:
 
     // router instance
     std::shared_ptr<abstract_actor> init_actor_instance(std::shared_ptr<router>&& actor,
-                                                        const std::shared_ptr<actor_system>& actor_system,
-                                                        const std::string name) const {
+                                                        const std::shared_ptr<actor_system>& ac,
+                                                        const std::string& name) const {
         auto pool = get_router_pool_function_();
-        pool->template create_pool<local_actor>(actor_system, name, get_mailbox_function_, get_typed_actor_function_);
+        pool->template create_pool<local_actor>(ac, name, get_mailbox_function_, get_typed_actor_function_);
         actor->set_router_pool(std::move(pool));
 
         return std::move(actor);
@@ -82,16 +81,16 @@ private:
 
     // promise actor instance
     std::shared_ptr<abstract_actor> init_actor_instance(std::shared_ptr<promise_actor>&& actor,
-                                                        const std::shared_ptr<actor_system>& actor_system,
-                                                        const std::string name) const {
+                                                        const std::shared_ptr<actor_system>& ac,
+                                                        const std::string& name) const {
         actor->init(get_typed_actor_function_());
         return std::move(actor);
     }
 
     // local actor instance
     std::shared_ptr<abstract_actor> init_actor_instance(std::shared_ptr<local_actor>&& actor,
-                                                        const std::shared_ptr<actor_system>& actor_system,
-                                                        const std::string name) const {
+                                                        const std::shared_ptr<actor_system>& ac,
+                                                        const std::string& name) const {
         actor->set_mailbox(get_mailbox_function_());
         actor->init(get_typed_actor_function_());
 

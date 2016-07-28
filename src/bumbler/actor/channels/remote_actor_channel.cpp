@@ -1,5 +1,12 @@
 #include "remote_actor_channel.h"
 
+#include "../../packet/packet.h"
+#include "../../actor/props/typed_props.h"
+#include "../../actor/promise_actor.h"
+#include "../../actor/typed_promise_actor.h"
+#include "../../actor_system/udp_server.h"
+#include "../../actor_system/actor_system_storage.h"
+#include "../../actor_system/actor_system_errors.h"
 #include "../../actor_system/actor_system.h"
 
 namespace bumbler {
@@ -22,13 +29,13 @@ void remote_actor_channel::tell_impl(std::unique_ptr<message> msg) {
 }
 
 void remote_actor_channel::ask_impl(std::unique_ptr<message> msg,
-                                    const std::function<void(boost::any)>& response_fn) {
+                                    const ResponseFun& response_fun) {
     auto target_system = get_actor_system(msg->get_sender());
     if (!target_system) {
         throw new server_doesnt_exist("can't send messages to remote actors w/o an active actor system");
     }
 
-    auto response_promise_actor = typed_props<promise_actor, typed_promise_actor>(response_fn);
+    auto response_promise_actor = typed_props<promise_actor, typed_promise_actor>(response_fun);
     actor_ref p_actor = target_system->actor_of(response_promise_actor,
                                                 target_system->get_next_temporary_actor_name());
 

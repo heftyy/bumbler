@@ -1,9 +1,13 @@
 #pragma once
 
-#include "../utility.h"
+#include <future>
+#include <boost/any.hpp>
+
 #include "../thread_pool/thread_pool.h"
 
 namespace bumbler {
+
+class actor_ref;
 
 class dispatcher {
 public:
@@ -18,6 +22,8 @@ public:
     void stop(bool wait = false) {
         this->thread_pool_->stop(wait);
     }
+
+    std::future<int> push(const actor_ref& ref, const boost::any& data);
 
     template<typename F, typename ...Rest>
     auto push(F&& f, Rest&&... rest) -> std::future<decltype(f(rest...))> {

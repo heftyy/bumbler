@@ -1,8 +1,10 @@
 #include "actor_ref.h"
 #include "../promise_actor.h"
-#include "../../actor_system/actor_system.h"
+#include "../../messages/commands/commands.h"
 #include "../channels/local_actor_channel.h"
 #include "../channels/remote_actor_channel.h"
+#include "../../actor_system/actor_system.h"
+#include "../../actor_system/actor_system_storage.h"
 
 namespace bumbler {
 

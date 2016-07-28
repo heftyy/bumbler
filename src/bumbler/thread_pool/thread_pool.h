@@ -18,7 +18,7 @@ public:
     void stop(bool wait = false);
 
     template<typename F, typename... Rest>
-    auto push(F&& f, Rest&& ... rest) -> std::future<decltype(f(rest...))> {
+    auto push(F&& f, Rest&&... rest) -> std::future<decltype(f(rest...))> {
         using taskType = decltype(f(rest...))();
 
         auto pck = std::make_shared<std::packaged_task<taskType>>(

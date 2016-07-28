@@ -5,6 +5,7 @@
 #include <boost/test/unit_test.hpp>
 #include <bumbler/actor/mailbox/priority_mailbox.h>
 #include <bumbler/actor/mailbox/fifo_mailbox.h>
+#include <bumbler/actor/props/typed_props.h>
 #include <bumbler/actor/local_actor.h>
 #include <bumbler/actor_system/actor_system.h>
 #include "test_actor.h"
@@ -92,13 +93,13 @@ BOOST_AUTO_TEST_CASE(ActorPriorityMailboxTest) {
     la1.tell(std::string("regular msg1"));
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
-    la1.tell(priority_message < std::string > ("priority msg second", 5));
-    la1.tell(priority_message < std::string > ("priority msg third ", 4));
-    la1.tell(priority_message < std::string > ("priority msg first", 9));
+    la1.tell(priority_message<std::string>("priority msg second", 5));
+    la1.tell(priority_message<std::string>("priority msg third ", 4));
+    la1.tell(priority_message<std::string>("priority msg first", 9));
 
     // stop the actor after all the messages from the queue are read
     // this will block for 1000ms+
-    la1.tell(bumbler::stop_actor < int > (5));
+    la1.tell(bumbler::stop_actor<int>(5));
 
     system1->stop(false);
 
