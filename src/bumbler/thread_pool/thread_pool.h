@@ -5,7 +5,6 @@
 #include <memory>
 #include <boost/thread.hpp>
 #include <boost/asio.hpp>
-#include "../utility.h"
 
 namespace bumbler {
 

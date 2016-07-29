@@ -228,8 +228,8 @@ int actor_system::add_actor(std::shared_ptr<abstract_actor> actor) {
 
 actor_system::actor_system(const std::string& name, int port, int thread_pool_size)
         : port_(port), system_name_(name),
-          dispatcher_(std::make_shared<dispatcher>(thread_pool_size)) {
-    scheduler_ = std::make_shared<scheduler>(dispatcher_);
+          dispatcher_(std::make_shared<dispatcher>(thread_pool_size)),
+          scheduler_(std::make_shared<scheduler>()) {
 }
 
 }

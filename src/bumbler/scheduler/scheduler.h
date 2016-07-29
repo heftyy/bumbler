@@ -5,9 +5,7 @@
 #include <memory>
 #include <iostream>
 #include "cancellable.h"
-#include "../dispatcher/dispatcher.h"
 #include "../actor/actor_ref/actor_ref.h"
-#include "../utility.h"
 
 namespace bumbler {
 
@@ -15,7 +13,7 @@ class actor_system;
 
 class scheduler {
 public:
-    scheduler(const std::shared_ptr<dispatcher>& dispatcher) : dispatcher_(dispatcher) {
+    scheduler() {
 //        cancellable_vector_it_ = cancellable_vector_.begin();
     }
 
@@ -36,7 +34,7 @@ public:
 	    auto ret_cancellable = std::make_shared<cancellable>();
 		std::weak_ptr<cancellable> ret_cancellable_weak_ptr = ret_cancellable;
 
-        dispatcher_->push([initial_delay_ms, interval_ms](const typed_message<T> msg_copy, std::weak_ptr<cancellable> cancellable) -> int {
+        std::thread scheduler_thread([initial_delay_ms, interval_ms](const typed_message<T> msg_copy, std::weak_ptr<cancellable> cancellable) -> int {
 			if (cancellable.expired()) return 2;
 			else {
 				cancellable.lock()->thread_id = std::this_thread::get_id();
@@ -75,6 +73,8 @@ public:
 			}
         }, *msg, ret_cancellable_weak_ptr);
 
+        scheduler_thread.detach();
+
         return ret_cancellable;
     }
 
@@ -82,9 +82,6 @@ public:
     std::shared_ptr<cancellable> schedule_once(std::unique_ptr<typed_message<T>> msg, long initial_delay_ms) {
         return schedule<T>(std::move(msg), initial_delay_ms, 0);
     }
-
-private:
-    std::shared_ptr<dispatcher> dispatcher_;
 
 };
 

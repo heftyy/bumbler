@@ -23,8 +23,6 @@ public:
         this->thread_pool_->stop(wait);
     }
 
-    std::future<int> push(const actor_ref& ref, const boost::any& data);
-
     template<typename F, typename ...Rest>
     auto push(F&& f, Rest&&... rest) -> std::future<decltype(f(rest...))> {
         return this->thread_pool_->push(std::forward<F>(f), std::forward<Rest>(rest)...);

@@ -6,6 +6,8 @@
 #include <memory>
 #include <chrono>
 #include <future>
+#include <boost/thread.hpp>
+#include <boost/asio.hpp>
 #include "../internal/bumbler.h"
 #include "../messages/typed_message.h"
 #include "../scheduler/scheduler.h"

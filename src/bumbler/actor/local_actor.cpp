@@ -1,5 +1,6 @@
 #include "local_actor.h"
 #include "../actor_system/actor_system.h"
+#include "../dispatcher/dispatcher.h"
 
 namespace bumbler {
 
@@ -57,7 +58,6 @@ void local_actor::create_internal_queue_thread() {
 void local_actor::read_messages() {
     while (!this->mailbox_->empty()) {
         auto msg = this->mailbox_->pop_message();
-
         if(msg == nullptr) return;
 
         // run the task in the thread pool supplied by the dispatcher
