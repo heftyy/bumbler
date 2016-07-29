@@ -12,7 +12,7 @@
 using namespace bumbler;
 
 //int MESSAGES_TO_SEND = 5 * 1000 * 1000;
-int MESSAGES_TO_SEND = 50 * 1000;
+int MESSAGES_TO_SEND = 500 * 1000;
 
 BOOST_AUTO_TEST_SUITE(messages_benchmark)
 
@@ -87,4 +87,5 @@ BOOST_AUTO_TEST_CASE(MessagesRouterBenchmark) {
 
     BOOST_CHECK_EQUAL(MESSAGES_TO_SEND, benchmark_actor::message_count.load());
 }
+
 BOOST_AUTO_TEST_SUITE_END()

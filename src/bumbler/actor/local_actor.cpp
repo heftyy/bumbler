@@ -14,7 +14,7 @@ void local_actor::init(std::unique_ptr<untyped_actor> u_actor) {
 }
 
 void local_actor::stop_actor(bool wait) {
-    if(stop_flag_) return;
+    if (stop_flag_) return;
 
     stop_flag_ = true;
 
@@ -28,12 +28,8 @@ void local_actor::stop_actor(bool wait) {
     }
 }
 
-void local_actor::tell(std::unique_ptr<message> msg) {
-    add_message(std::move(msg));
-}
-
 void local_actor::create_internal_queue_thread() {
-    queue_thread_future_ = std::async(std::launch::async ,[this]() {
+    queue_thread_future_ = std::async(std::launch::async, [this]() {
         bool isPopped = false;
 
         while (true) {
@@ -56,14 +52,15 @@ void local_actor::create_internal_queue_thread() {
 }
 
 void local_actor::read_messages() {
-    while (!this->mailbox_->empty()) {
-        auto msg = this->mailbox_->pop_message();
-        if(msg == nullptr) return;
+    while (!mailbox_->empty()) {
+        size_t throughput = calculate_throughput();
+
+        auto msg_vec = mailbox_->pop_messages(throughput);
+        if (msg_vec.size() == 0) return;
 
         // run the task in the thread pool supplied by the dispatcher
-        auto future_result = this->actor_system_.lock()->get_dispatcher()->push(dispatcher_fun_,
-                                                                                msg->get_sender(),
-                                                                                msg->get_data());
+        auto future_result = actor_system_.lock()->get_dispatcher()->push(dispatcher_fun_,
+                                                                          std::move(msg_vec));
 
         // wait for the task to finish
         future_result.wait();
@@ -71,11 +68,26 @@ void local_actor::read_messages() {
 }
 
 void local_actor::add_message(std::unique_ptr<message> msg) {
-    if(this->stop_flag_) return;
+    if (this->stop_flag_) return;
 
 //    BOOST_LOG_TRIVIAL(debug) << "[ACTOR] queueing new task";
     this->mailbox_->push_message(std::move(msg));
     cv_.notify_one();
+}
+
+void local_actor::tell(std::unique_ptr<message> msg) {
+    add_message(std::move(msg));
+}
+
+size_t local_actor::calculate_throughput() {
+    size_t throughput = static_cast<size_t>(0.1 * this->mailbox_size());
+    if (throughput > 60) {
+        return 60;
+    }
+    else if (throughput < 20) {
+        return 20;
+    }
+    return throughput;
 }
 
 void local_actor::run_task(const actor_ref& sender, const boost::any& data) {
@@ -86,7 +98,7 @@ void local_actor::run_task(const actor_ref& sender, const boost::any& data) {
     try {
         on_receive(data);
     }
-    catch(const std::exception& ex) {
+    catch (const std::exception& ex) {
         on_error(data, ex);
     }
 
