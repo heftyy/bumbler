@@ -25,12 +25,12 @@ BOOST_AUTO_TEST_CASE(LoopBenchmark) {
 
     for (int i = 0; i < MESSAGES_TO_SEND; i++) {
         benchmark_actor::message_count++;
-        x += 7 + 3;
+        x += compute();
     }
 
     auto end = std::chrono::steady_clock::now();
 
-    std::cout << "loop " << std::chrono::duration<double, std::milli>(end - start).count() << " ms, " << MESSAGES_TO_SEND << " messages " << x << std::endl;
+    std::cout << "loop        " << std::chrono::duration<double, std::milli>(end - start).count() << " ms, " << MESSAGES_TO_SEND << " messages " << x << std::endl;
 
     BOOST_CHECK_EQUAL(MESSAGES_TO_SEND, benchmark_actor::message_count.load());
 }
@@ -48,7 +48,7 @@ BOOST_AUTO_TEST_CASE(MessagesActorBenchmark) {
     auto start = std::chrono::steady_clock::now();
 
     for(int i = 0; i < MESSAGES_TO_SEND; i++) {
-        la1.tell(7);
+        la1.tell(37);
     }
 
     system1->stop(true);
@@ -76,7 +76,7 @@ BOOST_AUTO_TEST_CASE(MessagesRouterBenchmark) {
     auto start = std::chrono::steady_clock::now();
 
     for(int i = 0; i < MESSAGES_TO_SEND; i++) {
-        r1.tell(7);
+        r1.tell(37);
     }
 
     system1->stop(true);

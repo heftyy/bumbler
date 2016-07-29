@@ -9,6 +9,20 @@
 
 using namespace bumbler;
 
+int COMPUTE_LIMIT = 10000;
+
+int compute(int in = 37) {
+    // A bit like generating a hashcode. Pretty arbitrary choice,
+    // but simple code which would be hard for the compiler to
+    // optimise away.
+    int running_total = 23;
+    for (int i=0; i < COMPUTE_LIMIT; i++)
+    {
+        running_total = 37 * running_total + i;
+    }
+    return running_total;
+}
+
 class benchmark_actor : public untyped_actor {
 public:
     static std::atomic<int> message_count;
@@ -27,8 +41,7 @@ protected:
 
         if(is_type<int>(data)) {
             int in = cast_message<int>(data);
-            in += 5;
-            x = in;
+            x += compute(in);
         }
     }
 };
