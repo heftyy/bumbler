@@ -14,7 +14,7 @@ using namespace bumbler;
 BOOST_AUTO_TEST_SUITE(actor_suite)
 
 BOOST_AUTO_TEST_CASE(ActorSystemInitTest) {
-    auto system1 = actor_system::create_system("test_system1", 4555);
+    auto system1 = actor_system::create_system("test_system1", 4501);
     BOOST_CHECK_EQUAL(system1->started(), true);
 
     BOOST_CHECK_EQUAL(system1->stopped(), false);
@@ -23,7 +23,7 @@ BOOST_AUTO_TEST_CASE(ActorSystemInitTest) {
 }
 
 BOOST_AUTO_TEST_CASE(ActorInitTest) {
-    auto system1 = actor_system::create_system("test_system1", 4555);
+    auto system1 = actor_system::create_system("test_system1", 4502);
 
     auto props_local = typed_props<local_actor, test_actor>();
 
@@ -39,7 +39,7 @@ BOOST_AUTO_TEST_CASE(ActorInitTest) {
 BOOST_AUTO_TEST_CASE(ActorStopTest) {
     test_actor::message_count = 0;
 
-    auto system1 = actor_system::create_system("test_system1", 4555);
+    auto system1 = actor_system::create_system("test_system1", 4503);
 
     auto props_local = typed_props<local_actor, test_actor>();
     auto la1 = system1->actor_of(props_local, "test_actor1");
@@ -60,7 +60,7 @@ BOOST_AUTO_TEST_CASE(ActorStopTest) {
 BOOST_AUTO_TEST_CASE(ActorKillTest) {
     test_actor::message_count = 0;
 
-    auto system1 = actor_system::create_system("test_system1", 4555);
+    auto system1 = actor_system::create_system("test_system1", 4504);
 
     auto props_local = typed_props<local_actor, test_actor>();
     auto la1 = system1->actor_of(props_local, "test_actor1");

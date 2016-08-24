@@ -23,17 +23,17 @@ BOOST_AUTO_TEST_CASE(ActorRefTest) {
 
     BOOST_CHECK(none_ref.is_none());
 
-    actor_ref remote_test_ref = actor_ref("test_actor", "test_system", "localhost", 4555);
+    actor_ref remote_test_ref = actor_ref("test_actor", "test_system", "localhost", 4500);
     BOOST_CHECK(remote_test_ref.is_remote());
 
-    BOOST_CHECK_EQUAL(remote_test_ref.to_string(), "test_actor$test_system@localhost:4555");
+    BOOST_CHECK_EQUAL(remote_test_ref.to_string(), "test_actor$test_system@localhost:4500");
 }
 
 BOOST_AUTO_TEST_CASE(ActorRefResolveTest) {
     using test_props = typed_props<local_actor, test_actor>;
     auto p = test_props();
 
-    auto system1 = actor_system::create_system("test_system1", 4555);
+    auto system1 = actor_system::create_system("test_system1", 4500);
     auto ref1 = system1->actor_of(p, "actor1");
 
     ref1.resolve();

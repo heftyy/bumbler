@@ -40,7 +40,7 @@ BOOST_AUTO_TEST_CASE(MessagesActorBenchmark) {
             boost::log::trivial::severity >= boost::log::trivial::info);
     benchmark_actor::message_count = 0;
 
-    auto system1 = actor_system::create_system("test_system1", 4555);
+    auto system1 = actor_system::create_system("test_system1", 4509);
 
     auto props_local = typed_props<local_actor, benchmark_actor>();
     auto la1 = system1->actor_of(props_local, "benchmark_actor");
@@ -66,7 +66,7 @@ BOOST_AUTO_TEST_CASE(MessagesRouterBenchmark) {
     benchmark_actor::message_count = 0;
     int router_size = 5;
 
-    auto system1 = actor_system::create_system("test_system1", 4555, router_size);
+    auto system1 = actor_system::create_system("test_system1", 4510, router_size);
 
     auto props_router = typed_props<router, benchmark_actor>();
     props_router.with_router<round_robin_pool>(router_size);

@@ -24,7 +24,7 @@ BOOST_AUTO_TEST_CASE(PropsLocalActorTest) {
     BOOST_CHECK_EQUAL(p.has_mailbox(), true);
     BOOST_CHECK_EQUAL(p.has_network_actor(), false);
 
-    auto system1 = actor_system::create_system("test_system1", 4555);
+    auto system1 = actor_system::create_system("test_system1", 4511);
 
     actor_ref ref1 = system1->actor_of(p, "actor1");
     ref1.tell(14);
@@ -46,7 +46,7 @@ BOOST_AUTO_TEST_CASE(PropsRouterTest) {
     BOOST_CHECK_EQUAL(p.has_mailbox(), true);
     BOOST_CHECK_EQUAL(p.has_network_actor(), false);
 
-    auto system1 = actor_system::create_system("test_system1", 4555);
+    auto system1 = actor_system::create_system("test_system1", 4512);
 
     actor_ref ref1 = system1->actor_of(p, "actor1");
     ref1.tell(14);

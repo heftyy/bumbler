@@ -34,7 +34,7 @@ before_script:
   - cmake ..
 
 script:
-  - make -j2 && ctest
+  - make -j2 && ctest -j4
 
 notifications:
   email: false

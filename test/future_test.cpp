@@ -16,7 +16,7 @@ BOOST_CLASS_EXPORT(typed_message<typed_data<int>>)
 BOOST_AUTO_TEST_SUITE(future_test_suite)
 
 BOOST_AUTO_TEST_CASE(ActorLocalFutureTest) {
-    auto system1 = actor_system::create_system("test_system1", 4555);
+    auto system1 = actor_system::create_system("test_system1", 4505);
 
     auto props_local = typed_props<local_actor, test_actor>();
     auto la1 = system1->actor_of(props_local, "test_actor1");
@@ -34,13 +34,13 @@ BOOST_AUTO_TEST_CASE(ActorLocalFutureTest) {
 }
 
 BOOST_AUTO_TEST_CASE(ActorRemoteFutureTest) {
-    auto system1 = actor_system::create_system("test_system1", 4555);
-    auto system2 = actor_system::create_system("test_system2", 4556);
+    auto system1 = actor_system::create_system("test_system1", 4506);
+    auto system2 = actor_system::create_system("test_system2", 4507);
 
     auto props_local = typed_props<local_actor, test_actor>();
 
     auto la1 = system1->actor_of(props_local, "test_actor1");
-    auto ra1 = actor_ref("test_actor1$test_system1@localhost:4555");
+    auto ra1 = actor_ref("test_actor1$test_system1@localhost:4506");
 
     std::future<std::string> f1 = ra1.ask<std::string>(priority_message<int>(5, 10));
     auto status1 = f1.wait_for(std::chrono::seconds(5));
@@ -53,13 +53,13 @@ BOOST_AUTO_TEST_CASE(ActorRemoteFutureTest) {
 }
 
 BOOST_AUTO_TEST_CASE(ActorRemoteFutureSerializationTest) {
-    auto system1 = actor_system::create_system("test_system1", 4555);
-    auto system2 = actor_system::create_system("test_system2", 4556);
+    auto system1 = actor_system::create_system("test_system1", 4508);
+    auto system2 = actor_system::create_system("test_system2", 4509);
 
     auto props_local = typed_props<local_actor, test_actor>();
 
     auto la1 = system1->actor_of(props_local, "test_actor1");
-    auto ra1 = actor_ref("test_actor1$test_system1@localhost:4555");
+    auto ra1 = actor_ref("test_actor1$test_system1@localhost:4508");
 
     std::future<std::string> f1 = ra1.ask<std::string>(typed_data<int>(66));
     auto status1 = f1.wait_for(std::chrono::seconds(5));

@@ -83,7 +83,7 @@ BOOST_AUTO_TEST_CASE(PriorityMailboxTest) {
 BOOST_AUTO_TEST_CASE(ActorPriorityMailboxTest) {
     test_actor::message_count = 0;
 
-    auto system1 = actor_system::create_system("test_system1", 4555);
+    auto system1 = actor_system::create_system("test_system1", 4524);
 
     auto props_local = typed_props<local_actor, test_actor>();
     props_local.with_mailbox<priority_mailbox>();

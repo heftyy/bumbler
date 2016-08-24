@@ -17,7 +17,7 @@ using namespace bumbler;
 BOOST_AUTO_TEST_SUITE(router_test_suite)
 
 BOOST_AUTO_TEST_CASE(RouterCreateTest) {
-    auto system1 = actor_system::create_system("test_system1", 4555);
+    auto system1 = actor_system::create_system("test_system1", 4513);
 
     auto p = typed_props<router, test_actor>();
     p.with_mailbox<fifo_mailbox>().with_router<round_robin_pool>(4);
@@ -34,7 +34,7 @@ BOOST_AUTO_TEST_CASE(RouterCreateTest) {
 BOOST_AUTO_TEST_CASE(RouterTellTest) {
     test_actor::message_count.store(0);
 
-    auto system1 = actor_system::create_system("test_system1", 4555);
+    auto system1 = actor_system::create_system("test_system1", 4514);
 
     auto p = typed_props<router, test_actor>();
     p.with_mailbox<fifo_mailbox>().with_router<round_robin_pool>(1);
@@ -51,7 +51,7 @@ BOOST_AUTO_TEST_CASE(RouterTellTest) {
 BOOST_AUTO_TEST_CASE(RouterRandomTest) {
     test_actor::message_count.store(0);
 
-    auto system1 = actor_system::create_system("test_system1", 4555);
+    auto system1 = actor_system::create_system("test_system1", 4515);
 
     auto p = typed_props<router, test_actor>();
     p.with_mailbox<fifo_mailbox>().with_router<random_pool>(2);
@@ -71,7 +71,7 @@ BOOST_AUTO_TEST_CASE(RouterRandomTest) {
 BOOST_AUTO_TEST_CASE(RouterSmallestMailboxTest) {
     test_actor::message_count.store(0);
 
-    auto system1 = actor_system::create_system("test_system1", 4555);
+    auto system1 = actor_system::create_system("test_system1", 4516);
 
     auto p = typed_props<router, test_actor>();
     p.with_mailbox<fifo_mailbox>().with_router<smallest_mailbox_pool>(2);
@@ -91,7 +91,7 @@ BOOST_AUTO_TEST_CASE(RouterSmallestMailboxTest) {
 BOOST_AUTO_TEST_CASE(RouterFutureTest) {
     test_actor::message_count.store(0);
 
-    auto system1 = actor_system::create_system("test_system1", 4555);
+    auto system1 = actor_system::create_system("test_system1", 4517);
 
     auto p = typed_props<router, test_actor>();
     p.with_mailbox<fifo_mailbox>().with_router<round_robin_pool>(3);
@@ -113,7 +113,7 @@ BOOST_AUTO_TEST_CASE(RouterFutureTest) {
 BOOST_AUTO_TEST_CASE(RouterTellAllTest) {
     test_actor::message_count.store(0);
 
-    auto system1 = actor_system::create_system("test_system1", 4555, 1);
+    auto system1 = actor_system::create_system("test_system1", 4518, 1);
 
     auto p = typed_props<router, test_actor>();
     p.with_mailbox<fifo_mailbox>().with_router<round_robin_pool>(2);
@@ -132,15 +132,15 @@ BOOST_AUTO_TEST_CASE(RouterTellAllTest) {
 BOOST_AUTO_TEST_CASE(RouterRemoteTellAllTest) {
     test_actor::message_count.store(0);
 
-    auto system1 = actor_system::create_system("test_system1", 4555);
-    auto system2 = actor_system::create_system("test_system2", 4556);
+    auto system1 = actor_system::create_system("test_system1", 4519);
+    auto system2 = actor_system::create_system("test_system2", 4520);
 
     auto p = typed_props<router, test_actor>();
     p.with_mailbox<fifo_mailbox>().with_router<round_robin_pool>(3);
 
     auto r1 = system1->actor_of(p, "test_router1");
 
-    auto ra1 = actor_ref("test_router1$test_system1@localhost:4555");
+    auto ra1 = actor_ref("test_router1$test_system1@localhost:4519");
 
     ra1.tell(broadcast<int>(123));
 

@@ -6,9 +6,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/modules/")
 #set(CMAKE_BUILD_TYPE Debug)
 set(Boost_DEBUG 1)
 
-set(CMAKE_BINARY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/build")
-
-include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+include(${CMAKE_CURRENT_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup()
 
 find_package(Boost 1.60 COMPONENTS system chrono date_time regex log log_setup serialization unit_test_framework REQUIRED)

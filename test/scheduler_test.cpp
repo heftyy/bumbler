@@ -14,7 +14,7 @@ BOOST_AUTO_TEST_SUITE(scheduler_test_suite)
 BOOST_AUTO_TEST_CASE(SchedulerSingleMessageTest) {
     test_actor::message_count = 0;
 
-    auto system1 = actor_system::create_system("test_system1", 4555);
+    auto system1 = actor_system::create_system("test_system1", 4521);
 
     auto p = typed_props<router, test_actor>();
     p.with_mailbox<fifo_mailbox>().with_router<round_robin_pool>(2);
@@ -51,14 +51,14 @@ BOOST_AUTO_TEST_CASE(SchedulerBroadcastTest) {
 
     BOOST_LOG_TRIVIAL(debug) << "scheduler broadcas test started";
 
-    auto system1 = actor_system::create_system("test_system1", 4556);
+    auto system1 = actor_system::create_system("test_system1", 4522);
 
     auto p = typed_props<router, test_actor>();
     p.with_mailbox<fifo_mailbox>().with_router<round_robin_pool>(2);
 
     auto r1 = system1->actor_of(p, "test_actor1");
 
-    auto c1 = system1->schedule(broadcast < int > (5), r1, actor_ref::none(), 200, 0);
+    auto c1 = system1->schedule(broadcast<int>(5), r1, actor_ref::none(), 200, 0);
 
     std::this_thread::sleep_for(std::chrono::seconds(1));
 

@@ -14,13 +14,11 @@ foreach (testSrc ${TEST_SRCS})
     #link to Boost libraries AND your targets and dependencies
     target_link_libraries(${testName} ${Boost_LIBRARIES} bumbler)
 
-    #I like to move testing binaries into a testBin directory
-    set_target_properties(${testName} PROPERTIES
-            RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+    #Move testing binaries into test
+    #set_target_properties(${testName} PROPERTIES
+    #        RUNTIME_OUTPUT_DIRECTORY "build/test")
 
     #Finally add it to test execution -
     #Notice the WORKING_DIRECTORY and COMMAND
-    add_test(NAME ${testName}
-            WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-            COMMAND ${CMAKE_CURRENT_BINARY_DIR}/${testName})
+    add_test(NAME ${testName} COMMAND ${testName})
 endforeach (testSrc)

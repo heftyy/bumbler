@@ -20,7 +20,7 @@ BOOST_AUTO_TEST_CASE(SpawnActorBenchmark) {
     boost::log::core::get()->set_filter(
             boost::log::trivial::severity >= boost::log::trivial::info);
 
-    auto system1 = actor_system::create_system("test_system1", 4555);
+    auto system1 = actor_system::create_system("test_system1", 4525);
 
     auto props_local = typed_props<local_actor, benchmark_actor>();
 
