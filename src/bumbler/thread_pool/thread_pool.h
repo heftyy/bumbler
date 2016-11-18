@@ -20,9 +20,9 @@ public:
     auto push(F&& f, Rest&&... rest) -> std::future<decltype(f(rest...))> {
         using taskType = decltype(f(rest...))();
 
-        auto pck = std::make_shared<std::packaged_task<taskType>>(
-                std::bind(std::forward<F>(f), std::forward<Rest>(rest)...)
-        );
+        auto pck = std::make_shared<std::packaged_task<taskType>>([&f, &rest...]() {
+			return f(std::forward<Rest>(rest)...);
+        });
 
         io_service_.post([pck]() {
             // Suppress all exceptions.
