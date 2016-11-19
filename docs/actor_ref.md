@@ -4,6 +4,19 @@ actor_ref
 ---
 lightweight class that's the only way users can send messages to actors.
 
+getting actor_ref
+---
+ * you get an actor_ref when you create an actor using props
+```c++
+auto system1 = actor_system::create_system("test_system1", 4508);
+auto props_local = typed_props<local_actor, test_actor>();
+auto la1 = system1->actor_of(props_local, "test_actor1");
+```
+ * create actor_ref from string, representing an actor in this application or an actor in a remote location / different application
+```c++
+auto ra1 = actor_ref("test_actor1$test_system1@localhost:4508");
+```
+
 tell
 ---
 ```c++
