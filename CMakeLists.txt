@@ -27,11 +27,9 @@ if(${WIN32})
 ELSE()
   #linux
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lpthread")
-
+  
   add_definitions(-std=c++14)
-  #add_definitions(-DBOOST_ALL_DYN_LINK)
-
-  #set(Boost_USE_STATIC_RUNTIME  OFF)
+  add_definitions(-lpthread)
   set(Boost_USE_STATIC_LIBS     ON)
   set(Boost_USE_MULTITHREADED   ON)
 ENDIF()

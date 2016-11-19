@@ -5,7 +5,7 @@ I also wanted to write a message driven library for multithreading and networkin
 
 Client and server applications are simple examples of usage of the library.
 
-Basic documentation [src/bumbler](/docs).
+Basic documentation [bumbler/docs](/docs).
 
 toolchains tested:
 * gcc >= 4.9
