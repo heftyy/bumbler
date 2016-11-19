@@ -9,7 +9,7 @@ set(Boost_DEBUG 1)
 include(${CMAKE_CURRENT_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup()
 
-find_package(Boost 1.60 COMPONENTS system chrono date_time regex log log_setup serialization unit_test_framework REQUIRED)
+find_package(Boost 1.60 COMPONENTS system thread chrono date_time regex log log_setup serialization unit_test_framework filesystem REQUIRED)
 include_directories(${Boost_INCLUDE_DIRS})
 
 if(${WIN32})
@@ -29,10 +29,10 @@ ELSE()
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lpthread")
 
   add_definitions(-std=c++14)
-  add_definitions(-DBOOST_ALL_DYN_LINK)
+  #add_definitions(-DBOOST_ALL_DYN_LINK)
 
-  SET(Boost_USE_STATIC_RUNTIME  OFF)
-  #set(Boost_USE_STATIC_LIBS    ON)
+  #set(Boost_USE_STATIC_RUNTIME  OFF)
+  set(Boost_USE_STATIC_LIBS     ON)
   set(Boost_USE_MULTITHREADED   ON)
 ENDIF()
 
