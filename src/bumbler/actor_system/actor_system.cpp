@@ -78,7 +78,7 @@ void actor_system::stop(bool wait) {
 #ifdef WIN32
     // workaround for windows
     // wait for the udp server to properly shutdown, otherwise it SIGSEGVs
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    // std::this_thread::sleep_for(std::chrono::milliseconds(500));
 #endif
     server_.reset();
 }

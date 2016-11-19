@@ -79,7 +79,7 @@ void local_actor::tell(std::unique_ptr<message> msg) {
     add_message(std::move(msg));
 }
 
-size_t local_actor::calculate_throughput() {
+size_t local_actor::calculate_throughput() const {
     size_t throughput = static_cast<size_t>(0.1 * this->mailbox_size());
     if (throughput > 60) {
         return 60;

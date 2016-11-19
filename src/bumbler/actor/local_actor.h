@@ -41,7 +41,7 @@ private:
     std::function<int(const MessageVec&)> dispatcher_fun_;
     std::condition_variable cv_;
 
-    size_t calculate_throughput();
+    size_t calculate_throughput() const;
     void run_task(const actor_ref& sender, const boost::any& data);
 };
 

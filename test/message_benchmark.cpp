@@ -64,7 +64,7 @@ BOOST_AUTO_TEST_CASE(MessagesRouterBenchmark) {
     boost::log::core::get()->set_filter(
             boost::log::trivial::severity >= boost::log::trivial::info);
     benchmark_actor::message_count = 0;
-    int router_size = 5;
+    int router_size = 3;
 
     auto system1 = actor_system::create_system("test_system1", 4510, router_size);
 
