@@ -10,9 +10,6 @@ typed_props& with_router(RouterPoolArgs&&... pool_args);
 
 template<typename Mailbox, typename ...MailboxArgs>
 typed_props& with_mailbox(MailboxArgs&&... mailbox_args);
-
-typed_props& with_network_actor(const std::string network_actor_ref);
-typed_props& with_network_actor(const actor_ref& network_actor_ref);
 ```
 
 creating actors
