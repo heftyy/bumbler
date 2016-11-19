@@ -27,13 +27,14 @@ if(${WIN32})
 ELSE()
   #linux
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lpthread")
-
+  
   add_definitions(-std=c++14)
+  add_definitions(-lpthread)
   #add_definitions(-DBOOST_ALL_DYN_LINK)
 
-  #SET(Boost_USE_STATIC_RUNTIME  OFF)
-  set(Boost_USE_STATIC_LIBS    ON)
-  #set(Boost_USE_MULTITHREADED   ON)
+  #set(Boost_USE_STATIC_RUNTIME  OFF)
+  #set(Boost_USE_STATIC_LIBS     ON)
+  set(Boost_USE_MULTITHREADED   ON)
 ENDIF()
 
 add_subdirectory(src/bumbler)
