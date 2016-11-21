@@ -21,7 +21,7 @@ public:
         using taskType = decltype(f(rest...))();
 
         auto pck = std::make_shared<std::packaged_task<taskType>>([&f, &rest...]() {
-			return f(std::forward<Rest>(rest)...);
+            return f(std::forward<Rest>(rest)...);
         });
 
         io_service_.post([pck]() {
