@@ -67,9 +67,9 @@ BOOST_AUTO_TEST_CASE(ActorKillTest) {
 
     //task takes 500ms+ to finish
     la1.tell(std::string("msg1"));
-	std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
     la1.tell(std::string("msg2"));	
-	std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
     //clear the queue ( 1 message left ) and stop the actor
     la1.tell(bumbler::kill_actor<int>(5));
