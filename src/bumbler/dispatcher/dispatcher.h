@@ -7,8 +7,6 @@
 
 namespace bumbler {
 
-class actor_ref;
-
 class dispatcher {
 public:
     dispatcher(int size) {

@@ -68,7 +68,8 @@ public:
 
 	template<typename T>
 	std::shared_ptr<cancellable> schedule(T&& data, const actor_ref& target, const actor_ref& sender, long initial_delay_ms, long interval_ms = 0) const {
-        return scheduler_->schedule(typed_message_factory::create(target, sender, std::forward<T>(data)), initial_delay_ms, interval_ms);
+		auto variant = typed_variant_factory::create(std::forward<T>(data));
+        return scheduler_->schedule(typed_message_factory::create(target, sender, std::move(variant)), initial_delay_ms, interval_ms);
     }
 
     template<typename T>
@@ -78,7 +79,8 @@ public:
 
     template<typename T>
     std::shared_ptr<cancellable> schedule_once(T&& data, const actor_ref& target, const actor_ref& sender, long initial_delay_ms = 0) const {
-        return scheduler_->schedule(typed_message_factory::create(target, sender, std::forward<T>(data)), initial_delay_ms, 0);
+		auto variant = typed_variant_factory::create(std::forward<T>(data));
+        return scheduler_->schedule(typed_message_factory::create(target, sender, std::move(variant)), initial_delay_ms, 0);
     }
 
     std::shared_ptr<udp_server> get_server() const {
@@ -130,7 +132,7 @@ private:
     /*
      * callback used by the udp server when a message is received
      */
-    void receive(std::unique_ptr<packet> packet, const boost::asio::ip::udp::endpoint& sender_endpoint);
+    void receive(std::unique_ptr<packet> packet, const boost::asio::ip::udp::endpoint& sender_endpoint) const;
 };
 
 //workaround for std::make_shared and protected constructor

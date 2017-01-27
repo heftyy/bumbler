@@ -1,8 +1,7 @@
 #pragma once
 
-#include <iostream>
-#include <sstream>
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/any.hpp>
 
 namespace bumbler {
 
@@ -22,6 +21,10 @@ namespace utility {
         return std::unique_ptr<To, Deleter>(nullptr); // or throw std::bad_cast() if you prefer
     }
 
+	template<typename T>
+	bool is_type(const boost::any& data) {
+		return data.type().hash_code() == typeid(T).hash_code();
+	}
 }
 
 }

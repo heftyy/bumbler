@@ -5,6 +5,7 @@
 #include <boost/any.hpp>
 #include "actor_ref/actor_ref.h"
 #include "../messages/commands/commands.h"
+#include "../utility.h"
 
 namespace bumbler {
 
@@ -52,7 +53,7 @@ protected:
 
     template<typename T>
     bool is_type(const boost::any& data) {
-        return data.type().hash_code() == typeid(T).hash_code();
+		return utility::is_type<T>(data);
     }
 
     actor_ref get_self() {

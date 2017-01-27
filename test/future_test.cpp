@@ -11,7 +11,8 @@
 
 using namespace bumbler;
 
-BOOST_CLASS_EXPORT(typed_message<typed_data<int>>)
+BOOST_CLASS_EXPORT(typed_data<int>)
+BOOST_CLASS_EXPORT(typed_variant<typed_data<int>)
 
 BOOST_AUTO_TEST_SUITE(future_test_suite)
 

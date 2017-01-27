@@ -1,11 +1,9 @@
 #pragma once
 
 #include <memory>
-#include <iostream>
-#include <sstream>
 #include <future>
 #include "../channels/abstract_channel.h"
-#include "../../messages/typed_message.h"
+#include "../../messages/typed_variant.h"
 
 namespace bumbler {
 
@@ -66,10 +64,8 @@ public:
 
     template<typename T>
     void tell(T&& data, const actor_ref& sender = actor_ref::none()) {
-        std::unique_ptr<message> tm = typed_message_factory::create(*this, sender, std::forward<T>(data));
         if(!channel_ || channel_->expired()) resolve();
-
-        channel_->tell(std::move(tm));
+		channel_->tell(make_message(make_variant(std::forward<T>(data)), *this, sender));
     }
 
     void tell(std::unique_ptr<message> msg) {
@@ -83,11 +79,9 @@ public:
     }
 
     template<typename Result, typename T>
-    std::future<Result> ask(T && data) {
-        std::unique_ptr<message> tm = typed_message_factory::create(*this, none(), std::forward<T>(data));
-        if(!channel_ || channel_->expired()) resolve();
-
-        return channel_->ask<Result>(std::move(tm));
+    std::future<Result> ask(T&& data) {
+		if (!channel_ || channel_->expired()) resolve();
+        return channel_->ask<Result>(make_message(make_variant(std::forward<T>(data)), *this, none()));
     }
 
     /*
@@ -132,13 +126,16 @@ public:
 private:
     std::unique_ptr<abstract_channel> channel_;
 
+	template<typename T>
+	std::unique_ptr<variant> make_variant(T&& data) { return typed_variant_factory::create(std::forward<T>(data)); }
+	std::unique_ptr<message> make_message(std::unique_ptr<variant> variant_ptr, const actor_ref& target, const actor_ref& sender) const;
+
     void reset() {
         this->actor_name = "";
         this->system_name = "";
         this->ip = "";
         this->port = 0;
     }
-
 };
 
 }

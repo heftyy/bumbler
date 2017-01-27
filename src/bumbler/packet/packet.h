@@ -36,7 +36,7 @@ public:
         data.load(std::move(msg));
     }
 
-    std::string get_serialized() {
+    std::string get_serialized() const {
         if (header.type == 0) {
             throw new packet_structure_error("packet had no type");
         }
@@ -44,8 +44,6 @@ public:
         boost::archive::text_oarchive out_archive(archive_stream);
         out_archive << *this;
         return archive_stream.str();
-        //serialized_data = archive_stream.str();
-        //return std::unique_ptr<std::vector<char>>(new std::vector<char>(serialized_data.begin(), serialized_data.end()));
     }
 
     static packet parse(const std::string& received_data) {
@@ -56,7 +54,6 @@ public:
         in_archive >> received_packet;
         return received_packet;
     }
-
 };
 
 }

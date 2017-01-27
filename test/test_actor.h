@@ -42,7 +42,7 @@ protected:
         if(is_type<std::string>(data)) {
             std::string in = cast_message<std::string>(data);
             BOOST_LOG_TRIVIAL(debug) << "[TEST_ACTOR] message was " << in;
-            reply(::stop_actor<std::string>("HAH!"));
+            reply(::stop_actor("HAH!"));
         }
 
         if(is_type<char*>(data)) {

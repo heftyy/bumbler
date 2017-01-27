@@ -120,7 +120,7 @@ BOOST_AUTO_TEST_CASE(RouterTellAllTest) {
 
     auto r1 = system1->actor_of(p, "test_router1");
 
-    r1.tell(broadcast < int > (88));
+    r1.tell(broadcast<int>(88));
 
     r1.tell(typed_data<std::string>(std::string("blam")));
 

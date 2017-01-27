@@ -6,9 +6,10 @@
 
 #include "../../internal/bumbler.h"
 #include "../../logger/logger.h"
-#include "../../messages/message.h"
 
 namespace bumbler {
+
+class message;
 
 class abstract_channel {
 public:
@@ -36,13 +37,12 @@ public:
                 };
 
         ask_impl(std::move(msg), future_func);
-
         return f;
     }
 
     virtual bool expired() = 0;
 
-    virtual ~abstract_channel() = default;
+    virtual ~abstract_channel() {};
 
 protected:
     abstract_channel() {}

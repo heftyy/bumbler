@@ -6,10 +6,9 @@
 #include <boost/any.hpp>
 #include <boost/serialization/access.hpp>
 
-namespace bumbler {
+#include "../actor/actor_ref/actor_ref.h"
 
-class actor_ref;
-class message;
+namespace bumbler {
 
 class message {
 public:
@@ -24,8 +23,8 @@ public:
     virtual ~message() {}
 
     virtual boost::any get_data() const = 0;
-    virtual actor_ref& get_sender() const = 0;
-    virtual actor_ref& get_target() const = 0;
+    virtual actor_ref get_sender() const = 0;
+    virtual actor_ref get_target() const = 0;
 
     virtual std::unique_ptr<message> clone() const = 0;
 

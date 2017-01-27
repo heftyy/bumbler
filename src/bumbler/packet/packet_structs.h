@@ -31,16 +31,13 @@ private:
 
 class packet_data {
 public:
-    //std::vector<char> data;
     std::string data;
 
     packet_data() { }
 
-    packet_data(const std::string& d) : data(d) { }
-
-    packet_data(const std::vector<char>& d) : data(d.begin(), d.end()) { }
-
-    packet_data(char *data, size_t length) : data(std::string(data, data + sizeof(char) * length)) { }
+	explicit packet_data(const std::string& d) : data(d) { }
+	explicit packet_data(const std::vector<char>& d) : data(d.begin(), d.end()) { }
+	explicit packet_data(char *data, size_t length) : data(std::string(data, data + sizeof(char) * length)) { }
 
     void load(std::unique_ptr<message> msg);
 

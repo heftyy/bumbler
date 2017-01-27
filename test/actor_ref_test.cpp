@@ -33,7 +33,7 @@ BOOST_AUTO_TEST_CASE(ActorRefResolveTest) {
     using test_props = typed_props<local_actor, test_actor>;
     auto p = test_props();
 
-    auto system1 = actor_system::create_system("test_system1", 4500);
+    auto system1 = actor_system::create_system("test_system1", 4499);
     auto ref1 = system1->actor_of(p, "actor1");
 
     ref1.resolve();
