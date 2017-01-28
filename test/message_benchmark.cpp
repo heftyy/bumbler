@@ -12,11 +12,10 @@
 using namespace bumbler;
 
 //int MESSAGES_TO_SEND = 5 * 1000 * 1000;
-int MESSAGES_TO_SEND = 5 * 1000 * 1000;
+int MESSAGES_TO_SEND = 5 * 1000 * 1;
 
 BOOST_AUTO_TEST_SUITE(messages_benchmark)
 
-/*
 BOOST_AUTO_TEST_CASE(LoopBenchmark) {
     benchmark_actor::message_count = 0;
 
@@ -34,7 +33,7 @@ BOOST_AUTO_TEST_CASE(LoopBenchmark) {
     std::cout << "loop        " << std::chrono::duration<double, std::milli>(end - start).count() << " ms, " << MESSAGES_TO_SEND << " messages " << x << std::endl;
 
     BOOST_CHECK_EQUAL(MESSAGES_TO_SEND, benchmark_actor::message_count.load());
-}*/
+}
 
 BOOST_AUTO_TEST_CASE(MessagesActorBenchmark) {
     boost::log::core::get()->set_filter(

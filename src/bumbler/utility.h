@@ -23,7 +23,7 @@ namespace utility {
 
 	template<typename T>
 	bool is_type(const boost::any& data) {
-		return data.type().hash_code() == typeid(T).hash_code();
+		return data.type() == typeid(T);
 	}
 }
 

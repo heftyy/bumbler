@@ -3,6 +3,7 @@
 bumbler::typed_message::typed_message(const actor_ref& target, const actor_ref& sender,
 									  std::unique_ptr<variant> variant)
 	: target_(target), sender_(sender), variant_(std::move(variant)) {
+
 }
 
 bumbler::typed_message::typed_message(const typed_message& rhs) : message(rhs) {
@@ -30,22 +31,22 @@ int bumbler::typed_message::get_priority() const {
 }
 
 boost::any bumbler::typed_message::get_data() const {
-// 	if (is_broadcast()) {
-// 		broadcast cmd = boost::any_cast<broadcast>(variant_->data());
-// 		return cmd.var->data();
-// 	}
-// 	if (is_stop_actor()) {
-// 		stop_actor cmd = boost::any_cast<stop_actor>(variant_->data());
-// 		return cmd.var->data();
-// 	}
-// 	if (is_kill_actor()) {
-// 		kill_actor cmd = boost::any_cast<kill_actor>(variant_->data());
-// 		return cmd.var->data();
-// 	}
-// 	if (is_priority_message()) {
-// 		priority_message cmd = boost::any_cast<priority_message>(variant_->data());
-// 		return cmd.var->data();
-// 	}
+	if (is_broadcast()) {
+		broadcast cmd = boost::any_cast<broadcast>(variant_->data());
+		return cmd.var->data();
+	}
+	if (is_stop_actor()) {
+		stop_actor cmd = boost::any_cast<stop_actor>(variant_->data());
+		return cmd.var->data();
+	}
+	if (is_kill_actor()) {
+		kill_actor cmd = boost::any_cast<kill_actor>(variant_->data());
+		return cmd.var->data();
+	}
+	if (is_priority_message()) {
+		priority_message cmd = boost::any_cast<priority_message>(variant_->data());
+		return cmd.var->data();
+	}
 
 	return variant_->data();
 }

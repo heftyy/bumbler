@@ -20,6 +20,10 @@ public:
 		return data_;
 	}
 
+	const boost::typeindex::type_info& type() const override {
+		return typeid(data_);
+	}
+
 	std::unique_ptr<variant> clone() const override {
 		return std::make_unique<typed_variant<T>>(*this);
 	}

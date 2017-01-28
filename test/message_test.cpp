@@ -36,20 +36,13 @@ BOOST_AUTO_TEST_CASE(IntMessageTest) {
     {
         auto tm_copy = tm->clone();
 
-        bool is_same = std::is_same<decltype(tm), decltype(tm_copy)>::value;
-        BOOST_CHECK(is_same);
+		std::cout << boost::core::demangled_name(BOOST_CORE_TYPEID(tm)) << std::endl;
+		std::cout << boost::core::demangled_name(BOOST_CORE_TYPEID(tm_copy)) << std::endl;
 
-        boost::any data = tm_copy->get_data();
-        BOOST_CHECK_EQUAL(boost::any_cast<int>(data), 11);
+		std::cout << boost::core::demangled_name(BOOST_CORE_TYPEID(*tm)) << std::endl;
+		std::cout << boost::core::demangled_name(BOOST_CORE_TYPEID(*tm_copy)) << std::endl;
 
-        BOOST_CHECK(target == tm_copy->get_target());
-        BOOST_CHECK(sender == tm_copy->get_sender());
-    }
-
-    {
-        auto tm_copy = tm->clone();
-
-        bool is_same = std::is_same<decltype(tm), decltype(tm_copy)>::value;
+        bool is_same = std::is_base_of<message, std::decay<decltype(*tm)>::type>::value;
         BOOST_CHECK(is_same);
 
         boost::any data = tm_copy->get_data();

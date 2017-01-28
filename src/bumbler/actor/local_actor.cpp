@@ -81,7 +81,7 @@ size_t local_actor::calculate_throughput() const {
     else if (throughput < 20) {
         return 20;
     }
-    return throughput;
+	return throughput;
 }
 
 void local_actor::run_task(const actor_ref& sender, const boost::any& data) {

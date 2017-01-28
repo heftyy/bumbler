@@ -18,8 +18,6 @@ public:
     }
 
     ~scheduler() {
-        BOOST_LOG_TRIVIAL(debug) << "[SCHEDULER] DESTROY";
-
 		/*
         for (std::shared_ptr<cancellable>& cancellable : cancellable_vector_) {
             if (!cancellable->is_cancelled()) {

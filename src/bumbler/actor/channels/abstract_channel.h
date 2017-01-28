@@ -22,11 +22,9 @@ public:
         auto promise_ptr = std::make_shared<std::promise<Result>>();
         auto f = promise_ptr->get_future();
 
-        auto future_type_hashcode = typeid(Result).hash_code();
-
         ResponseFun future_func =
-                [future_type_hashcode, promise_ptr](const boost::any& response) {
-                    if (response.type().hash_code() == future_type_hashcode) {
+                [promise_ptr](const boost::any& response) {
+                    if (response.type() == boost::typeindex::type_id<Result>()) {
                         Result value = boost::any_cast<Result>(response);
                         promise_ptr->set_value(value);
                     }

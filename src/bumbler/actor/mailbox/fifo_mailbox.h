@@ -16,7 +16,7 @@ public:
         std::unique_lock<std::mutex> lock(this->mailbox_mutex_);
 
         auto msg = std::move(this->queue_.front());
-        this->queue_.pop();
+        this->queue_.pop_front();
 
         return std::move(msg);
     }
@@ -29,7 +29,7 @@ public:
             if(this->queue_.empty()) break;
 
             auto msg = std::move(this->queue_.front());
-            this->queue_.pop();
+            this->queue_.pop_front();
 
             result.push_back(std::move(msg));
         }

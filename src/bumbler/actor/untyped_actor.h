@@ -43,7 +43,7 @@ protected:
 
     template<typename T>
     T cast_message(const boost::any& data) {
-        if(data.type().hash_code() == typeid(T).hash_code()) {
+        if (is_type<T>(data)) {
             return boost::any_cast<T>(data);
         }
         else {

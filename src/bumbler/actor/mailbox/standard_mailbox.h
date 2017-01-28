@@ -21,7 +21,7 @@ public:
     void clear() override {
         std::unique_lock<std::mutex> lock(this->mailbox_mutex_);
         while(!empty()) {
-            this->queue_.pop();
+            this->queue_.pop_front();
         }
     }
 
@@ -36,7 +36,7 @@ public:
     virtual std::unique_ptr<mailbox> clone() const = 0;
 
 protected:
-    std::queue<std::unique_ptr<message>> queue_;
+    std::deque<std::unique_ptr<message>> queue_;
 
     standard_mailbox(const standard_mailbox& rhs) : mailbox(rhs), queue_() { }
     standard_mailbox& operator=(const standard_mailbox& rhs) {
@@ -49,7 +49,7 @@ protected:
 private:
     void push_to_queue(std::unique_ptr<message> msg) {
         std::unique_lock<std::mutex> lock(this->mailbox_mutex_);
-        this->queue_.emplace(std::move(msg));
+        this->queue_.emplace_back(std::move(msg));
     }
 
 };

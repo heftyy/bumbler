@@ -29,19 +29,19 @@ public:
     int get_priority() const override;
 
     bool is_broadcast() const override {
-		return utility::is_type<broadcast>(variant_->data());
+		return typeid(broadcast) == variant_->type();
     }
 
     bool is_stop_actor() const override {
-		return utility::is_type<stop_actor>(variant_->data());
+		return typeid(stop_actor) == variant_->type();
     }
 
     bool is_kill_actor() const override {
-		return utility::is_type<kill_actor>(variant_->data());
+		return typeid(kill_actor) == variant_->type();
     }
 
     bool is_priority_message() const override {
-		return utility::is_type<priority_message>(variant_->data());
+		return typeid(priority_message) == variant_->type();
     }
 
     boost::any get_data() const override;
