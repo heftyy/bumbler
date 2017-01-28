@@ -37,10 +37,10 @@ There are 4 special types of messages:
  * kill_actor - clears the message queue and stops the actor as soon as possible. Sending this message will synchrnously wait for the actor to stop.
  * priority_message - if the actor that recevies the message uses priority_mailbox, messages with highest priority are passed to the on_recevied method first. Broadcast, stop_actor and kill_actor messages can also have the priority set in the constructor.
 ```c++
-actor_ref.tell(broadcast<int>(88));
-actor_ref.tell(stop_actor<int>(5));
-actor_ref.tell(kill_actor<int>(5));
-actor_ref.tell(priority_message<int>(5, 10));
+actor_ref.tell(broadcast(88));
+actor_ref.tell(stop_actor(5));
+actor_ref.tell(kill_actor(5));
+actor_ref.tell(priority_message(5, 10));
 ```
 Current data send in stop_actor and kill_actor messages is ignored.
 

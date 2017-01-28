@@ -33,7 +33,7 @@ auto system1 = actor_system::create_system("test_system1", 4555, 1);
 auto router_props = typed_props<router, test_actor>();
 router_props.with_router<round_robin_pool>(4);
 auto r1 = system1->actor_of(router_props, "test_router1");
-r1.tell(broadcast<int>(88));
+r1.tell(broadcast(88));
 ```
 
 Using different types of mailboxes
