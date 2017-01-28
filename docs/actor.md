@@ -15,12 +15,12 @@ virtual void on_error(boost::any data, std::exception ex);
 You can find the type of the message by calling
 ```c++
 template<typename T>
-bool is_type(boost::any& data);
+bool is_type(const boost::any& data);
 ```
 and then cast it with
 ```c++
 template<typename T>
-T cast_message(boost::any& data);
+T cast_message(const boost::any& data);
 ```
 
 Reply can be used to send a message back from the actor, there are 2 overloads for reply
