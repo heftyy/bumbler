@@ -43,37 +43,11 @@ public:
         this->push_to_queue(std::move(msg), msg->get_priority());
     }
 
-    std::unique_ptr<message> pop_message() override {
-        std::unique_lock<std::mutex> lock(this->mailbox_mutex_);
+    std::unique_ptr<message> pop_message() override;
 
-        QueueElement moved = std::move(const_cast<QueueElement&>(this->queue_.top()));
-        this->queue_.pop();
+    std::vector<std::unique_ptr<message>> pop_messages(size_t count) override;
 
-        return std::move(moved.msg);
-    }
-
-    std::vector<std::unique_ptr<message>> pop_messages(size_t count) override {
-        std::unique_lock<std::mutex> lock(this->mailbox_mutex_);
-
-        std::vector<std::unique_ptr<message>> result;
-        for (size_t i = 0; i < count; i++) {
-            if(this->queue_.empty()) break;
-
-            QueueElement moved = std::move(const_cast<QueueElement&>(this->queue_.top()));
-            this->queue_.pop();
-
-            result.push_back(std::move(moved.msg));
-        }
-
-        return result;
-    }
-
-    void clear() override {
-        std::unique_lock<std::mutex> lock(this->mailbox_mutex_);
-        while(!empty()) {
-            this->queue_.pop();
-        }
-    }
+    void clear() override;
 
     bool empty() override {
         return this->queue_.empty();

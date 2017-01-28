@@ -9,7 +9,7 @@
 
 using namespace bumbler;
 
-int COMPUTE_LIMIT = 500;
+int COMPUTE_LIMIT = 10000;
 
 int compute(int in = 37) {
     // A bit like generating a hashcode. Pretty arbitrary choice,

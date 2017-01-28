@@ -37,15 +37,6 @@ public:
     virtual bool is_stop_actor() const = 0;
     virtual bool is_kill_actor() const = 0;
     virtual bool is_priority_message() const = 0;
-
-private:
-
-    friend class boost::serialization::access;
-    template<class Archive>
-    void serialize(Archive& ar, const unsigned int version) {
-        throw std::runtime_error("serialize not implemented in message");
-    }
-
 };
 
 }

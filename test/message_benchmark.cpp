@@ -12,7 +12,7 @@
 using namespace bumbler;
 
 //int MESSAGES_TO_SEND = 5 * 1000 * 1000;
-int MESSAGES_TO_SEND = 5 * 1000 * 1;
+int MESSAGES_TO_SEND = 5 * 1000 * 10;
 
 BOOST_AUTO_TEST_SUITE(messages_benchmark)
 

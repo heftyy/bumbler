@@ -39,8 +39,11 @@ set(bumbler_SOURCES
         actor/mailbox/mailbox.h
         actor/mailbox/standard_mailbox.h
         actor/mailbox/fifo_mailbox.h
+        actor/mailbox/fifo_mailbox.cpp
         actor/mailbox/lifo_mailbox.h
+        actor/mailbox/lifo_mailbox.cpp
         actor/mailbox/priority_mailbox.h
+        actor/mailbox/priority_mailbox.cpp
         actor/untyped_actor.h
         actor/props/typed_props.h
         actor/routing/router_logic.h

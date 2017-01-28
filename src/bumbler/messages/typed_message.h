@@ -14,10 +14,6 @@ class typed_message : public message {
 public:
     typed_message() { }
 
-	typed_message(const actor_ref& target,
-				  const actor_ref& sender,
-				  std::unique_ptr<variant> variant);
-
 	typed_message(const typed_message& rhs);
 	typed_message& operator=(const typed_message& rhs);
 
@@ -71,6 +67,11 @@ private:
 	actor_ref sender_;
 	std::unique_ptr<variant> variant_;
 
+	friend class typed_message_factory;
+	typed_message(const actor_ref& target,
+				  const actor_ref& sender,
+				  std::unique_ptr<variant> variant);
+
     friend class boost::serialization::access;
     template<class Archive>
     void serialize(Archive& ar, const unsigned int version) {
@@ -85,7 +86,7 @@ private:
 class typed_message_factory {
 public:
     static std::unique_ptr<typed_message> create(const actor_ref& target, const actor_ref& sender, std::unique_ptr<variant> variant) {
-        return std::make_unique<typed_message>(target, sender, std::move(variant));
+        return std::unique_ptr<typed_message>(new typed_message(target, sender, std::move(variant)));
     }
 };
 
