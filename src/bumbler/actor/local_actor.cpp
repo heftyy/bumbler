@@ -53,14 +53,8 @@ void local_actor::create_internal_queue_thread() {
 
 void local_actor::read_messages() {
     while (!mailbox_->empty()) {
-        size_t throughput = calculate_throughput();
-
-        auto msg_vec = mailbox_->pop_messages(throughput);
-        if (msg_vec.size() == 0) return;
-
         // run the task in the thread pool supplied by the dispatcher
-        auto future_result = actor_system_.lock()->get_dispatcher()->push(dispatcher_fun_,
-                                                                          std::move(msg_vec));
+        auto future_result = actor_system_.lock()->get_dispatcher()->push(dispatcher_fun_);
 
         // wait for the task to finish
         future_result.wait();
@@ -87,7 +81,7 @@ size_t local_actor::calculate_throughput() const {
     else if (throughput < 20) {
         return 20;
     }
-    return throughput;
+	return throughput;
 }
 
 void local_actor::run_task(const actor_ref& sender, const boost::any& data) {

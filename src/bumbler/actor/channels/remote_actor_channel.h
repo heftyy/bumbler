@@ -2,6 +2,7 @@
 
 #include <boost/asio.hpp>
 #include "actor_channel.h"
+#include "../actor_ref/actor_ref.h"
 
 namespace bumbler {
 
@@ -9,10 +10,9 @@ class actor_system;
 
 class remote_actor_channel : public actor_channel {
 public:
-    remote_actor_channel() { }
+    remote_actor_channel() : actor_channel() { }
 
-    remote_actor_channel(const actor_ref& target_actor_ref) :
-            actor_channel(target_actor_ref),
+    explicit remote_actor_channel(const actor_ref& target_actor_ref) :
             network_actor_endpoint_(get_remote_endpoint(target_actor_ref)) { }
 private:
     boost::asio::ip::udp::endpoint network_actor_endpoint_;

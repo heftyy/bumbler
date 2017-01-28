@@ -18,8 +18,6 @@ public:
     }
 
     ~scheduler() {
-        BOOST_LOG_TRIVIAL(debug) << "[SCHEDULER] DESTROY";
-
 		/*
         for (std::shared_ptr<cancellable>& cancellable : cancellable_vector_) {
             if (!cancellable->is_cancelled()) {
@@ -29,12 +27,11 @@ public:
 		*/
     }
 
-    template<typename T>
-    std::shared_ptr<cancellable> schedule(std::unique_ptr<typed_message<T>> msg, long initial_delay_ms, long interval_ms) {
+    std::shared_ptr<cancellable> schedule(std::unique_ptr<typed_message> msg, long initial_delay_ms, long interval_ms) const {
 	    auto ret_cancellable = std::make_shared<cancellable>();
 		std::weak_ptr<cancellable> ret_cancellable_weak_ptr = ret_cancellable;
 
-        std::thread scheduler_thread([initial_delay_ms, interval_ms](const typed_message<T> msg_copy, std::weak_ptr<cancellable> cancellable) -> int {
+        std::thread scheduler_thread([initial_delay_ms, interval_ms](typed_message msg_copy, std::weak_ptr<cancellable> cancellable) -> int {
 			if (cancellable.expired()) return 2;
 			else {
 				cancellable.lock()->thread_id = std::this_thread::get_id();
@@ -78,9 +75,8 @@ public:
         return ret_cancellable;
     }
 
-    template<typename T>
-    std::shared_ptr<cancellable> schedule_once(std::unique_ptr<typed_message<T>> msg, long initial_delay_ms) {
-        return schedule<T>(std::move(msg), initial_delay_ms, 0);
+    std::shared_ptr<cancellable> schedule_once(std::unique_ptr<typed_message> msg, long initial_delay_ms) const {
+        return schedule(std::move(msg), initial_delay_ms, 0);
     }
 
 };

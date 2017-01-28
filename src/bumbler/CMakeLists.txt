@@ -1,8 +1,11 @@
 cmake_minimum_required(VERSION 3.1)
 
 set(bumbler_SOURCES
+        messages/variant.h
+        messages/typed_variant.h
         messages/message.h
         messages/typed_message.h
+		messages/typed_message.cpp
         messages/serialization_utility.h
         messages/commands/command.h
         messages/commands/broadcast.h
@@ -15,7 +18,6 @@ set(bumbler_SOURCES
         actor/messaging/messaging_service.cpp
         actor/messaging/messaging_service.h
         actor/channels/abstract_channel.h
-        actor/channels/actor_channel.cpp
         actor/channels/actor_channel.h
         actor/channels/invalid_channel.h
         actor/channels/local_actor_channel.cpp
@@ -37,8 +39,11 @@ set(bumbler_SOURCES
         actor/mailbox/mailbox.h
         actor/mailbox/standard_mailbox.h
         actor/mailbox/fifo_mailbox.h
+        actor/mailbox/fifo_mailbox.cpp
         actor/mailbox/lifo_mailbox.h
+        actor/mailbox/lifo_mailbox.cpp
         actor/mailbox/priority_mailbox.h
+        actor/mailbox/priority_mailbox.cpp
         actor/untyped_actor.h
         actor/props/typed_props.h
         actor/routing/router_logic.h

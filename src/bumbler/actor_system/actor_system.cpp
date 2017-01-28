@@ -66,7 +66,7 @@ void actor_system::stop(bool wait) {
         return;
     }
 
-    BOOST_LOG_TRIVIAL(debug) << "[ACTOR_SYSTEM] SHUTTING DOWN";
+    //BOOST_LOG_TRIVIAL(debug) << "[ACTOR_SYSTEM] SHUTTING DOWN";
     server_->stop();
     started_ = false;
     stopped_ = true;
@@ -166,13 +166,13 @@ std::unique_ptr<actor_channel> actor_system::get_actor_channel(const std::string
     auto search = actors_.find(actor_name);
     if (search != actors_.end()) {
         auto actor_ptr = actors_[actor_name];
-        return std::make_unique<local_actor_channel>(actor_ptr->get_self(), actor_ptr);
+        return std::make_unique<local_actor_channel>(actor_ptr);
     }
 
     return nullptr;
 }
 
-void actor_system::receive(std::unique_ptr<packet> packet, const boost::asio::ip::udp::endpoint& sender_endpoint) {
+void actor_system::receive(std::unique_ptr<packet> packet, const boost::asio::ip::udp::endpoint& sender_endpoint) const {
     std::stringstream ss(packet->data.data);
     boost::archive::text_iarchive ia(ss);
 

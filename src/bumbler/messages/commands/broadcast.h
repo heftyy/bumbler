@@ -4,11 +4,11 @@
 
 namespace bumbler {
 
-template<typename T>
-class broadcast : public command<T> {
+class broadcast : public command {
 public:
-    broadcast() { }
-    broadcast(T data, int priority = 0) : command<T>(data, priority) {}
+    broadcast() : command() { }
+	template<typename T>
+    broadcast(const T& data) : command(data) {}
 };
 
 }

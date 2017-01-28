@@ -1,30 +1,20 @@
 #pragma once
 
 #include <bumbler/messages/typed_message.h>
+#include <bumbler/messages/typed_variant.h>
 #include <bumbler/messages/commands/commands.h>
 
 using namespace bumbler;
 
-BOOST_CLASS_EXPORT(typed_message<std::string>)
-BOOST_CLASS_EXPORT(typed_message<double>)
-BOOST_CLASS_EXPORT(typed_message<float>)
-BOOST_CLASS_EXPORT(typed_message<long>)
-BOOST_CLASS_EXPORT(typed_message<int>)
+BOOST_CLASS_EXPORT(typed_message)
 
-BOOST_CLASS_EXPORT(typed_message<broadcast<std::string>>)
-BOOST_CLASS_EXPORT(typed_message<broadcast<double>>)
-BOOST_CLASS_EXPORT(typed_message<broadcast<float>>)
-BOOST_CLASS_EXPORT(typed_message<broadcast<long>>)
-BOOST_CLASS_EXPORT(typed_message<broadcast<int>>)
+BOOST_CLASS_EXPORT(typed_variant<std::string>)
+BOOST_CLASS_EXPORT(typed_variant<double>)
+BOOST_CLASS_EXPORT(typed_variant<float>)
+BOOST_CLASS_EXPORT(typed_variant<long>)
+BOOST_CLASS_EXPORT(typed_variant<int>)
 
-BOOST_CLASS_EXPORT(typed_message<stop_actor<std::string>>)
-BOOST_CLASS_EXPORT(typed_message<stop_actor<double>>)
-BOOST_CLASS_EXPORT(typed_message<stop_actor<float>>)
-BOOST_CLASS_EXPORT(typed_message<stop_actor<long>>)
-BOOST_CLASS_EXPORT(typed_message<stop_actor<int>>)
-
-BOOST_CLASS_EXPORT(typed_message<kill_actor<std::string>>)
-BOOST_CLASS_EXPORT(typed_message<kill_actor<double>>)
-BOOST_CLASS_EXPORT(typed_message<kill_actor<float>>)
-BOOST_CLASS_EXPORT(typed_message<kill_actor<long>>)
-BOOST_CLASS_EXPORT(typed_message<kill_actor<int>>)
+BOOST_CLASS_EXPORT(typed_variant<broadcast>)
+BOOST_CLASS_EXPORT(typed_variant<stop_actor>)
+BOOST_CLASS_EXPORT(typed_variant<kill_actor>)
+BOOST_CLASS_EXPORT(typed_variant<priority_message>)

@@ -4,11 +4,11 @@
 
 namespace bumbler {
 
-template<typename T>
-class priority_message : public command<T> {
+class priority_message : public command {
 public:
     priority_message() {}
-    priority_message(T data, int priority = 0) : command<T>(data, priority) {}
+	template<typename T>
+    priority_message(const T& data, int priority) : command(data, priority) {}
 };
 
 }

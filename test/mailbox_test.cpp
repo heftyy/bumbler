@@ -13,14 +13,14 @@
 using namespace bumbler;
 
 using msgPtr = std::unique_ptr<message>;
-using priorityMsg = priority_message<int>;
+using priorityMsg = priority_message;
 
 BOOST_AUTO_TEST_SUITE(mailbox_test_suite)
 
 BOOST_AUTO_TEST_CASE(StandardMailboxTest) {
     std::unique_ptr<mailbox> mailbox = std::make_unique<fifo_mailbox>();
 
-    auto tm = typed_message_factory::create(actor_ref::none(), actor_ref::none(), 5);
+    auto tm = typed_message_factory::create(actor_ref::none(), actor_ref::none(), typed_variant_factory::create(5));
 
     mailbox->push_message(std::move(tm));
 
@@ -36,7 +36,7 @@ BOOST_AUTO_TEST_CASE(PriorityMailboxTest) {
     std::unique_ptr<mailbox> mailbox = std::make_unique<priority_mailbox>();
 
     // add one message without a priority set ( uses default 0 )
-    auto tm = typed_message_factory::create(actor_ref::none(), actor_ref::none(), 4);
+    auto tm = typed_message_factory::create(actor_ref::none(), actor_ref::none(), typed_variant_factory::create(4));
 
     mailbox->push_message(std::move(tm));
 
@@ -49,8 +49,8 @@ BOOST_AUTO_TEST_CASE(PriorityMailboxTest) {
 
     for (auto const& entry : map) {
         // add 4 messages with priority from the map
-        auto tm = typed_message_factory::create(actor_ref::none(), actor_ref::none(),
-                                                priority_message < int > (entry.first, entry.second));
+		auto pm = priority_message(entry.first, entry.second);
+		auto tm = typed_message_factory::create(actor_ref::none(), actor_ref::none(), typed_variant_factory::create(pm));
 
         mailbox->push_message(std::move(tm));
     }
@@ -93,13 +93,13 @@ BOOST_AUTO_TEST_CASE(ActorPriorityMailboxTest) {
     la1.tell(std::string("regular msg1"));
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
-    la1.tell(priority_message<std::string>("priority msg second", 5));
-    la1.tell(priority_message<std::string>("priority msg third ", 4));
-    la1.tell(priority_message<std::string>("priority msg first", 9));
+    la1.tell(priority_message("priority msg second", 5));
+    la1.tell(priority_message("priority msg third ", 4));
+    la1.tell(priority_message("priority msg first", 9));
 
     // stop the actor after all the messages from the queue are read
     // this will block for 1000ms+
-    la1.tell(bumbler::stop_actor<int>(5));
+    la1.tell(bumbler::stop_actor(5));
 
     system1->stop(false);
 

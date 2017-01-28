@@ -1,6 +1,7 @@
 #pragma once
 
 #include "actor_channel.h"
+#include "../actor_ref/actor_ref.h"
 
 namespace bumbler {
 
@@ -10,12 +11,7 @@ class local_actor_channel : public actor_channel {
 public:
     local_actor_channel() : actor_channel() { }
 
-    local_actor_channel(const actor_ref& target_actor_ref) :
-            actor_channel(target_actor_ref) { }
-
-    local_actor_channel(const actor_ref& target_actor_ref,
-                        const std::shared_ptr<abstract_actor>& actor_ptr) :
-            actor_channel(target_actor_ref),
+    local_actor_channel(const std::shared_ptr<abstract_actor>& actor_ptr) :
             actor_ptr_(actor_ptr) { }
 
 private:

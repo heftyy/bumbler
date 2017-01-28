@@ -15,11 +15,11 @@ std::string actor_ref::to_string() const {
 }
 
 void actor_ref::stop() {
-    this->tell(stop_actor<int>(0));
+    this->tell(stop_actor(0));
 }
 
 void actor_ref::kill() {
-    this->tell(kill_actor<int>(0));
+    this->tell(kill_actor(0));
 }
 
 void actor_ref::resolve() {
@@ -28,6 +28,10 @@ void actor_ref::resolve() {
     } else {
         channel_ = actor_system_storage::instance().get_system(system_name)->get_actor_channel(actor_name);
     }
+}
+
+std::unique_ptr<message> actor_ref::make_message(std::unique_ptr<variant> variant_ptr, const actor_ref& target, const actor_ref& sender) const {
+	return typed_message_factory::create(target, sender, std::move(variant_ptr));
 }
 
 }
