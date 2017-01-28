@@ -5,7 +5,6 @@
 #include <boost/any.hpp>
 
 #include "variant.h"
-#include "commands/commands.h"
 
 namespace bumbler {
 

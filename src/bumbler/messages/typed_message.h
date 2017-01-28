@@ -4,6 +4,7 @@
 #include <boost/any.hpp>
 #include "variant.h"
 #include "message.h"
+#include "commands/commands.h"
 #include "../utility.h"
 
 namespace bumbler {
