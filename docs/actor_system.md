@@ -17,9 +17,13 @@ void stop(bool wait = false);
 
 int stop_actor(std::string actor_name, bool wait = false);
 int tell_actor(std::unique_ptr<message> msg, bool from_remote = false);
-int future_tell_actor(std::unique_ptr<message> msg, std::function<void(boost::any)>& response_fn);
+int ask_actor(std::unique_ptr<message> msg, const ResponseFun& response_fn);
 
 const actor_ref get_actor_ref(std::string actor_name);
+std::unique_ptr<actor_channel> get_actor_channel(const std::string& actor_name);
+
+template<typename Props, typename ...ActorArgs>
+actor_ref actor_of(Props&& props, ActorArgs&&... actor_args);
 
 template<typename T>
 std::shared_ptr<cancellable> schedule(T&& data, const actor_ref& target, long initial_delay_ms, long interval_ms = 0) const;
