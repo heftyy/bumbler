@@ -1,5 +1,8 @@
 #include "smallest_mailbox_pool.h"
 
+#include "../abstract_actor.h"
+#include "../../messages/message.h"
+
 namespace bumbler {
 
 void smallest_mailbox_pool::tell_one(std::unique_ptr<message> msg) {

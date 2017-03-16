@@ -2,9 +2,7 @@
 
 #include <iostream>
 #include <atomic>
-#include <bumbler/actor/local_actor.h>
-#include <bumbler/messages/commands/commands.h>
-#include <communication/message_settings.h>
+#include <bumbler/actor/untyped_actor.h>
 
 class out_actor : public bumbler::untyped_actor {
 public:

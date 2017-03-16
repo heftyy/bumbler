@@ -1,10 +1,7 @@
 #pragma once
 
-#include <iostream>
-#include <atomic>
 #include <boost/format.hpp>
-#include <bumbler/actor_system/actor_system.h>
-#include <communication/message_settings.h>
+#include <bumbler/actor/untyped_actor.h>
 
 class out_router : public untyped_actor
 {

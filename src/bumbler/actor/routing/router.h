@@ -1,16 +1,14 @@
 #pragma once
 
-#include <list>
 #include <memory>
-#include <functional>
-#include "../abstract_actor.h"
-#include "../local_actor.h"
 #include "router_pool.h"
+#include "../abstract_actor.h"
 
 namespace bumbler {
 
 class actor_system;
 class untyped_actor;
+class router_pool;
 
 class router : public abstract_actor
 {

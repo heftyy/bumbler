@@ -1,7 +1,7 @@
 #pragma once
 
-#include <vector>
 #include <memory>
+#include <atomic>
 #include "router_pool.h"
 
 namespace bumbler {

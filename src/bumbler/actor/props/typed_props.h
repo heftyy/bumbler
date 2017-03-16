@@ -5,6 +5,7 @@
 #include "../local_actor.h"
 #include "../promise_actor.h"
 #include "../routing/router.h"
+#include "../mailbox/fifo_mailbox.h"
 #include "props.h"
 
 namespace bumbler {

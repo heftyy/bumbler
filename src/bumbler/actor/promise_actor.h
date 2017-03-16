@@ -1,6 +1,5 @@
 #pragma once
 
-#include <future>
 #include "abstract_actor.h"
 
 namespace bumbler {

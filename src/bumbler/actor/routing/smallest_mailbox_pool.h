@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <memory>
+#include <mutex>
 #include "router_pool.h"
 
 namespace bumbler {

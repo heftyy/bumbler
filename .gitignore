@@ -158,6 +158,7 @@ $RECYCLE.BIN/
 .DS_Store
 
 .idea/
+.vs/
 .vscode/
 _build/
 Testing/

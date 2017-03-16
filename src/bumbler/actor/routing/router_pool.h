@@ -2,10 +2,14 @@
 
 #include <memory>
 #include <vector>
-#include "../abstract_actor.h"
+#include <cassert>
 #include "router_logic.h"
 
 namespace bumbler {
+
+class actor_system;
+class abstract_actor;
+class message;
 
 class router_pool {
 public:
@@ -18,19 +22,7 @@ public:
 
     virtual std::unique_ptr<router_pool> clone() const = 0;
 
-    void tell(std::unique_ptr<message> msg) {
-        assert(
-                (routees_.size() > 0) &&
-                "router pool has to be initialized before you use tell"
-        );
-
-        if(msg->is_broadcast()) {
-            this->tell_all(std::move(msg));
-        }
-        else {
-            this->tell_one(std::move(msg));
-        }
-    }
+	void tell(std::unique_ptr<message> msg);
 
     template<typename ActorType, typename MailboxFunc, typename TypedActorFunc>
     void create_pool(const std::shared_ptr<actor_system>& actor_system,
@@ -45,11 +37,7 @@ public:
         }
     }
 
-    void stop(bool wait = false) {
-        for(auto& routee : this->routees_) {
-            routee->stop_actor(wait);
-        }
-    }
+	void stop(bool wait = false);
 
 protected:
     int pool_size_;
@@ -58,10 +46,7 @@ protected:
 
     router_pool(int pool_size, const router_logic &logic)
             : pool_size_(pool_size), logic_(logic) {
-        assert(
-                (pool_size > 0) &&
-                "router pool size has to be greater than 0"
-        );
+        assert(pool_size > 0 && "router pool size has to be greater than 0");
     }
 
     router_pool(const router_pool& rhs) : pool_size_(rhs.pool_size_), logic_(rhs.logic_), routees_() { }
@@ -74,14 +59,7 @@ protected:
     }
 
     virtual void tell_one(std::unique_ptr<message> msg) = 0;
-
-    void tell_all(std::unique_ptr<message> msg) {
-        for(int i = 0; i < this->routees_.size(); i++) {
-            auto msg_copy = std::move(msg->clone());
-
-            routees_[i]->pass_message(std::move(msg_copy));
-        }
-    }
+	void tell_all(std::unique_ptr<message> msg);
 };
 
 }

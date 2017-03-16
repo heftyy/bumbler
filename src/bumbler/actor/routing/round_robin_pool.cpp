@@ -1,4 +1,8 @@
+
 #include "round_robin_pool.h"
+
+#include "../abstract_actor.h"
+#include "../../messages/message.h"
 
 namespace bumbler {
 

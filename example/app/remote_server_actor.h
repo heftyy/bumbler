@@ -2,7 +2,7 @@
 
 #include <iostream>
 #include <atomic>
-#include <communication/message_settings.h>
+#include <bumbler/actor/untyped_actor.h>
 
 class remote_server_actor : public untyped_actor {
 public:

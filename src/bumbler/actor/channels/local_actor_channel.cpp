@@ -1,5 +1,4 @@
 #include "local_actor_channel.h"
-#include "../../actor/abstract_actor.h"
 #include "../../actor/promise_actor.h"
 #include "../../actor/typed_promise_actor.h"
 #include "../../actor/props/typed_props.h"

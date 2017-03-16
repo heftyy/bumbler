@@ -1,27 +1,15 @@
 #pragma once
 
-#include <chrono>
 #include <atomic>
-#include <mutex>
-#include <queue>
-#include <thread>
-#include <future>
 #include <memory>
-#include <type_traits>
-#include <boost/static_assert.hpp>
 #include "actor_ref/actor_ref.h"
-#include "../actor_system/actor_system_errors.h"
-#include "../messages/message.h"
-#include "../messages/commands/commands.h"
-#include "../packet/packet.h"
-#include "../logger/logger.h"
-#include "../utility.h"
-#include "untyped_actor.h"
-#include "mailbox/fifo_mailbox.h"
 
 namespace bumbler {
 
 class actor_system;
+class message;
+class mailbox;
+class untyped_actor;
 
 class abstract_actor {
 public:
@@ -41,7 +29,7 @@ public:
     void pass_message(std::unique_ptr<message> msg);
 
     bool is_busy() const { return busy_; }
-    size_t mailbox_size() const { return this->mailbox_->size(); }
+	size_t mailbox_size() const;
 
     std::string actor_name() const;
     std::string system_name() const;
@@ -50,9 +38,7 @@ public:
         return self_;
     }
 
-    void set_mailbox(std::unique_ptr<mailbox> mbox) {
-        this->mailbox_ = std::move(mbox);
-    }
+	void set_mailbox(std::unique_ptr<mailbox> mbox);
 
 protected:
     std::unique_ptr<untyped_actor> untyped_actor_;
@@ -63,17 +49,10 @@ protected:
     std::weak_ptr<actor_system> actor_system_;
     actor_ref self_;
 
-    virtual void on_receive(const boost::any& data) {
-        this->untyped_actor_->on_receive(data);
-    }
+	virtual void on_receive(const boost::any& data);
+	virtual void on_error(const boost::any& data, const std::exception& ex);
 
-    virtual void on_error(const boost::any& data, const std::exception& ex) {
-        this->untyped_actor_->on_error(data, ex);
-    }
-
-    void clear_queue() {
-        if(this->mailbox_) this->mailbox_->clear();
-    }
+	void clear_queue();
 
 };
 

@@ -15,8 +15,6 @@ set(bumbler_SOURCES
         messages/commands/commands.h
         actor/actor_ref/actor_ref.h
         actor/actor_ref/actor_ref.cpp
-        actor/messaging/messaging_service.cpp
-        actor/messaging/messaging_service.h
         actor/channels/abstract_channel.h
         actor/channels/actor_channel.h
         actor/channels/invalid_channel.h

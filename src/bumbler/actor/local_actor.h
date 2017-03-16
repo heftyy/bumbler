@@ -11,20 +11,7 @@ class untyped_actor;
 
 class local_actor : public abstract_actor {
 public:
-    local_actor(const std::shared_ptr<actor_system>& actor_system, const std::string& name) :
-            abstract_actor(actor_system, name),
-            dispatcher_fun_([this] () -> int {
-				size_t throughput = calculate_throughput();
-
-				auto msg_vec = mailbox_->pop_messages(throughput);
-				if (msg_vec.size() == 0) return 0;
-
-                for (int i = 0; i < msg_vec.size(); i++) {
-                    this->run_task(msg_vec[i]->get_sender(), msg_vec[i]->get_data());
-                }
-                return 0;
-            })
-    { }
+	local_actor(const std::shared_ptr<actor_system>& actor_system, const std::string& name);
 
     virtual ~local_actor();
 

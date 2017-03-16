@@ -1,5 +1,6 @@
 #include "router.h"
 #include "router_pool.h"
+#include "../../messages/message.h"
 
 namespace bumbler {
 
