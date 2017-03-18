@@ -4,6 +4,7 @@
 #include <vector>
 #include <cassert>
 #include "router_logic.h"
+#include "../../internal/bumbler.h"
 
 namespace bumbler {
 
@@ -17,7 +18,7 @@ public:
     router_pool& operator=(router_pool&& rhs) = default;
 
     virtual ~router_pool() {
-        stop();
+        stop(stop_mode::IGNORE_QUEUE);
     }
 
     virtual std::unique_ptr<router_pool> clone() const = 0;
@@ -37,7 +38,7 @@ public:
         }
     }
 
-	void stop(bool wait = false);
+	void stop(stop_mode stop_mode);
 
 protected:
     int pool_size_;

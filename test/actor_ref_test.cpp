@@ -47,7 +47,7 @@ BOOST_AUTO_TEST_CASE(ActorRefResolveTest) {
     ref2.resolve();
     BOOST_CHECK_EQUAL(ref2.is_resolved(), true);
 
-    system1->stop(false);
+    system1->stop(stop_mode::IGNORE_QUEUE);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

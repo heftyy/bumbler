@@ -16,7 +16,7 @@ public:
     router(const std::shared_ptr<actor_system> &actor_system, const std::string &name)
             : abstract_actor(actor_system, name) { }
 
-    void stop_actor(bool wait = false) override;
+    void stop_actor(stop_mode stop_mode) override;
     void set_router_pool(std::unique_ptr<router_pool> pool);
 
 protected:

@@ -14,7 +14,7 @@
 using namespace bumbler;
 
 //int MESSAGES_TO_SEND = 5 * 1000 * 1000;
-int MESSAGES_TO_SEND = 5 * 1000 * 10;
+int MESSAGES_TO_SEND = 5 * 1000 * 100;
 
 BOOST_AUTO_TEST_SUITE(messages_benchmark)
 
@@ -52,7 +52,7 @@ BOOST_AUTO_TEST_CASE(MessagesActorBenchmark) {
         la1.tell(37);
     }
 
-    system1->stop(true);
+    system1->stop(stop_mode::WAIT_FOR_QUEUE);
 
     auto end = std::chrono::steady_clock::now();
 
@@ -79,7 +79,7 @@ BOOST_AUTO_TEST_CASE(MessagesRouterBenchmark) {
         r1.tell(37);
     }
 
-    system1->stop(true);
+    system1->stop(stop_mode::WAIT_FOR_QUEUE);
 
     auto end = std::chrono::steady_clock::now();
 

@@ -1,8 +1,9 @@
 #include "actor_ref.h"
 #include "../promise_actor.h"
-#include "../../messages/commands/commands.h"
 #include "../channels/local_actor_channel.h"
 #include "../channels/remote_actor_channel.h"
+#include "../../messages/commands/commands.h"
+#include "../../messages/typed_message.h"
 #include "../../actor_system/actor_system.h"
 #include "../../actor_system/actor_system_storage.h"
 

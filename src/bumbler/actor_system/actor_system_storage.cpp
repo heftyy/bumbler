@@ -1,5 +1,6 @@
 #include "actor_system_storage.h"
 #include "actor_system.h"
+#include "../messages/message.h"
 
 namespace bumbler {
 

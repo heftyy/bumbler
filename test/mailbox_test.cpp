@@ -8,6 +8,7 @@
 #include <bumbler/actor/props/typed_props.h>
 #include <bumbler/actor/local_actor.h>
 #include <bumbler/actor_system/actor_system.h>
+#include <bumbler/messages/typed_message.h>
 #include "test_actor.h"
 
 using namespace bumbler;
@@ -101,7 +102,7 @@ BOOST_AUTO_TEST_CASE(ActorPriorityMailboxTest) {
     // this will block for 1000ms+
     la1.tell(bumbler::stop_actor(5));
 
-    system1->stop(false);
+    system1->stop(stop_mode::IGNORE_QUEUE);
 
     BOOST_CHECK_EQUAL(test_actor::message_count.load(), 4);
 }

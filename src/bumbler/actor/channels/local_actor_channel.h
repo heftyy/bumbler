@@ -1,7 +1,6 @@
 #pragma once
 
 #include "actor_channel.h"
-#include "../actor_ref/actor_ref.h"
 
 namespace bumbler {
 

@@ -2,7 +2,6 @@
 
 #include <memory>
 #include <map>
-#include <iostream>
 #include <mutex>
 
 namespace bumbler {
@@ -19,11 +18,9 @@ public:
     void destroy();
 
     void add_system(std::shared_ptr<actor_system> actor_system);
-
     void remove_system(std::string system_name);
 
     std::shared_ptr<actor_system> get_system(std::string system_name);
-
     std::shared_ptr<actor_system> any();
 
 private:

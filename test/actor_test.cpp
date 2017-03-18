@@ -8,6 +8,7 @@
 #include <bumbler/thread_pool/thread_pool.h>
 #include <bumbler/actor_system/actor_system.h>
 #include <bumbler/actor/local_actor.h>
+#include <bumbler/messages/message.h>
 #include <communication/serializable_types.h>
 #include "test_actor.h"
 #include "typed_data.h"
@@ -24,7 +25,7 @@ BOOST_AUTO_TEST_CASE(ActorSystemInitTest) {
     BOOST_CHECK_EQUAL(system1->started(), true);
 
     BOOST_CHECK_EQUAL(system1->stopped(), false);
-    system1->stop(false);
+    system1->stop(stop_mode::IGNORE_QUEUE);
     BOOST_CHECK_EQUAL(system1->stopped(), true);
 }
 
@@ -39,7 +40,7 @@ BOOST_AUTO_TEST_CASE(ActorInitTest) {
 
     BOOST_CHECK_EQUAL(from_system1.to_string(), la1.to_string());
 
-    system1->stop(false);
+    system1->stop(stop_mode::IGNORE_QUEUE);
 }
 
 BOOST_AUTO_TEST_CASE(ActorStopTest) {
@@ -58,7 +59,7 @@ BOOST_AUTO_TEST_CASE(ActorStopTest) {
     //this will block for 1000ms+
     la1.tell(bumbler::stop_actor(5));
 
-    system1->stop(false);
+    system1->stop(stop_mode::IGNORE_QUEUE);
 
     BOOST_CHECK_EQUAL(test_actor::message_count.load(), 2);
 }
@@ -80,7 +81,7 @@ BOOST_AUTO_TEST_CASE(ActorKillTest) {
     //clear the queue ( 1 message left ) and stop the actor
     la1.tell(bumbler::kill_actor(5));
 
-    system1->stop(false);
+    system1->stop(stop_mode::IGNORE_QUEUE);
 
     BOOST_CHECK_LE(test_actor::message_count.load(), 1);
 }
@@ -104,7 +105,7 @@ BOOST_AUTO_TEST_CASE(ActorRemoteTest) {
 		BOOST_LOG_TRIVIAL(debug) << e.what();
 	}
 
-	system1->stop(true);
+	system1->stop(stop_mode::WAIT_FOR_QUEUE);
 
 	BOOST_CHECK_LE(test_actor::message_count.load(), 2);
 }

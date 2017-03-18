@@ -28,7 +28,7 @@ BOOST_AUTO_TEST_CASE(SpawnActorBenchmark) {
         auto la1 = system1->actor_of(props_local, "benchmark_actor" + std::to_string(i));
     }
 
-    system1->stop(true);
+    system1->stop(stop_mode::WAIT_FOR_QUEUE);
 }
 
 

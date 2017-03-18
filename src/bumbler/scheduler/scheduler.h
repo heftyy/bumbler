@@ -75,10 +75,6 @@ public:
         return ret_cancellable;
     }
 
-    std::shared_ptr<cancellable> schedule_once(std::unique_ptr<typed_message> msg, long initial_delay_ms) const {
-        return schedule(std::move(msg), initial_delay_ms, 0);
-    }
-
 };
 
 }

@@ -62,16 +62,16 @@ public:
         this->tell(std::string(data), sender);
     }
 
+	void tell(std::unique_ptr<message> msg) {
+		if (!channel_ || channel_->expired()) resolve();
+		channel_->tell(std::move(msg));
+	}
+
     template<typename T>
     void tell(T&& data, const actor_ref& sender = actor_ref::none()) {
         if(!channel_ || channel_->expired()) resolve();
 		channel_->tell(make_message(make_variant(std::forward<T>(data)), *this, sender));
-    }
-
-    void tell(std::unique_ptr<message> msg) {
-        if(!channel_ || channel_->expired()) resolve();
-        channel_->tell(std::move(msg));
-    }
+    }    
 
     template<typename Result>
     std::future<Result> ask(const char* data) {

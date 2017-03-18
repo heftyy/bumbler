@@ -1,12 +1,13 @@
 #define BOOST_TEST_MODULE ROUTER_TEST
 
 #include <boost/test/unit_test.hpp>
-#include <bumbler/actor_system/actor_system.h>
 #include <communication/serializable_types.h>
+#include <bumbler/actor_system/actor_system.h>
 #include <bumbler/actor/props/typed_props.h>
 #include <bumbler/actor/routing/round_robin_pool.h>
 #include <bumbler/actor/routing/smallest_mailbox_pool.h>
 #include <bumbler/actor/routing/random_pool.h>
+#include <bumbler/messages/message.h>
 #include "test_actor.h"
 #include "remote_test_actor.h"
 #include "test_actor.h"
@@ -28,7 +29,7 @@ BOOST_AUTO_TEST_CASE(RouterCreateTest) {
 
 	BOOST_CHECK_EQUAL(from_system1.to_string(), r1.to_string());
 
-	system1->stop(true);
+	system1->stop(stop_mode::WAIT_FOR_QUEUE);
 }
 
 BOOST_AUTO_TEST_CASE(RouterTellTest) {
@@ -43,7 +44,7 @@ BOOST_AUTO_TEST_CASE(RouterTellTest) {
 
 	r1.tell(6);
 
-	system1->stop(true);
+	system1->stop(stop_mode::WAIT_FOR_QUEUE);
 
 	BOOST_CHECK_EQUAL(test_actor::message_count.load(), 1);
 }
@@ -63,7 +64,7 @@ BOOST_AUTO_TEST_CASE(RouterRandomTest) {
 	r1.tell(8);
 	r1.tell(9);
 
-	system1->stop(true);
+	system1->stop(stop_mode::WAIT_FOR_QUEUE);
 
 	BOOST_CHECK_EQUAL(test_actor::message_count.load(), 4);
 }
@@ -83,7 +84,7 @@ BOOST_AUTO_TEST_CASE(RouterSmallestMailboxTest) {
 	r1.tell(8);
 	r1.tell(9);
 
-	system1->stop(true);
+	system1->stop(stop_mode::WAIT_FOR_QUEUE);
 
 	BOOST_CHECK_EQUAL(test_actor::message_count.load(), 4);
 }
@@ -107,7 +108,7 @@ BOOST_AUTO_TEST_CASE(RouterFutureTest) {
 
 	BOOST_CHECK_EQUAL(test_actor::message_count.load(), 1);
 
-	system1->stop(true);
+	system1->stop(stop_mode::WAIT_FOR_QUEUE);
 }
 
 BOOST_AUTO_TEST_CASE(RouterTellAllTest) {
@@ -124,7 +125,7 @@ BOOST_AUTO_TEST_CASE(RouterTellAllTest) {
 
 	r1.tell(typed_data<std::string>(std::string("blam")));
 
-	system1->stop(true);
+	system1->stop(stop_mode::WAIT_FOR_QUEUE);
 
 	BOOST_CHECK_EQUAL(test_actor::message_count.load(), 3);
 }
@@ -146,8 +147,8 @@ BOOST_AUTO_TEST_CASE(RouterRemoteTellAllTest) {
 
 	std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
-	system1->stop(true);
-	system2->stop(true);
+	system1->stop(stop_mode::WAIT_FOR_QUEUE);
+	system2->stop(stop_mode::WAIT_FOR_QUEUE);
 
 	BOOST_CHECK_EQUAL(test_actor::message_count.load(), 3);
 }

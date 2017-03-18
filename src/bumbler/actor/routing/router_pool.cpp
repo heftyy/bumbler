@@ -13,9 +13,9 @@ void bumbler::router_pool::tell(std::unique_ptr<message> msg) {
 	}
 }
 
-void bumbler::router_pool::stop(bool wait) {
+void bumbler::router_pool::stop(stop_mode stop_mode) {
 	for (auto&& routee : this->routees_) {
-		routee->stop_actor(wait);
+		routee->stop_actor(stop_mode);
 	}
 }
 

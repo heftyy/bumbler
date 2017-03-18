@@ -34,7 +34,7 @@ BOOST_AUTO_TEST_CASE(ActorLocalFutureTest) {
 
     BOOST_CHECK_EQUAL(f1.get(), "BLAM");
 
-    system1->stop(true);
+    system1->stop(stop_mode::WAIT_FOR_QUEUE);
 }
 
 BOOST_AUTO_TEST_CASE(ActorRemoteFutureTest) {
@@ -53,7 +53,7 @@ BOOST_AUTO_TEST_CASE(ActorRemoteFutureTest) {
 
     BOOST_CHECK_EQUAL(f1.get(), "BLAM");
 
-    system1->stop(true);
+    system1->stop(stop_mode::WAIT_FOR_QUEUE);
 }
 
 BOOST_AUTO_TEST_CASE(ActorRemoteFutureSerializationTest) {
@@ -70,7 +70,7 @@ BOOST_AUTO_TEST_CASE(ActorRemoteFutureSerializationTest) {
 
     BOOST_CHECK_EQUAL(f1.get(), "BLAM");
 
-    system1->stop(true);
+    system1->stop(stop_mode::WAIT_FOR_QUEUE);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

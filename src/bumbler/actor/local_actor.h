@@ -2,7 +2,6 @@
 
 #include <vector>
 #include "abstract_actor.h"
-#include "../actor_system/actor_system_errors.h"
 
 namespace bumbler {
 
@@ -16,7 +15,7 @@ public:
     virtual ~local_actor();
 
     void init(std::unique_ptr<untyped_actor> u_actor) override;
-    void stop_actor(bool wait = false) override;
+    void stop_actor(stop_mode stop_mode) override;
 
     void create_internal_queue_thread();
 
@@ -30,7 +29,6 @@ private:
 
     std::mutex actor_thread_mutex_;
     std::future<void> queue_thread_future_;
-    std::function<int()> dispatcher_fun_;
     std::condition_variable cv_;
 
     size_t calculate_throughput() const;

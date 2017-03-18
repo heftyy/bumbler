@@ -45,7 +45,7 @@ private:
 class typed_variant_factory {
 public:
 	template<typename T>
-	static  std::unique_ptr<variant> create(const T& data) {
+	static std::unique_ptr<variant> create(const T& data) {
 		return std::unique_ptr<variant>(new typed_variant<T>(data));
 	}
 };

@@ -22,7 +22,7 @@ public:
     virtual ~abstract_actor();
 
     virtual void init(std::unique_ptr<untyped_actor> u_actor);
-    virtual void stop_actor(bool wait = false) = 0;
+	virtual void stop_actor(stop_mode stop_mode) = 0;
 
     virtual void tell(std::unique_ptr<message> msg) = 0;
 
@@ -34,9 +34,7 @@ public:
     std::string actor_name() const;
     std::string system_name() const;
 
-    actor_ref get_self() const {
-        return self_;
-    }
+    actor_ref get_self() const { return self_; }
 
 	void set_mailbox(std::unique_ptr<mailbox> mbox);
 

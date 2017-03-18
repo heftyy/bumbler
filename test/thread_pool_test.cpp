@@ -40,7 +40,7 @@ BOOST_AUTO_TEST_CASE(ThreadPollWait) {
     }, 4);
 
     // wait for all tasks to finish
-    tp.stop(true);
+    tp.stop(stop_mode::WAIT_FOR_QUEUE);
 
     BOOST_LOG_TRIVIAL(debug) << "task_counter = " << task_counter;
 
