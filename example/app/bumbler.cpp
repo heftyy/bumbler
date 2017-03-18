@@ -10,7 +10,7 @@
 
 int main(int argc, char *argv[]) {
 
-	auto system = actor_system::create_system("actor_system", 4444);
+    auto system = actor_system::create_system("actor_system", 4444);
 
     auto props_local = bumbler::typed_props<local_actor, out_actor>();
 

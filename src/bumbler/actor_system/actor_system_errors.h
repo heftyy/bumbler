@@ -11,12 +11,12 @@ public:
 
 class actor_already_exists : public bumbler_error {
 public:
-	actor_already_exists(const std::string& message) : bumbler_error(message) { };
+    actor_already_exists(const std::string& message) : bumbler_error(message) { };
 };
 
 class actor_not_found : public bumbler_error {
 public:
-	actor_not_found(const std::string& message) : bumbler_error(message) { };
+    actor_not_found(const std::string& message) : bumbler_error(message) { };
 };
 
 class actor_system_stopped : public bumbler_error {
@@ -26,17 +26,17 @@ public:
 
 class server_doesnt_exist : public bumbler_error {
 public:
-	server_doesnt_exist(const std::string& message) : bumbler_error(message) { };
+    server_doesnt_exist(const std::string& message) : bumbler_error(message) { };
 };
 
 class wrong_actor_system: public bumbler_error {
 public:
-	wrong_actor_system(const std::string& message) : bumbler_error(message) { };
+    wrong_actor_system(const std::string& message) : bumbler_error(message) { };
 };
 
 class wrong_actor_method: public bumbler_error {
 public:
-	wrong_actor_method(const std::string& message) : bumbler_error(message) { };
+    wrong_actor_method(const std::string& message) : bumbler_error(message) { };
 };
 
 

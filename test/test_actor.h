@@ -23,7 +23,7 @@ public:
 
 protected:
     void on_receive(const boost::any& data) override {
-	    ++message_count;
+        ++message_count;
 
         BOOST_LOG_TRIVIAL(debug) << "[TEST_ACTOR] on_receive thread id = " << std::this_thread::get_id();
         BOOST_LOG_TRIVIAL(debug) << "[TEST_ACTOR] received message from " << get_sender().actor_name;

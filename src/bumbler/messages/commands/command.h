@@ -15,29 +15,29 @@ namespace bumbler {
 
 class command {
 public:
-	std::unique_ptr<variant> var;
+    std::unique_ptr<variant> var;
     int priority;
 
     command() { }
     command(const char* data, int priority = 0) : command(std::string(data), priority) {}
-	template<typename T>
+    template<typename T>
     command(const T& data, int priority = 0) : priority(priority) {
-		var = typed_variant_factory::create(data);
-	}
+        var = typed_variant_factory::create(data);
+    }
 
-	command(const command& rhs) {
-		this->var = rhs.var->clone();
-		this->priority = rhs.priority;
-	}
+    command(const command& rhs) {
+        this->var = rhs.var->clone();
+        this->priority = rhs.priority;
+    }
 
-	command& operator=(const command& rhs) {
-		this->var = rhs.var->clone();
-		this->priority = rhs.priority;
-		return *this;
-	}
+    command& operator=(const command& rhs) {
+        this->var = rhs.var->clone();
+        this->priority = rhs.priority;
+        return *this;
+    }
 
-	command(command&&) = default; // support moving
-	command& operator=(command&&) = default;
+    command(command&&) = default; // support moving
+    command& operator=(command&&) = default;
 
 private:
     friend class boost::serialization::access;

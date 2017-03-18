@@ -23,7 +23,7 @@ public:
 
     virtual std::unique_ptr<router_pool> clone() const = 0;
 
-	void tell(std::unique_ptr<message> msg);
+    void tell(std::unique_ptr<message> msg);
 
     template<typename ActorType, typename MailboxFunc, typename TypedActorFunc>
     void create_pool(const std::shared_ptr<actor_system>& actor_system,
@@ -38,7 +38,7 @@ public:
         }
     }
 
-	void stop(stop_mode stop_mode);
+    void stop(stop_mode stop_mode);
 
 protected:
     int pool_size_;
@@ -60,7 +60,7 @@ protected:
     }
 
     virtual void tell_one(std::unique_ptr<message> msg) = 0;
-	void tell_all(std::unique_ptr<message> msg);
+    void tell_all(std::unique_ptr<message> msg);
 };
 
 }

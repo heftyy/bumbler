@@ -15,8 +15,8 @@ class typed_message : public message {
 public:
     typed_message() { }
 
-	typed_message(const typed_message& rhs);
-	typed_message& operator=(const typed_message& rhs);
+    typed_message(const typed_message& rhs);
+    typed_message& operator=(const typed_message& rhs);
 
     typed_message(typed_message&&) = default; // support moving
     typed_message& operator=(typed_message&&) = default;
@@ -26,19 +26,19 @@ public:
     int get_priority() const override;
 
     bool is_broadcast() const override {
-		return typeid(broadcast) == variant_->type();
+        return typeid(broadcast) == variant_->type();
     }
 
     bool is_stop_actor() const override {
-		return typeid(stop_actor) == variant_->type();
+        return typeid(stop_actor) == variant_->type();
     }
 
     bool is_kill_actor() const override {
-		return typeid(kill_actor) == variant_->type();
+        return typeid(kill_actor) == variant_->type();
     }
 
     bool is_priority_message() const override {
-		return typeid(priority_message) == variant_->type();
+        return typeid(priority_message) == variant_->type();
     }
 
     boost::any get_data() const override;
@@ -63,15 +63,15 @@ public:
         return std::make_unique<typed_message>(*this);
     }
 
-private:	
-	actor_ref target_;
-	actor_ref sender_;
-	std::unique_ptr<variant> variant_;
+private:    
+    actor_ref target_;
+    actor_ref sender_;
+    std::unique_ptr<variant> variant_;
 
-	friend class typed_message_factory;
-	typed_message(const actor_ref& target,
-				  const actor_ref& sender,
-				  std::unique_ptr<variant> variant);
+    friend class typed_message_factory;
+    typed_message(const actor_ref& target,
+                  const actor_ref& sender,
+                  std::unique_ptr<variant> variant);
 
     friend class boost::serialization::access;
     template<class Archive>

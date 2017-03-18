@@ -35,9 +35,9 @@ public:
 
     packet_data() { }
 
-	explicit packet_data(const std::string& d) : data(d) { }
-	explicit packet_data(const std::vector<char>& d) : data(d.begin(), d.end()) { }
-	explicit packet_data(char *data, size_t length) : data(std::string(data, data + sizeof(char) * length)) { }
+    explicit packet_data(const std::string& d) : data(d) { }
+    explicit packet_data(const std::vector<char>& d) : data(d.begin(), d.end()) { }
+    explicit packet_data(char *data, size_t length) : data(std::string(data, data + sizeof(char) * length)) { }
 
     void load(std::unique_ptr<message> msg);
 

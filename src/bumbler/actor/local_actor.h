@@ -10,7 +10,7 @@ class untyped_actor;
 
 class local_actor : public abstract_actor {
 public:
-	local_actor(const std::shared_ptr<actor_system>& actor_system, const std::string& name);
+    local_actor(const std::shared_ptr<actor_system>& actor_system, const std::string& name);
 
     virtual ~local_actor();
 

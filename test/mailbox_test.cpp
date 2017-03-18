@@ -50,8 +50,8 @@ BOOST_AUTO_TEST_CASE(PriorityMailboxTest) {
 
     for (auto const& entry : map) {
         // add 4 messages with priority from the map
-		auto pm = priority_message(entry.first, entry.second);
-		auto tm = typed_message_factory::create(actor_ref::none(), actor_ref::none(), typed_variant_factory::create(pm));
+        auto pm = priority_message(entry.first, entry.second);
+        auto tm = typed_message_factory::create(actor_ref::none(), actor_ref::none(), typed_variant_factory::create(pm));
 
         mailbox->push_message(std::move(tm));
     }

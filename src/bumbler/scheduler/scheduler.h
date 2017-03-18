@@ -18,35 +18,35 @@ public:
     }
 
     ~scheduler() {
-		/*
+        /*
         for (std::shared_ptr<cancellable>& cancellable : cancellable_vector_) {
             if (!cancellable->is_cancelled()) {
                 cancellable->cancel();
             }
         }
-		*/
+        */
     }
 
     std::shared_ptr<cancellable> schedule(std::unique_ptr<typed_message> msg, long initial_delay_ms, long interval_ms) const {
-	    auto ret_cancellable = std::make_shared<cancellable>();
-		std::weak_ptr<cancellable> ret_cancellable_weak_ptr = ret_cancellable;
+        auto ret_cancellable = std::make_shared<cancellable>();
+        std::weak_ptr<cancellable> ret_cancellable_weak_ptr = ret_cancellable;
 
         std::thread scheduler_thread([initial_delay_ms, interval_ms](typed_message msg_copy, std::weak_ptr<cancellable> cancellable) -> int {
-			if (cancellable.expired()) return 2;
-			else {
-				cancellable.lock()->thread_id = std::this_thread::get_id();
+            if (cancellable.expired()) return 2;
+            else {
+                cancellable.lock()->thread_id = std::this_thread::get_id();
 
-				if (initial_delay_ms > 0) {
-					std::chrono::milliseconds initial_delay(initial_delay_ms);
-					std::this_thread::sleep_for(initial_delay);
-				}
-			}
+                if (initial_delay_ms > 0) {
+                    std::chrono::milliseconds initial_delay(initial_delay_ms);
+                    std::this_thread::sleep_for(initial_delay);
+                }
+            }
 
-			if (cancellable.expired()) return 2;
-			else if (cancellable.lock()->check_cancel()) {
-				cancellable.lock()->cancelled();
-				return 1;
-			};
+            if (cancellable.expired()) return 2;
+            else if (cancellable.lock()->check_cancel()) {
+                cancellable.lock()->cancelled();
+                return 1;
+            };
 
             while (!cancellable.expired() && cancellable.lock() != nullptr && !cancellable.lock()->check_cancel()) {
                 BOOST_LOG_TRIVIAL(debug) << "[SCHEDULER] thread_id: " << std::this_thread::get_id() <<
@@ -63,11 +63,11 @@ public:
                 }
             }
 
-			if (cancellable.expired()) return 2;
-			else {
-				cancellable.lock()->cancelled();
-				return 0;
-			}
+            if (cancellable.expired()) return 2;
+            else {
+                cancellable.lock()->cancelled();
+                return 0;
+            }
         }, *msg, ret_cancellable_weak_ptr);
 
         scheduler_thread.detach();

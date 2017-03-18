@@ -1,10 +1,7 @@
 #pragma once
 
-#include <atomic>
 #include <memory>
-#include <stdexcept>
 #include <boost/any.hpp>
-#include <boost/serialization/access.hpp>
 
 #include "../actor/actor_ref/actor_ref.h"
 
@@ -17,8 +14,8 @@ public:
     message(message&& msg) = default; // support moving
     message& operator=(message&& msg) = default;
 
-	message(const message& msg) = default;
-	message& operator=(const message& msg) = default;
+    message(const message& msg) = default;
+    message& operator=(const message& msg) = default;
 
     virtual ~message() {}
 

@@ -7,7 +7,7 @@ namespace bumbler {
 class kill_actor : public command {
 public:
     kill_actor() {}
-	template<typename T>
+    template<typename T>
     kill_actor(const T& data) : command(data) {}
 };
 

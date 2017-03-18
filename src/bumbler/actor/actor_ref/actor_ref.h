@@ -7,6 +7,8 @@
 
 namespace bumbler {
 
+class message;
+
 class actor_ref {
 public:
     std::string actor_name;
@@ -23,15 +25,15 @@ public:
             : actor_name(actor_name), system_name(system_name), ip(ip), port(port) { }
 
     actor_ref(const std::string& actor_ref) /** [actor]$[system_name]@[ip]:[port] */ {
-	    auto system_name_start = actor_ref.find('$');
-	    auto ip_start = actor_ref.find('@');
+        auto system_name_start = actor_ref.find('$');
+        auto ip_start = actor_ref.find('@');
         unsigned long long int port_start = actor_ref.find(':');
         actor_name = actor_ref.substr(0, system_name_start);
         system_name = actor_ref.substr(system_name_start + 1, ip_start - system_name_start - 1);
         ip = actor_ref.substr(ip_start + 1, port_start - ip_start - 1);
         //boost asio doesn't like localhost
-        if(ip.compare("localhost") == 0) ip = "127.0.0.1";
-        port = atoi(actor_ref.substr(port_start + 1, actor_ref.length() - port_start - 1).c_str());
+        if(ip == "localhost") ip = "127.0.0.1";
+        port = std::atoi(actor_ref.substr(port_start + 1, actor_ref.length() - port_start - 1).c_str());
     }
 
     virtual ~actor_ref() = default; // make dtor virtual
@@ -62,15 +64,10 @@ public:
         this->tell(std::string(data), sender);
     }
 
-	void tell(std::unique_ptr<message> msg) {
-		if (!channel_ || channel_->expired()) resolve();
-		channel_->tell(std::move(msg));
-	}
-
     template<typename T>
     void tell(T&& data, const actor_ref& sender = actor_ref::none()) {
         if(!channel_ || channel_->expired()) resolve();
-		channel_->tell(make_message(make_variant(std::forward<T>(data)), *this, sender));
+        channel_->tell(make_message(make_variant(std::forward<T>(data)), *this, sender));
     }    
 
     template<typename Result>
@@ -80,7 +77,7 @@ public:
 
     template<typename Result, typename T>
     std::future<Result> ask(T&& data) {
-		if (!channel_ || channel_->expired()) resolve();
+        if (!channel_ || channel_->expired()) resolve();
         return channel_->ask<Result>(make_message(make_variant(std::forward<T>(data)), *this, none()));
     }
 
@@ -126,9 +123,9 @@ public:
 private:
     std::unique_ptr<abstract_channel> channel_;
 
-	template<typename T>
-	std::unique_ptr<variant> make_variant(T&& data) { return typed_variant_factory::create(std::forward<T>(data)); }
-	std::unique_ptr<message> make_message(std::unique_ptr<variant> variant_ptr, const actor_ref& target, const actor_ref& sender) const;
+    template<typename T>
+    std::unique_ptr<variant> make_variant(T&& data) { return typed_variant_factory::create(std::forward<T>(data)); }
+    std::unique_ptr<message> make_message(std::unique_ptr<variant> variant_ptr, const actor_ref& target, const actor_ref& sender) const;
 
     void reset() {
         this->actor_name = "";

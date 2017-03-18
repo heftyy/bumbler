@@ -7,7 +7,7 @@
 namespace bumbler {
 
 local_actor::local_actor(const std::shared_ptr<actor_system>& actor_system, const std::string& name) :
-	abstract_actor(actor_system, name)	
+    abstract_actor(actor_system, name)    
 { }
 
 local_actor::~local_actor() {
@@ -58,17 +58,17 @@ void local_actor::create_internal_queue_thread() {
 }
 
 void local_actor::read_messages() {
-	static auto dispatcher_fun_ = [](local_actor& actor) -> int {
-		size_t throughput = actor.calculate_throughput();
+    static auto dispatcher_fun_ = [](local_actor& actor) -> int {
+        size_t throughput = actor.calculate_throughput();
 
-		auto msg_vec = actor.mailbox_->pop_messages(throughput);
-		if (msg_vec.size() == 0) return 0;
+        auto msg_vec = actor.mailbox_->pop_messages(throughput);
+        if (msg_vec.size() == 0) return 0;
 
-		for (int i = 0; i < msg_vec.size(); i++) {
-			actor.run_task(msg_vec[i]->get_sender(), msg_vec[i]->get_data());
-		}
-		return 0;
-	};
+        for (int i = 0; i < msg_vec.size(); i++) {
+            actor.run_task(msg_vec[i]->get_sender(), msg_vec[i]->get_data());
+        }
+        return 0;
+    };
 
     while (!mailbox_->empty()) {
         // run the task in the thread pool supplied by the dispatcher
@@ -99,7 +99,7 @@ size_t local_actor::calculate_throughput() const {
     else if (throughput < 20) {
         return 20;
     }
-	return throughput;
+    return throughput;
 }
 
 void local_actor::run_task(const actor_ref& sender, const boost::any& data) {

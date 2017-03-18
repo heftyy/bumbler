@@ -15,7 +15,6 @@ class actor_channel;
 class abstract_actor;
 class packet;
 class cancellable;
-class message;
 class scheduler;
 
 class actor_system : public std::enable_shared_from_this<actor_system> {
@@ -36,8 +35,9 @@ public:
 
     int stop_actor(const std::string& actor_name, stop_mode stop_mode = stop_mode::IGNORE_QUEUE);
 
-#if 0
+
     int tell_actor(std::unique_ptr<message> msg);
+#if 0
     int ask_actor(std::unique_ptr<message> msg, const ResponseFun& response_fn);
 #endif
 
@@ -60,15 +60,15 @@ public:
 
     int add_actor(std::shared_ptr<abstract_actor> actor);
 
-	template<typename T>
-	std::shared_ptr<cancellable> schedule(T&& data, const actor_ref& target, long initial_delay_ms, long interval_ms = 0) const {
-		return this->schedule(std::forward<T>(data), target, actor_ref::none(), initial_delay_ms, interval_ms);
-	}
+    template<typename T>
+    std::shared_ptr<cancellable> schedule(T&& data, const actor_ref& target, long initial_delay_ms, long interval_ms = 0) const {
+        return this->schedule(std::forward<T>(data), target, actor_ref::none(), initial_delay_ms, interval_ms);
+    }
 
-	template<typename T>
-	std::shared_ptr<cancellable> schedule(T&& data, const actor_ref& target, const actor_ref& sender, long initial_delay_ms, long interval_ms = 0) const {
-		auto variant = typed_variant_factory::create(std::forward<T>(data));
-		return schedule_with_variant(std::move(variant), target, sender, initial_delay_ms, interval_ms);
+    template<typename T>
+    std::shared_ptr<cancellable> schedule(T&& data, const actor_ref& target, const actor_ref& sender, long initial_delay_ms, long interval_ms = 0) const {
+        auto variant = typed_variant_factory::create(std::forward<T>(data));
+        return schedule_with_variant(std::move(variant), target, sender, initial_delay_ms, interval_ms);
     }
 
     template<typename T>
@@ -78,8 +78,8 @@ public:
 
     template<typename T>
     std::shared_ptr<cancellable> schedule_once(T&& data, const actor_ref& target, const actor_ref& sender, long initial_delay_ms = 0) const {
-		auto variant = typed_variant_factory::create(std::forward<T>(data));
-		return schedule_with_variant(std::move(variant), target, sender, initial_delay_ms, 0);
+        auto variant = typed_variant_factory::create(std::forward<T>(data));
+        return schedule_with_variant(std::move(variant), target, sender, initial_delay_ms, 0);
     }
 
     std::shared_ptr<udp_server> get_server() const {
@@ -132,7 +132,7 @@ private:
      */
     void receive(std::unique_ptr<packet> packet, const boost::asio::ip::udp::endpoint& sender_endpoint) const;
 
-	std::shared_ptr<cancellable> schedule_with_variant(std::unique_ptr<variant> variant, const actor_ref& target, const actor_ref& sender, long initial_delay_ms, long interval_ms) const;
+    std::shared_ptr<cancellable> schedule_with_variant(std::unique_ptr<variant> variant, const actor_ref& target, const actor_ref& sender, long initial_delay_ms, long interval_ms) const;
 };
 
 //workaround for std::make_shared and protected constructor

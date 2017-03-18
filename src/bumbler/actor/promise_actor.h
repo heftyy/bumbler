@@ -10,7 +10,7 @@ public:
             : abstract_actor(actor_system, name) {
     }
 
-	void stop_actor(stop_mode stop_mode) override { };
+    void stop_actor(stop_mode stop_mode) override { };
     void tell(std::unique_ptr<message> msg) override;
 };
 

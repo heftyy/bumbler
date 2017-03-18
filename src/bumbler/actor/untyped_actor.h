@@ -13,7 +13,7 @@ class abstract_actor;
 
 class untyped_actor {
 public:
-	virtual ~untyped_actor() { }
+    virtual ~untyped_actor() { }
 
     virtual void on_receive(const boost::any& data) = 0;
     virtual void on_error(const boost::any& data, std::exception ex) { BOOST_LOG_TRIVIAL(error) << "[UNTYPED_ACTOR] " << ex.what(); };
@@ -53,7 +53,7 @@ protected:
 
     template<typename T>
     bool is_type(const boost::any& data) {
-		return utility::is_type<T>(data);
+        return utility::is_type<T>(data);
     }
 
     actor_ref get_self() {

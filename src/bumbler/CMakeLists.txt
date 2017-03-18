@@ -5,7 +5,7 @@ set(bumbler_SOURCES
         messages/typed_variant.h
         messages/message.h
         messages/typed_message.h
-		messages/typed_message.cpp
+        messages/typed_message.cpp
         messages/serialization_utility.h
         messages/commands/command.h
         messages/commands/broadcast.h

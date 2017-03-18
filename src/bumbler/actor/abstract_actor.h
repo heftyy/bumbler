@@ -22,21 +22,21 @@ public:
     virtual ~abstract_actor();
 
     virtual void init(std::unique_ptr<untyped_actor> u_actor);
-	virtual void stop_actor(stop_mode stop_mode) = 0;
+    virtual void stop_actor(stop_mode stop_mode) = 0;
 
     virtual void tell(std::unique_ptr<message> msg) = 0;
 
     void pass_message(std::unique_ptr<message> msg);
 
     bool is_busy() const { return busy_; }
-	size_t mailbox_size() const;
+    size_t mailbox_size() const;
 
     std::string actor_name() const;
     std::string system_name() const;
 
     actor_ref get_self() const { return self_; }
 
-	void set_mailbox(std::unique_ptr<mailbox> mbox);
+    void set_mailbox(std::unique_ptr<mailbox> mbox);
 
 protected:
     std::unique_ptr<untyped_actor> untyped_actor_;
@@ -47,10 +47,10 @@ protected:
     std::weak_ptr<actor_system> actor_system_;
     actor_ref self_;
 
-	virtual void on_receive(const boost::any& data);
-	virtual void on_error(const boost::any& data, const std::exception& ex);
+    virtual void on_receive(const boost::any& data);
+    virtual void on_error(const boost::any& data, const std::exception& ex);
 
-	void clear_queue();
+    void clear_queue();
 
 };
 

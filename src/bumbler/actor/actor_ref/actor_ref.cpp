@@ -32,7 +32,7 @@ void actor_ref::resolve() {
 }
 
 std::unique_ptr<message> actor_ref::make_message(std::unique_ptr<variant> variant_ptr, const actor_ref& target, const actor_ref& sender) const {
-	return typed_message_factory::create(target, sender, std::move(variant_ptr));
+    return typed_message_factory::create(target, sender, std::move(variant_ptr));
 }
 
 }

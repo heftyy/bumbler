@@ -10,14 +10,14 @@ class abstract_actor;
 
 class props {
 public:
-	props() :
-		router_pool_set_(false),
-		mailbox_set_(false),
-		network_actor_ref_set_(false) { }
+    props() :
+        router_pool_set_(false),
+        mailbox_set_(false),
+        network_actor_ref_set_(false) { }
 
-	virtual ~props() {}
+    virtual ~props() {}
 
-	bool has_router() const {
+    bool has_router() const {
         return router_pool_set_;
     }
 

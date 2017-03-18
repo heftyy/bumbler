@@ -29,7 +29,7 @@ void actor_system::init() {
 
     //create a future that is going to wait until the io_service thread has started and io_service is reading messages
     auto promise_ptr = std::make_shared<std::promise<int>>();
-	auto f = promise_ptr->get_future();
+    auto f = promise_ptr->get_future();
 
     io_service_.post([promise_ptr] () {
         BOOST_LOG_TRIVIAL(debug) << "[IO_SERVICE] run thread started";
@@ -60,9 +60,9 @@ void actor_system::stop(stop_mode stop_mode) {
         actors_.erase(iter++);
     }
 
-	scheduler_.reset();
-	dispatcher_->stop(stop_mode);
-	actor_system_storage::instance().remove_system(system_name_);
+    scheduler_.reset();
+    dispatcher_->stop(stop_mode);
+    actor_system_storage::instance().remove_system(system_name_);
 
     if(!started_) {
         server_.reset();
@@ -74,7 +74,7 @@ void actor_system::stop(stop_mode stop_mode) {
     started_ = false;
     stopped_ = true;
 
-	if (work_) work_.reset();
+    if (work_) work_.reset();
     if (!io_service_.stopped()) io_service_.stop();
     if (io_service_thread_->joinable()) io_service_thread_->join();
 
@@ -107,7 +107,6 @@ int actor_system::stop_actor(const std::string& actor_name, stop_mode stop_mode)
     throw new actor_not_found(actor_name);
 }
 
-#if 0
 int actor_system::tell_actor(std::unique_ptr<message> msg) {
     if (stopped_.load()) throw new actor_system_stopped(system_name());
 
@@ -124,7 +123,7 @@ int actor_system::tell_actor(std::unique_ptr<message> msg) {
 
     throw new actor_not_found(msg->get_target().actor_name);
 }
-
+#if 0
 int actor_system::ask_actor(std::unique_ptr<message> msg, const ResponseFun& response_fn) {
     if (stopped_.load()) throw new actor_system_stopped(system_name());
 
@@ -186,10 +185,10 @@ void actor_system::receive(std::unique_ptr<packet> packet, const boost::asio::ip
 
     if (!msg->get_target().is_none()) {
         try {
-			auto target = msg->get_target();
+            auto target = msg->get_target();
             auto target_system = actor_system_storage::instance().get_system(target.system_name);
             if(target_system != nullptr) {
-				target_system->get_actor_ref(target.actor_name).tell(std::move(msg));
+                target_system->tell_actor(std::move(msg));
             }
         }
         catch (std::runtime_error& e) {
@@ -201,7 +200,7 @@ void actor_system::receive(std::unique_ptr<packet> packet, const boost::asio::ip
 
 std::shared_ptr<cancellable> actor_system::schedule_with_variant(std::unique_ptr<variant> variant, const actor_ref & target, const actor_ref & sender, long initial_delay_ms, long interval_ms) const
 {
-	return scheduler_->schedule(typed_message_factory::create(target, sender, std::move(variant)), initial_delay_ms, interval_ms);
+    return scheduler_->schedule(typed_message_factory::create(target, sender, std::move(variant)), initial_delay_ms, interval_ms);
 }
 
 std::string actor_system::get_next_temporary_actor_name() const {
