@@ -43,11 +43,11 @@ public:
 
     boost::any get_data() const override;
 
-    actor_ref get_sender() const override {
+    const actor_ref& get_sender() const override {
         return sender_;
     }
 
-    actor_ref get_target() const override {
+    const actor_ref& get_target() const override {
         return target_;
     }
 

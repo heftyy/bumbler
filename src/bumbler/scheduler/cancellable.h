@@ -11,11 +11,7 @@ class cancellable {
 public:
     friend class scheduler;
 
-    std::atomic<std::thread::id> thread_id;
-
     cancellable() : cancel_(false), cancelled_(false) { }
-
-    cancellable(std::thread::id thread_id) : thread_id(thread_id), cancel_(false), cancelled_(false) { }
 
     ~cancellable() {
         cancel_ = true;

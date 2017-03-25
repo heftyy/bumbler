@@ -27,6 +27,9 @@ set(bumbler_SOURCES
         actor/promise_actor.h
         actor/abstract_actor.h
         actor/abstract_actor.cpp
+        actor/untyped_actor.h
+        actor/typed_promise_actor.h
+        actor/promise_actor.cpp
         actor_system/actor_system.h
         actor_system/actor_system.cpp
         actor_system/actor_system_errors.h
@@ -41,9 +44,9 @@ set(bumbler_SOURCES
         actor/mailbox/lifo_mailbox.h
         actor/mailbox/lifo_mailbox.cpp
         actor/mailbox/priority_mailbox.h
-        actor/mailbox/priority_mailbox.cpp
-        actor/untyped_actor.h
+        actor/mailbox/priority_mailbox.cpp        
         actor/props/typed_props.h
+        actor/props/props.h
         actor/routing/router_logic.h
         actor/routing/smallest_mailbox_pool.cpp
         actor/routing/smallest_mailbox_pool.h
@@ -51,26 +54,25 @@ set(bumbler_SOURCES
         actor/routing/round_robin_pool.h
         actor/routing/random_pool.cpp
         actor/routing/random_pool.h
-        actor/routing/router_pool.h
+        actor/routing/router_pool.cpp
         packet/packet.h
         packet/packet_exceptions.h
         packet/packet_structs.h
         packet/packet_structs.cpp
-        scheduler/scheduler.h
+        scheduler/scheduler.cpp
+        scheduler/scheduler.h        
         scheduler/cancellable.h
         dispatcher/dispatcher.cpp
         dispatcher/dispatcher.h
         thread_pool/thread_pool.cpp
-        thread_pool/thread_pool.h
-        actor/props/props.h
-        actor/routing/router_pool.cpp
-        actor/typed_promise_actor.h
-        actor/promise_actor.cpp
+        thread_pool/thread_pool.h        
         logger/logger.h
         logger/logger.cpp
         utility.h
         utility.cpp
-        internal/bumbler.h)
+        internal/identifier.h
+        internal/bumbler.h
+        )
 
 if (${WIN32})
     add_library(bumbler STATIC ${bumbler_SOURCES})

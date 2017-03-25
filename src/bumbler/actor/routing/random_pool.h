@@ -21,24 +21,9 @@ public:
 
     void tell_one(std::unique_ptr<message> msg) override;
 
-    virtual std::unique_ptr<router_pool> clone() const override  {
-        return std::unique_ptr<router_pool>(new random_pool(*this));
-    }
-
 protected:
-    random_pool(const random_pool& rhs) :
-            router_pool(rhs),
-            distribution_(rhs.distribution_),
-            random_gen_(rhs.random_gen_) { }
-
-    random_pool& operator=(const random_pool& rhs) {
-        if(this != &rhs) {
-            router_pool::operator=(rhs);
-            random_gen_ = rhs.random_gen_;
-            distribution_ = rhs.distribution_;
-        }
-        return *this;
-    }
+    random_pool(const random_pool& rhs) = delete;
+    random_pool& operator=(const random_pool& rhs) = delete;
 
 private:
     std::random_device rd_;

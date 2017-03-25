@@ -20,8 +20,8 @@ public:
     virtual ~message() {}
 
     virtual boost::any get_data() const = 0;
-    virtual actor_ref get_sender() const = 0;
-    virtual actor_ref get_target() const = 0;
+    virtual const actor_ref& get_sender() const = 0;
+    virtual const actor_ref& get_target() const = 0;
 
     virtual std::unique_ptr<message> clone() const = 0;
 

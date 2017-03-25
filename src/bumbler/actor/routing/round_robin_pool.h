@@ -18,22 +18,9 @@ public:
 
     void tell_one(std::unique_ptr<message> msg) override;
 
-    virtual std::unique_ptr<router_pool> clone() const override  {
-        return std::unique_ptr<router_pool>(new round_robin_pool(*this));
-    }
-
 protected:
-    round_robin_pool(const round_robin_pool& rhs) :
-            router_pool(rhs),
-            next_actor_to_message_(rhs.next_actor_to_message_.load()) { }
-
-    round_robin_pool& operator=(const round_robin_pool& rhs) {
-        if(this != &rhs) {
-            router_pool::operator=(rhs);
-            next_actor_to_message_.store(rhs.next_actor_to_message_);
-        }
-        return *this;
-    }
+    round_robin_pool(const round_robin_pool& rhs) = delete;
+    round_robin_pool& operator=(const round_robin_pool& rhs) = delete;
 
 private:
     std::atomic<int> next_actor_to_message_;

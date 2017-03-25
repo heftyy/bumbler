@@ -18,7 +18,7 @@ protected:
         messages_++;
 
         BOOST_LOG_TRIVIAL(debug) << "[OUT_ROUTER] on_receive thread id = " << std::this_thread::get_id();
-        BOOST_LOG_TRIVIAL(debug) << "[OUT_ROUTER] received message from " << get_sender().actor_name << " message count = " << messages_;
+        BOOST_LOG_TRIVIAL(debug) << "[OUT_ROUTER] received message from " << get_sender().actor_key.to_string() << " message count = " << messages_;
 
         if(is_type<int>(data)) {
             int in = cast_message<int>(data);

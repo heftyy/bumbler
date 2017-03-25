@@ -70,32 +70,32 @@ private:
     std::function<std::unique_ptr<mailbox>(void)> get_mailbox_function_;
 
     // router instance
-    std::shared_ptr<abstract_actor> init_actor_instance(std::shared_ptr<router>&& actor,
+    std::shared_ptr<abstract_actor> init_actor_instance(const std::shared_ptr<router>& actor,
                                                         const std::shared_ptr<actor_system>& ac,
                                                         const std::string& name) const {
         auto pool = get_router_pool_function_();
-        pool->template create_pool<local_actor>(ac, name, get_mailbox_function_, get_typed_actor_function_);
+        pool->create<local_actor>(ac, name, get_mailbox_function_, get_typed_actor_function_);
         actor->set_router_pool(std::move(pool));
 
-        return std::move(actor);
+        return actor;
     }
 
     // promise actor instance
-    std::shared_ptr<abstract_actor> init_actor_instance(std::shared_ptr<promise_actor>&& actor,
+    std::shared_ptr<abstract_actor> init_actor_instance(const std::shared_ptr<promise_actor>& actor,
                                                         const std::shared_ptr<actor_system>& ac,
                                                         const std::string& name) const {
         actor->init(get_typed_actor_function_());
-        return std::move(actor);
+        return actor;
     }
 
     // local actor instance
-    std::shared_ptr<abstract_actor> init_actor_instance(std::shared_ptr<local_actor>&& actor,
+    std::shared_ptr<abstract_actor> init_actor_instance(const std::shared_ptr<local_actor>& actor,
                                                         const std::shared_ptr<actor_system>& ac,
                                                         const std::string& name) const {
         actor->set_mailbox(get_mailbox_function_());
         actor->init(get_typed_actor_function_());
 
-        return std::move(actor);
+        return actor;
     }
 };
 

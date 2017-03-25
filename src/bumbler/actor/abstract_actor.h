@@ -31,8 +31,8 @@ public:
     bool is_busy() const { return busy_; }
     size_t mailbox_size() const;
 
-    std::string actor_name() const;
-    std::string system_name() const;
+    identifier actor_key() const;
+    identifier system_key() const;
 
     actor_ref get_self() const { return self_; }
 
@@ -43,8 +43,8 @@ protected:
     std::unique_ptr<mailbox> mailbox_;
     std::atomic<bool> busy_;
     std::atomic<bool> stop_flag_;
-    std::string actor_name_;
     std::weak_ptr<actor_system> actor_system_;
+    identifier actor_key_;
     actor_ref self_;
 
     virtual void on_receive(const boost::any& data);

@@ -4,18 +4,18 @@
 #include <thread>
 #include <memory>
 #include <boost/asio.hpp>
+#include "../dispatcher/dispatcher.h"
+#include "../scheduler/scheduler.h"
 #include "../internal/bumbler.h"
 #include "../actor/actor_ref/actor_ref.h"
 
 namespace bumbler {
 
-class dispatcher;
 class udp_server;
 class actor_channel;
 class abstract_actor;
 class packet;
 class cancellable;
-class scheduler;
 
 class actor_system : public std::enable_shared_from_this<actor_system> {
 public:
@@ -32,17 +32,16 @@ public:
      * if stop_mode is IGNORE_QUEUE system exits as soon as possible ignoring messages in the queue
      */
     void stop(stop_mode stop_mode = stop_mode::IGNORE_QUEUE);
+    int stop_actor(const identifier& actor_name, stop_mode stop_mode = stop_mode::IGNORE_QUEUE);
 
-    int stop_actor(const std::string& actor_name, stop_mode stop_mode = stop_mode::IGNORE_QUEUE);
-
-
-    int tell_actor(std::unique_ptr<message> msg);
+    void tell_actor(std::unique_ptr<message> msg);
 #if 0
-    int ask_actor(std::unique_ptr<message> msg, const ResponseFun& response_fn);
+    void ask_actor(std::unique_ptr<message> msg, const ResponseFun& response_fn);
 #endif
 
-    actor_ref get_actor_ref(const std::string& actor_name);
-    std::unique_ptr<actor_channel> get_actor_channel(const std::string& actor_name);
+    bool has_actor(const identifier& actor_ident);
+    actor_ref get_actor_ref(const identifier& actor_name);
+    std::unique_ptr<actor_channel> get_actor_channel(const identifier& actor_name);
 
     /*
      * generate a new name for a temporary actor
@@ -82,20 +81,17 @@ public:
         return schedule_with_variant(std::move(variant), target, sender, initial_delay_ms, 0);
     }
 
+    template<typename F, typename ...Rest>
+    auto dispatch(F&& f, Rest&&... rest) -> std::future<decltype(f(rest...))> {
+        return dispatcher_->push(std::forward<F>(f), std::forward<Rest>(rest)...);
+    }
+
     std::shared_ptr<udp_server> get_server() const {
         return server_;
     }
 
-    std::shared_ptr<scheduler> get_scheduler() const {
-        return scheduler_;
-    }
-
-    std::shared_ptr<dispatcher> get_dispatcher() const {
-        return dispatcher_;
-    }
-
-    const std::string system_name() const {
-        return system_name_;
+    const identifier system_key() const {
+        return system_key_;
     }
 
     bool started() {
@@ -107,23 +103,23 @@ public:
     }
 
 protected:
-    actor_system(const std::string& name, int port, int thread_pool_size = 5);
+    actor_system(const std::string& name, int port);
 
 private:
     int port_;
+    identifier system_key_;
     std::atomic<bool> started_;
-    std::atomic<bool> stopped_;
-    std::string system_name_;
-    std::map<std::string, std::shared_ptr<abstract_actor>> actors_;
+    std::atomic<bool> stopped_;    
+    std::map<identifier, std::shared_ptr<abstract_actor>> actors_;
     std::mutex actors_write_mutex_;
     std::shared_ptr<udp_server> server_;
     std::unique_ptr<std::thread> io_service_thread_;
     boost::asio::io_service io_service_;
     std::unique_ptr<boost::asio::io_service::work> work_;
-    std::shared_ptr<scheduler> scheduler_;
-    std::shared_ptr<dispatcher> dispatcher_;
+    std::unique_ptr<scheduler> scheduler_;
+    std::unique_ptr<dispatcher> dispatcher_;
 
-    void init();
+    void init(int thread_pool_size);
 
     void send_completed() { }
 
@@ -137,8 +133,7 @@ private:
 
 //workaround for std::make_shared and protected constructor
 struct concrete_actor_system : public actor_system {
-    concrete_actor_system(const std::string &name, int port, int thread_pool_size)
-            : actor_system(name, port, thread_pool_size) { }
+    concrete_actor_system(const std::string &name, int port) : actor_system(name, port) { }
 };
 
 }

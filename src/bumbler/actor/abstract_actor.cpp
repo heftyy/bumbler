@@ -8,8 +8,8 @@ namespace bumbler {
 
 abstract_actor::abstract_actor(const std::shared_ptr<actor_system>& actor_system, const std::string& name) :
         actor_system_(actor_system),
-        actor_name_(name),
-        self_(actor_name(), system_name()),
+        actor_key_(name),
+        self_(actor_key(), system_key()),
         stop_flag_(false) { }
 
 abstract_actor::~abstract_actor() {
@@ -23,10 +23,10 @@ void abstract_actor::init(std::unique_ptr<untyped_actor> u_actor) {
 
 void abstract_actor::pass_message(std::unique_ptr<message> msg) {
     if (msg->is_kill_actor()) {
-        this->actor_system_.lock()->stop_actor(this->actor_name_, stop_mode::IGNORE_QUEUE);
+        this->actor_system_.lock()->stop_actor(actor_key_, stop_mode::IGNORE_QUEUE);
     }
     else if (msg->is_stop_actor()) {
-        this->actor_system_.lock()->stop_actor(this->actor_name_, stop_mode::WAIT_FOR_QUEUE);
+        this->actor_system_.lock()->stop_actor(actor_key_, stop_mode::WAIT_FOR_QUEUE);
     }
     else {
         this->tell(std::move(msg));
@@ -37,12 +37,12 @@ size_t abstract_actor::mailbox_size() const {
     return this->mailbox_->size(); 
 }
 
-std::string abstract_actor::actor_name() const {
-    return this->actor_name_;
+identifier abstract_actor::actor_key() const {
+    return this->actor_key_;
 }
 
-std::string abstract_actor::system_name() const {
-    return actor_system_.lock()->system_name();
+identifier abstract_actor::system_key() const {
+    return actor_system_.lock()->system_key();
 }
 
 void abstract_actor::set_mailbox(std::unique_ptr<mailbox> mbox) {

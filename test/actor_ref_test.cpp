@@ -16,8 +16,8 @@ BOOST_AUTO_TEST_SUITE(actor_suite)
 BOOST_AUTO_TEST_CASE(ActorRefTest) {
     actor_ref test_ref = actor_ref("test_actor", "test_system");
 
-    BOOST_CHECK_EQUAL(test_ref.actor_name, "test_actor");
-    BOOST_CHECK_EQUAL(test_ref.system_name, "test_system");
+    BOOST_CHECK_EQUAL(test_ref.actor_key.to_string(), "test_actor");
+    BOOST_CHECK_EQUAL(test_ref.system_key.to_string(), "test_system");
 
     actor_ref none_ref = actor_ref::none();
 

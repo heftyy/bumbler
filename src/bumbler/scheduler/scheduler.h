@@ -1,80 +1,22 @@
 #pragma once
 
-#include <map>
-#include <mutex>
 #include <memory>
-#include <iostream>
-#include "cancellable.h"
-#include "../actor/actor_ref/actor_ref.h"
 
 namespace bumbler {
 
 class actor_system;
+class cancellable;
+class message;
 
 class scheduler {
 public:
-    scheduler() {
-//        cancellable_vector_it_ = cancellable_vector_.begin();
-    }
+    scheduler(std::shared_ptr<actor_system> system) : system_(system) {}
+    std::shared_ptr<cancellable> schedule(std::unique_ptr<message> msg, long initial_delay_ms, long interval_ms) const;
 
-    ~scheduler() {
-        /*
-        for (std::shared_ptr<cancellable>& cancellable : cancellable_vector_) {
-            if (!cancellable->is_cancelled()) {
-                cancellable->cancel();
-            }
-        }
-        */
-    }
+private:
+    std::weak_ptr<actor_system> system_;
 
-    std::shared_ptr<cancellable> schedule(std::unique_ptr<typed_message> msg, long initial_delay_ms, long interval_ms) const {
-        auto ret_cancellable = std::make_shared<cancellable>();
-        std::weak_ptr<cancellable> ret_cancellable_weak_ptr = ret_cancellable;
-
-        std::thread scheduler_thread([initial_delay_ms, interval_ms](typed_message msg_copy, std::weak_ptr<cancellable> cancellable) -> int {
-            if (cancellable.expired()) return 2;
-            else {
-                cancellable.lock()->thread_id = std::this_thread::get_id();
-
-                if (initial_delay_ms > 0) {
-                    std::chrono::milliseconds initial_delay(initial_delay_ms);
-                    std::this_thread::sleep_for(initial_delay);
-                }
-            }
-
-            if (cancellable.expired()) return 2;
-            else if (cancellable.lock()->check_cancel()) {
-                cancellable.lock()->cancelled();
-                return 1;
-            };
-
-            while (!cancellable.expired() && cancellable.lock() != nullptr && !cancellable.lock()->check_cancel()) {
-                BOOST_LOG_TRIVIAL(debug) << "[SCHEDULER] thread_id: " << std::this_thread::get_id() <<
-                                         " sending message to " << msg_copy.get_target().to_string();
-
-                msg_copy.get_target().tell(msg_copy);
-
-                if (interval_ms > 0) {
-                    std::chrono::milliseconds interval(interval_ms);
-                    std::this_thread::sleep_for(interval);
-                }
-                else {
-                    break;
-                }
-            }
-
-            if (cancellable.expired()) return 2;
-            else {
-                cancellable.lock()->cancelled();
-                return 0;
-            }
-        }, *msg, ret_cancellable_weak_ptr);
-
-        scheduler_thread.detach();
-
-        return ret_cancellable;
-    }
-
+    void send_message(std::unique_ptr<message> msg) const;
 };
 
 }

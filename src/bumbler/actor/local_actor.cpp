@@ -16,7 +16,6 @@ local_actor::~local_actor() {
 
 void local_actor::init(std::unique_ptr<untyped_actor> u_actor) {
     abstract_actor::init(std::move(u_actor));
-    this->create_internal_queue_thread();
 }
 
 void local_actor::stop_actor(stop_mode stop_mode) {
@@ -72,7 +71,7 @@ void local_actor::read_messages() {
 
     while (!mailbox_->empty()) {
         // run the task in the thread pool supplied by the dispatcher
-        auto future_result = actor_system_.lock()->get_dispatcher()->push(dispatcher_fun_, *this);
+        auto future_result = actor_system_.lock()->dispatch(dispatcher_fun_, *this);
 
         // wait for the task to finish
         future_result.wait();
@@ -81,6 +80,9 @@ void local_actor::read_messages() {
 
 void local_actor::add_message(std::unique_ptr<message> msg) {
     if (this->stop_flag_) return;
+
+    if (!queue_thread_future_.valid())
+        create_internal_queue_thread();
 
 //    BOOST_LOG_TRIVIAL(debug) << "[ACTOR] queueing new task";
     this->mailbox_->push_message(std::move(msg));

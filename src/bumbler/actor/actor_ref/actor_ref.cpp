@@ -11,7 +11,7 @@ namespace bumbler {
 
 std::string actor_ref::to_string() const {
     std::stringstream ss;
-    ss << actor_name << "$" << system_name << "@" << ip << ":" << port;
+    ss << actor_key.to_string() << "$" << system_key.to_string() << "@" << ip << ":" << port;
     return ss.str();
 }
 
@@ -27,7 +27,7 @@ void actor_ref::resolve() {
     if(is_remote()) {
         channel_ = std::make_unique<remote_actor_channel>(*this);
     } else {
-        channel_ = actor_system_storage::instance().get_system(system_name)->get_actor_channel(actor_name);
+        channel_ = actor_system_storage::instance().get_system(system_key)->get_actor_channel(actor_key);
     }
 }
 
