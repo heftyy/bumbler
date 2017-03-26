@@ -25,10 +25,10 @@ public:
         std::string next_router_name = router_name + "/a";
 
         for(int i = 0; i < this->pool_size_; i++) {
-            auto actor = std::shared_ptr<ActorType>(new ActorType(actor_system, next_router_name));
+            auto actor = std::make_unique<ActorType>(actor_system, next_router_name);
             actor->set_mailbox(get_mailbox_func());
             actor->init(get_typed_actor_func());
-            actor_system->add_actor(actor);
+            actor_system->add_actor(std::move(actor));
             routees_.push_back(next_router_name);
 
             if (next_router_name[next_router_name.length() - 1] == 'z') {

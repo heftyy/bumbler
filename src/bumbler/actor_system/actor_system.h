@@ -58,7 +58,7 @@ public:
         return ref;
     }
 
-    void add_actor(std::shared_ptr<abstract_actor> actor);
+    void add_actor(std::unique_ptr<abstract_actor> actor);
 
     template<typename T>
     std::shared_ptr<cancellable> schedule(T&& data, const actor_ref& target, long initial_delay_ms, long interval_ms = 0) const {
@@ -87,9 +87,7 @@ public:
         return dispatcher_->push(std::forward<F>(f), std::forward<Rest>(rest)...);
     }
 
-    std::shared_ptr<udp_server> get_server() const {
-        return server_;
-    }
+    void send_data(const std::string& data, const boost::asio::ip::udp::endpoint& target_endpoint);
 
     const identifier system_key() const {
         return system_key_;
@@ -108,9 +106,9 @@ private:
     identifier system_key_;
     std::atomic<bool> started_;
     std::atomic<bool> stopped_;
-    std::map<identifier, std::shared_ptr<abstract_actor>> actors_;
+    std::map<identifier, std::unique_ptr<abstract_actor>> actors_;
     std::mutex actors_write_mutex_;
-    std::shared_ptr<udp_server> server_;
+    std::unique_ptr<udp_server> server_;
     std::unique_ptr<std::thread> io_service_thread_;
     boost::asio::io_service io_service_;
     std::unique_ptr<boost::asio::io_service::work> work_;

@@ -26,7 +26,7 @@ void remote_actor_channel::tell_impl(std::unique_ptr<message> msg) {
     packet msg_packet(std::move(msg));
     std::string serialized_packet = msg_packet.get_serialized();
 
-    target_system->get_server()->do_send(serialized_packet, network_actor_endpoint_);
+    target_system->send_data(serialized_packet, network_actor_endpoint_);
 }
 
 void remote_actor_channel::ask_impl(std::unique_ptr<message> msg, const ResponseFun& response_fun) {
@@ -44,7 +44,7 @@ void remote_actor_channel::ask_impl(std::unique_ptr<message> msg, const Response
     packet msg_packet(std::move(msg));
     std::string serialized_packet = msg_packet.get_serialized();
 
-    target_system->get_server()->do_send(serialized_packet, network_actor_endpoint_);
+    target_system->send_data(serialized_packet, network_actor_endpoint_);
 }
 
 std::shared_ptr<actor_system> remote_actor_channel::get_actor_system(const actor_ref& sender) const {

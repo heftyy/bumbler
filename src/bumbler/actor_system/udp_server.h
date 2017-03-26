@@ -92,9 +92,7 @@ public:
         return nullptr;
     }
 
-    //void do_send(std::unique_ptr<std::vector<char>> data, udp::endpoint& target_endpoint)
-    void do_send(const std::string& data, udp::endpoint& target_endpoint) {
-        //std::cout << "do_send thread id = " << std::this_thread::get_id() << std::endl;
+    void do_send(const std::string& data, const udp::endpoint& target_endpoint) {
         socket_.async_send_to(
                 boost::asio::buffer(data.c_str(), data.length()), target_endpoint,
                 [this](boost::system::error_code, std::size_t) {

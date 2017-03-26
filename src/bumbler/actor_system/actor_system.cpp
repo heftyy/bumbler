@@ -28,7 +28,7 @@ void actor_system::init(int thread_pool_size) {
 
     work_ = std::make_unique<boost::asio::io_service::work>(io_service_);
 
-    server_ = std::make_shared<udp_server>(io_service_, port_);
+    server_ = std::make_unique<udp_server>(io_service_, port_);
     server_->send_completed_function = [&]() { send_completed(); };
     server_->receive_function = [&](std::unique_ptr<packet> packet,
                                     boost::asio::ip::udp::endpoint sender_endpoint) {
@@ -240,6 +240,11 @@ void actor_system::receive(std::unique_ptr<packet> packet, const boost::asio::ip
     return;
 }
 
+void actor_system::send_data(const std::string& data, const boost::asio::ip::udp::endpoint& target_endpoint)
+{
+    server_->do_send(data, target_endpoint);
+}
+
 std::shared_ptr<cancellable> actor_system::schedule_with_variant(std::unique_ptr<variant> variant, const actor_ref & target, const actor_ref & sender, long initial_delay_ms, long interval_ms) const
 {
     return scheduler_->schedule(typed_message_factory::create(target, sender, std::move(variant)), initial_delay_ms, interval_ms);
@@ -260,7 +265,7 @@ std::string actor_system::get_next_temporary_actor_name() const {
     return temp_name;
 }
 
-void actor_system::add_actor(std::shared_ptr<abstract_actor> actor) {
+void actor_system::add_actor(std::unique_ptr<abstract_actor> actor) {
     if (stopped_.load()) throw new actor_system_stopped(system_key_.to_string());
 
     std::lock_guard<std::mutex> guard(actors_write_mutex_);
