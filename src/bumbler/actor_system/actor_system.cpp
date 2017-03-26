@@ -29,11 +29,10 @@ void actor_system::init(int thread_pool_size) {
 
     work_ = std::make_unique<boost::asio::io_service::work>(io_service_);
 
-    server_ = std::make_unique<udp_server>(io_service_, port_);
+    server_ = std::make_shared<udp_server>(io_service_, port_);
     server_->send_completed_function = [&]() { send_completed(); };
-    server_->receive_function = [&](std::unique_ptr<packet> packet,
-                                    boost::asio::ip::udp::endpoint sender_endpoint) {
-        receive(std::move(packet), sender_endpoint);
+    server_->receive_function = [this](const packet& p, const boost::asio::ip::udp::endpoint& sender_endpoint) {
+        receive(p, sender_endpoint);
     };
 
     //create a future that is going to wait until the io_service thread has started and io_service is reading messages
@@ -90,9 +89,9 @@ void actor_system::stop(stop_mode stop_mode) {
     if (io_service_thread_->joinable()) io_service_thread_->join();
 
 #ifdef WIN32
-    // workaround for windows
-    // wait for the udp server to properly shutdown, otherwise it SIGSEGVs
-    // std::this_thread::sleep_for(std::chrono::milliseconds(500));
+     // workaround for windows
+     // wait for the udp server to properly shutdown, otherwise it SIGSEGVs
+     // std::this_thread::sleep_for(std::chrono::milliseconds(500));
 #endif
     server_.reset();
 }
@@ -214,11 +213,11 @@ size_t actor_system::actor_mailbox_size(const identifier& actor_ident) {
     return 0;
 }
 
-void actor_system::receive(std::unique_ptr<packet> packet, const boost::asio::ip::udp::endpoint& sender_endpoint) const {
-    std::stringstream ss(packet->data.data);
+void actor_system::receive(const packet& p, const boost::asio::ip::udp::endpoint& sender_endpoint) const {
+    std::stringstream ss(p.data.data);
     boost::archive::text_iarchive ia(ss);
 
-    std::unique_ptr<typed_message> msg;
+    std::unique_ptr<message> msg;
     ia >> msg;
 
     actor_ref sender = msg->get_sender();

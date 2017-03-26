@@ -24,10 +24,6 @@ public:
         get_typed_actor_function_ = [args...]() -> std::unique_ptr<untyped_actor> {
             return std::make_unique<TypedActor>(std::forward<Args>(args)...);
         };
-
-        get_actor_function_ = [](const std::shared_ptr<actor_system>& system, const std::string& name) -> std::unique_ptr<ActorType> {
-            return std::make_unique<ActorType>(system, name);
-        };
     }
 
     ~typed_props() { }
@@ -70,7 +66,6 @@ public:
     }
 
 private:
-    ActorCreateFun get_actor_function_;
     TypedActorCreateFun get_typed_actor_function_;
     RouterPoolCreateFun get_router_pool_function_;
     MailboxCreateFun get_mailbox_function_;
@@ -80,7 +75,7 @@ private:
                                                         const std::shared_ptr<actor_system>& ac,
                                                         const std::string& name) const {
         auto pool = get_router_pool_function_();
-        pool->create(ac, name, get_actor_function_, get_mailbox_function_, get_typed_actor_function_);
+        pool->create(ac, name, get_mailbox_function_, get_typed_actor_function_);
         actor->set_router_pool(std::move(pool));
 
         return actor;

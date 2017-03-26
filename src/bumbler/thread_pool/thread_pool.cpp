@@ -16,7 +16,7 @@ thread_pool::~thread_pool() {
 
 void thread_pool::stop(stop_mode stop_mode) {
     // Force all threads to return from io_service::run().
-    if(stop_mode == bumbler::stop_mode::IGNORE_QUEUE) work_.reset();
+    if(stop_mode == bumbler::stop_mode::WAIT_FOR_QUEUE) work_.reset();
     else io_service_.stop();
 
     // Suppress all exceptions.

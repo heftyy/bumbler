@@ -105,7 +105,7 @@ private:
     std::atomic<bool> stopped_;
     std::map<identifier, std::unique_ptr<abstract_actor>> actors_;
     std::mutex actors_write_mutex_;
-    std::unique_ptr<udp_server> server_;
+    std::shared_ptr<udp_server> server_;
     std::unique_ptr<std::thread> io_service_thread_;
     boost::asio::io_service io_service_;
     std::unique_ptr<boost::asio::io_service::work> work_;
@@ -119,7 +119,7 @@ private:
     /*
      * callback used by the udp server when a message is received
      */
-    void receive(std::unique_ptr<packet> packet, const boost::asio::ip::udp::endpoint& sender_endpoint) const;
+    void receive(const packet& p, const boost::asio::ip::udp::endpoint& sender_endpoint) const;
 
     std::shared_ptr<cancellable> schedule_with_variant(std::unique_ptr<variant> variant, const actor_ref& target, const actor_ref& sender, long initial_delay_ms, long interval_ms) const;
 };

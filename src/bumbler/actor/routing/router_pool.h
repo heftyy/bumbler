@@ -21,7 +21,7 @@ public:
     void tell(std::unique_ptr<message> msg);
 
     void create(const std::shared_ptr<actor_system>& actor_system, const std::string& router_name,
-                const ActorCreateFun& get_actor_func, const MailboxCreateFun& get_mailbox_func, const TypedActorCreateFun& get_typed_actor_func);
+                const MailboxCreateFun& get_mailbox_func, const TypedActorCreateFun& get_typed_actor_func);
 
 protected:
     int pool_size_;

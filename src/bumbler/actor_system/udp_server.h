@@ -16,12 +16,12 @@ using boost::asio::ip::udp;
 
 class udp_server {
 public:
-    std::function<void(std::unique_ptr<packet>, udp::endpoint)> receive_function;
+    std::function<void(const packet&, const udp::endpoint&)> receive_function;
     std::function<void()> send_completed_function;
 
     udp_server(boost::asio::io_service& io_service, int port)
-            : socket_(io_service, udp::endpoint(udp::v4(), static_cast<unsigned short>(port))), future_socket_(io_service, udp::endpoint(udp::v4(), 0)),
-              port_(port) {
+        : socket_(io_service, udp::endpoint(udp::v4(), static_cast<unsigned short>(port)))
+        , port_(port) {
         do_receive();
     }
 
@@ -33,63 +33,6 @@ public:
         if (socket_.is_open()) {
             socket_.close();
         }
-        if (future_socket_.is_open()) {
-            future_socket_.close();
-        }
-    }
-
-    std::unique_ptr<packet> future(const std::string& data, const udp::endpoint& target_endpoint, int timeout_ms) {
-        sync_send(data, target_endpoint);
-        auto packet = sync_receive(target_endpoint, timeout_ms);
-        if (packet) {
-            return std::move(packet);
-        }
-        return nullptr;
-    }
-
-    void sync_send(const std::string& data, const udp::endpoint& target_endpoint) {
-        future_socket_.send_to(boost::asio::buffer(data.c_str(), data.length()), target_endpoint);
-    }
-
-    std::unique_ptr<packet> sync_receive(const udp::endpoint& target_endpoint, int timeout_ms) {
-        std::atomic<bool> stop_deadline(false);
-        auto expires_at = std::chrono::system_clock::now() + std::chrono::milliseconds(1000);
-
-        auto deadline_check = std::thread([&expires_at, &stop_deadline, this]() {
-            while (!stop_deadline.load() && std::chrono::system_clock::now() < expires_at) {
-                std::this_thread::sleep_for(std::chrono::milliseconds(10));
-            }
-            if (!stop_deadline.load()) {
-                future_socket_.close();
-                future_socket_.open(udp::v4());
-            }
-        });
-
-        try {
-            auto bytes_recvd = future_socket_.receive_from(boost::asio::buffer(data_, PACKET_MAX_LENGTH), sender_endpoint_);
-            if (bytes_recvd &&
-                sender_endpoint_.address().to_string().compare(target_endpoint.address().to_string()) == 0) {
-                std::string string_data(data_.begin(), data_.begin() + bytes_recvd * sizeof(char));
-                try {
-                    stop_deadline = true;
-                    deadline_check.join();
-                    auto received_packet = packet::parse(string_data);
-                    return std::move(std::unique_ptr<packet>(new packet(received_packet)));
-                }
-                catch (std::exception e) {
-                    BOOST_LOG_TRIVIAL(error) << "[UDP_SERVER] parsing error on received packet";
-                }
-            }
-        }
-        catch (boost::system::system_error& ec) {
-            BOOST_LOG_TRIVIAL(error) << "boost::system:error_code = " << ec.what();
-        }
-        catch (...) {
-            BOOST_LOG_TRIVIAL(debug) << "Got an exception!";
-        }
-        stop_deadline = true;
-        deadline_check.join();
-        return nullptr;
     }
 
     void do_send(const std::string& data, const udp::endpoint& target_endpoint) {
@@ -111,7 +54,6 @@ public:
 
 private:
     udp::socket socket_;
-    udp::socket future_socket_;
     udp::endpoint sender_endpoint_;
     std::array<char, PACKET_MAX_LENGTH> data_;
     int port_;
@@ -123,11 +65,8 @@ private:
                     if (!ec && bytes_recvd > 0) {
                         std::string string_data(data_.begin(), data_.begin() + bytes_recvd * sizeof(char));
                         try {
-                            auto received_packet = packet::parse(string_data);
-                            receive_function(
-                                    std::move(std::unique_ptr<packet>(new packet(received_packet))),
-                                    sender_endpoint_
-                            );
+                            packet received_packet = packet::parse(string_data);
+                            receive_function(received_packet, sender_endpoint_);
                         }
                         catch (std::exception e) {
                             BOOST_LOG_TRIVIAL(error) << "parsing error on received packet";

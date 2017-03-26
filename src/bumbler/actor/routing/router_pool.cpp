@@ -4,7 +4,7 @@
 #include "../../internal/messaging_service.h"
 #include "../../actor/mailbox/mailbox.h"
 #include "../../actor/untyped_actor.h"
-#include "../../actor/abstract_actor.h"
+#include "../../actor/local_actor.h"
 #include "../../actor_system/actor_system.h"
 
 namespace bumbler {
@@ -21,11 +21,11 @@ void router_pool::tell(std::unique_ptr<message> msg) {
 }
 
 void router_pool::create(const std::shared_ptr<actor_system>& actor_system, const std::string& router_name, 
-                         const ActorCreateFun& get_actor_func, const MailboxCreateFun& get_mailbox_func, const TypedActorCreateFun& get_typed_actor_func) {
+                         const MailboxCreateFun& get_mailbox_func, const TypedActorCreateFun& get_typed_actor_func) {
     std::string next_router_name = router_name + "/a";
 
     for (int i = 0; i < this->pool_size_; i++) {
-        auto actor = get_actor_func(actor_system, next_router_name);
+        auto actor = std::make_unique<local_actor>(actor_system, next_router_name);
         actor->set_mailbox(get_mailbox_func());
         actor->init(get_typed_actor_func());
         actor_system->add_actor(std::move(actor));
