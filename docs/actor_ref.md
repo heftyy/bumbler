@@ -23,10 +23,13 @@ tell
 void tell(char* data, actor_ref sender = actor_ref::none());
 
 template<typename T>
-void tell(T&& data, actor_ref sender = actor_ref::none()) const;
+void tell(T&& data, actor_ref sender = actor_ref::none());
 
-template<typename T>
-void tell(const typed_message<T>& msg) const;
+template<typename Result>
+std::future<Result> ask(const char* data);
+
+template<typename Result, typename T>
+std::future<Result> ask(T&& data);
 ```
 
 Tell method will send a message to the actor.

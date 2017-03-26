@@ -21,7 +21,7 @@ public:
             "TypedActor template has to be a derived from untyped_actor class"
             );
 
-        get_typed_actor_function_ = [args...]()->std::unique_ptr<untyped_actor> {
+        get_typed_actor_function_ = [args...]() -> std::unique_ptr<untyped_actor> {
             return std::make_unique<TypedActor>(std::forward<Args>(args)...);
         };
 
