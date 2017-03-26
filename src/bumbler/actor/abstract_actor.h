@@ -26,8 +26,6 @@ public:
 
     virtual void tell(std::unique_ptr<message> msg) = 0;
 
-    void pass_message(std::unique_ptr<message> msg);
-
     bool is_busy() const { return busy_; }
     size_t mailbox_size() const;
 
@@ -36,7 +34,7 @@ public:
 
     actor_ref get_self() const { return self_; }
 
-    void set_mailbox(std::unique_ptr<mailbox> mbox);
+    void set_mailbox(std::unique_ptr<mailbox> mailbox);
 
 protected:
     std::unique_ptr<untyped_actor> untyped_actor_;

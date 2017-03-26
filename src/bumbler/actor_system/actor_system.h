@@ -4,8 +4,6 @@
 #include <thread>
 #include <memory>
 #include <boost/asio.hpp>
-#include "../dispatcher/dispatcher.h"
-#include "../scheduler/scheduler.h"
 #include "../internal/bumbler.h"
 #include "../actor/actor_ref/actor_ref.h"
 
@@ -16,14 +14,15 @@ class actor_channel;
 class abstract_actor;
 class packet;
 class cancellable;
+class dispatcher;
+class scheduler;
 
 class actor_system : public std::enable_shared_from_this<actor_system> {
 public:
     static std::shared_ptr<actor_system> create_system(const std::string& name, int port, int thread_pool_size = 5);
 
-    virtual ~actor_system() {
-        stop();
-    }
+    actor_system(const std::string& name, int port);
+    virtual ~actor_system();
 
     /*
      * if stop_mode is WAIT_FOR_QUEUE the dispatcher will wait for the all tasks to finish and actors in the system will
@@ -43,6 +42,8 @@ public:
     actor_ref get_actor_ref(const identifier& actor_name);
     std::unique_ptr<actor_channel> get_actor_channel(const identifier& actor_name);
 
+    size_t actor_mailbox_size(const identifier& actor_ident);
+
     /*
      * generate a new name for a temporary actor
      */
@@ -57,7 +58,7 @@ public:
         return ref;
     }
 
-    int add_actor(std::shared_ptr<abstract_actor> actor);
+    void add_actor(std::shared_ptr<abstract_actor> actor);
 
     template<typename T>
     std::shared_ptr<cancellable> schedule(T&& data, const actor_ref& target, long initial_delay_ms, long interval_ms = 0) const {
@@ -102,14 +103,11 @@ public:
         return stopped_;
     }
 
-protected:
-    actor_system(const std::string& name, int port);
-
 private:
     int port_;
     identifier system_key_;
     std::atomic<bool> started_;
-    std::atomic<bool> stopped_;    
+    std::atomic<bool> stopped_;
     std::map<identifier, std::shared_ptr<abstract_actor>> actors_;
     std::mutex actors_write_mutex_;
     std::shared_ptr<udp_server> server_;
@@ -129,11 +127,6 @@ private:
     void receive(std::unique_ptr<packet> packet, const boost::asio::ip::udp::endpoint& sender_endpoint) const;
 
     std::shared_ptr<cancellable> schedule_with_variant(std::unique_ptr<variant> variant, const actor_ref& target, const actor_ref& sender, long initial_delay_ms, long interval_ms) const;
-};
-
-//workaround for std::make_shared and protected constructor
-struct concrete_actor_system : public actor_system {
-    concrete_actor_system(const std::string &name, int port) : actor_system(name, port) { }
 };
 
 }

@@ -1,19 +1,24 @@
 ﻿#include "typed_message.h"
+#include "commands/commands.h"
 
-bumbler::typed_message::typed_message(const actor_ref& target, const actor_ref& sender,
-                                      std::unique_ptr<variant> variant)
+namespace bumbler {
+
+typed_message::typed_message() {}
+typed_message::~typed_message() {}
+
+typed_message::typed_message(const actor_ref& target, const actor_ref& sender, std::unique_ptr<variant> variant)
     : target_(target), sender_(sender), variant_(std::move(variant)) {
 
 }
 
-bumbler::typed_message::typed_message(const typed_message& rhs) : message(rhs) {
+typed_message::typed_message(const typed_message& rhs) : message(rhs) {
     std::cout << "typed_message copy ctor\n";
     this->variant_ = rhs.variant_->clone();
     this->target_ = rhs.target_;
     this->sender_ = rhs.sender_;
 }
 
-bumbler::typed_message& bumbler::typed_message::operator=(const typed_message& rhs) {
+typed_message& bumbler::typed_message::operator=(const typed_message& rhs) {
     std::cout << "typed_message assign ctor\n";
     this->variant_ = rhs.variant_->clone();
     this->target_ = rhs.target_;
@@ -21,7 +26,7 @@ bumbler::typed_message& bumbler::typed_message::operator=(const typed_message& r
     return *this;
 }
 
-int bumbler::typed_message::get_priority() const {
+int typed_message::get_priority() const {
     if (is_priority_message()) {
         priority_message pm = boost::any_cast<priority_message>(variant_->data());
         return pm.priority;
@@ -30,7 +35,23 @@ int bumbler::typed_message::get_priority() const {
     return 0;
 }
 
-boost::any bumbler::typed_message::get_data() const {
+bool typed_message::is_broadcast() const {
+    return typeid(broadcast) == variant_->type();
+}
+
+bool typed_message::is_stop_actor() const {
+    return typeid(stop_actor) == variant_->type();
+}
+
+bool typed_message::is_kill_actor() const {
+    return typeid(kill_actor) == variant_->type();
+}
+
+bool typed_message::is_priority_message() const {
+    return typeid(priority_message) == variant_->type();
+}
+
+boost::any typed_message::get_data() const {
     if (is_broadcast()) {
         broadcast cmd = boost::any_cast<broadcast>(variant_->data());
         return cmd.var->data();
@@ -50,3 +71,7 @@ boost::any bumbler::typed_message::get_data() const {
 
     return variant_->data();
 }
+
+}
+
+

@@ -5,8 +5,10 @@
 #include <iostream>
 
 #include "cancellable.h"
+#include "../actor/actor_ref/actor_ref.h"
 #include "../messages/message.h"
-#include "../actor_system/actor_system.h"
+#include "../internal/messaging_service.h"
+#include "../logger/logger.h"
 
 namespace bumbler {
 
@@ -33,7 +35,7 @@ std::shared_ptr<cancellable> scheduler::schedule(std::unique_ptr<message> msg, l
             BOOST_LOG_TRIVIAL(debug) << "[SCHEDULER] thread_id: " << std::this_thread::get_id() <<
                 " sending message to " << moved_message->get_target().to_string();
 
-            send_message(moved_message->clone());
+            messaging_service::send_message(moved_message->clone());
 
             if (interval_ms > 0) {
                 std::chrono::milliseconds interval(interval_ms);
@@ -54,13 +56,6 @@ std::shared_ptr<cancellable> scheduler::schedule(std::unique_ptr<message> msg, l
     scheduler_thread.detach();
 
     return ret_cancellable;
-}
-
-void scheduler::send_message(std::unique_ptr<message> msg) const {
-    if (system_.expired())
-        return;
-
-    system_.lock()->tell_actor(std::move(msg));
 }
 
 }

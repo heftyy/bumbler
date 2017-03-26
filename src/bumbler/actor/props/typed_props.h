@@ -1,7 +1,6 @@
 #pragma once
 
 #include <memory>
-#include <boost/any.hpp>
 #include "../local_actor.h"
 #include "../promise_actor.h"
 #include "../routing/router.h"

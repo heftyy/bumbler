@@ -2,9 +2,9 @@
 #include "udp_server.h"
 #include "actor_system_errors.h"
 #include "actor_system_storage.h"
-#include "../messages/typed_message.h"
-#include "../scheduler/scheduler.h"
 #include "../dispatcher/dispatcher.h"
+#include "../scheduler/scheduler.h"
+#include "../messages/typed_message.h"
 #include "../actor/actor_ref/actor_ref.h"
 #include "../actor/typed_promise_actor.h"
 #include "../actor/channels/local_actor_channel.h"
@@ -15,9 +15,16 @@
 
 namespace bumbler {
 
+actor_system::actor_system(const std::string& name, int port)
+    : port_(port), system_key_(name) {}
+
+actor_system::~actor_system() {
+    stop();
+}
+
 void actor_system::init(int thread_pool_size) {
     dispatcher_ = std::make_unique<dispatcher>(thread_pool_size);
-    scheduler_ = std::make_unique<scheduler>(shared_from_this());
+    scheduler_ = std::make_unique<scheduler>();
 
     work_ = std::make_unique<boost::asio::io_service::work>(io_service_);
 
@@ -90,7 +97,7 @@ void actor_system::stop(stop_mode stop_mode) {
 }
 
 std::shared_ptr<actor_system> actor_system::create_system(const std::string& name, int port, int thread_pool_size) {
-    std::shared_ptr<actor_system> system = std::make_shared<concrete_actor_system>(name, port);
+    std::shared_ptr<actor_system> system = std::make_shared<actor_system>(name, port);
     system->init(thread_pool_size);
 
     return system;
@@ -195,6 +202,17 @@ std::unique_ptr<actor_channel> actor_system::get_actor_channel(const identifier&
     return nullptr;
 }
 
+size_t actor_system::actor_mailbox_size(const identifier& actor_ident) {
+    if (stopped_) return 0;
+
+    auto search = actors_.find(actor_ident);
+    if (search != actors_.end()) {
+        return search->second->mailbox_size();
+    }
+
+    return 0;
+}
+
 void actor_system::receive(std::unique_ptr<packet> packet, const boost::asio::ip::udp::endpoint& sender_endpoint) const {
     std::stringstream ss(packet->data.data);
     boost::archive::text_iarchive ia(ss);
@@ -242,7 +260,7 @@ std::string actor_system::get_next_temporary_actor_name() const {
     return temp_name;
 }
 
-int actor_system::add_actor(std::shared_ptr<abstract_actor> actor) {
+void actor_system::add_actor(std::shared_ptr<abstract_actor> actor) {
     if (stopped_.load()) throw new actor_system_stopped(system_key_.to_string());
 
     std::lock_guard<std::mutex> guard(actors_write_mutex_);
@@ -252,10 +270,6 @@ int actor_system::add_actor(std::shared_ptr<abstract_actor> actor) {
     }
 
     actors_.emplace(actor->actor_key(), std::move(actor));
-    return 0;
 }
-
-actor_system::actor_system(const std::string& name, int port)
-    : port_(port), system_key_(name) {}
 
 }

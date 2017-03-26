@@ -7,9 +7,6 @@
 #include <bumbler/actor/routing/round_robin_pool.h>
 #include <bumbler/actor/routing/smallest_mailbox_pool.h>
 #include <bumbler/actor/routing/random_pool.h>
-#include <bumbler/messages/message.h>
-#include "test_actor.h"
-#include "remote_test_actor.h"
 #include "test_actor.h"
 #include "typed_data.h"
 

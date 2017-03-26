@@ -1,7 +1,6 @@
 #pragma once
 
 #include <future>
-#include <boost/any.hpp>
 
 #include "../thread_pool/thread_pool.h"
 

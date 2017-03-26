@@ -3,21 +3,20 @@
 #include <memory>
 #include <boost/any.hpp>
 
-#include "../actor/actor_ref/actor_ref.h"
-
 namespace bumbler {
+
+class actor_ref;
 
 class message {
 public:
     message() {}
+    virtual ~message() {}
 
     message(message&& msg) = default; // support moving
     message& operator=(message&& msg) = default;
 
     message(const message& msg) = default;
     message& operator=(const message& msg) = default;
-
-    virtual ~message() {}
 
     virtual boost::any get_data() const = 0;
     virtual const actor_ref& get_sender() const = 0;

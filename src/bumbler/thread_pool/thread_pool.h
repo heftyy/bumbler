@@ -1,7 +1,6 @@
 #pragma once
 
 #include <future>
-#include <functional>
 #include <memory>
 #include <boost/thread.hpp>
 #include <boost/asio.hpp>
@@ -53,8 +52,8 @@ public:
 
 private:
     boost::asio::io_service io_service_;
-    std::unique_ptr<boost::asio::io_service::work> work_;
     boost::thread_group threads_;
+    std::unique_ptr<boost::asio::io_service::work> work_;
 };
 
 }

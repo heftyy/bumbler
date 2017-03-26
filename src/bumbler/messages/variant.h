@@ -2,7 +2,6 @@
 
 #include <memory>
 #include <boost/any.hpp>
-#include <boost/serialization/access.hpp>
 
 namespace bumbler {
 

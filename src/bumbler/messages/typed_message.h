@@ -1,11 +1,9 @@
 #pragma once
 
 #include <memory>
-#include <boost/any.hpp>
 #include "variant.h"
 #include "message.h"
-#include "commands/commands.h"
-#include "../utility.h"
+#include "../actor/actor_ref/actor_ref.h"
 
 namespace bumbler {
 
@@ -13,7 +11,8 @@ BOOST_SERIALIZATION_ASSUME_ABSTRACT(message)
 
 class typed_message : public message {
 public:
-    typed_message() { }
+    typed_message();
+    ~typed_message();
 
     typed_message(const typed_message& rhs);
     typed_message& operator=(const typed_message& rhs);
@@ -21,25 +20,12 @@ public:
     typed_message(typed_message&&) = default; // support moving
     typed_message& operator=(typed_message&&) = default;
 
-    ~typed_message() { }
-
     int get_priority() const override;
 
-    bool is_broadcast() const override {
-        return typeid(broadcast) == variant_->type();
-    }
-
-    bool is_stop_actor() const override {
-        return typeid(stop_actor) == variant_->type();
-    }
-
-    bool is_kill_actor() const override {
-        return typeid(kill_actor) == variant_->type();
-    }
-
-    bool is_priority_message() const override {
-        return typeid(priority_message) == variant_->type();
-    }
+    bool is_broadcast() const override;
+    bool is_stop_actor() const override;
+    bool is_kill_actor() const override;
+    bool is_priority_message() const override;
 
     boost::any get_data() const override;
 
