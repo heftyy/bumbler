@@ -3,6 +3,8 @@
 #include <memory>
 #include <future>
 #include <boost/test/unit_test.hpp>
+#include <boost/log/expressions.hpp>
+#include <bumbler/logger/logger.h>
 #include <bumbler/actor/props/typed_props.h>
 #include <bumbler/thread_pool/thread_pool.h>
 #include <bumbler/actor_system/actor_system.h>
@@ -24,7 +26,7 @@ BOOST_AUTO_TEST_CASE(LoopBenchmark) {
     int x = 5;
 
     for (int i = 0; i < MESSAGES_TO_SEND; i++) {
-	    ++benchmark_actor::message_count;
+        ++benchmark_actor::message_count;
         x += compute();
     }
 
@@ -36,8 +38,7 @@ BOOST_AUTO_TEST_CASE(LoopBenchmark) {
 }
 
 BOOST_AUTO_TEST_CASE(MessagesActorBenchmark) {
-    boost::log::core::get()->set_filter(
-            boost::log::trivial::severity >= boost::log::trivial::info);
+    boost::log::core::get()->set_filter(boost::log::trivial::severity >= boost::log::trivial::info);
     benchmark_actor::message_count = 0;
 
     auto system1 = actor_system::create_system("test_system1", 4509);
@@ -51,7 +52,7 @@ BOOST_AUTO_TEST_CASE(MessagesActorBenchmark) {
         la1.tell(37);
     }
 
-    system1->stop(true);
+    system1->stop(stop_mode::WAIT_FOR_QUEUE);
 
     auto end = std::chrono::steady_clock::now();
 
@@ -61,8 +62,7 @@ BOOST_AUTO_TEST_CASE(MessagesActorBenchmark) {
 }
 
 BOOST_AUTO_TEST_CASE(MessagesRouterBenchmark) {
-    boost::log::core::get()->set_filter(
-            boost::log::trivial::severity >= boost::log::trivial::info);
+    boost::log::core::get()->set_filter(boost::log::trivial::severity >= boost::log::trivial::info);
     benchmark_actor::message_count = 0;
     int router_size = 3;
 
@@ -79,7 +79,7 @@ BOOST_AUTO_TEST_CASE(MessagesRouterBenchmark) {
         r1.tell(37);
     }
 
-    system1->stop(true);
+    system1->stop(stop_mode::WAIT_FOR_QUEUE);
 
     auto end = std::chrono::steady_clock::now();
 

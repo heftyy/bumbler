@@ -29,7 +29,7 @@ BOOST_AUTO_TEST_CASE(PropsLocalActorTest) {
     actor_ref ref1 = system1->actor_of(p, "actor1");
     ref1.tell(14);
 
-    system1->stop(true);
+    system1->stop(stop_mode::WAIT_FOR_QUEUE);
 
     BOOST_CHECK_EQUAL(test_actor::message_count.load(), 1);
 }
@@ -51,7 +51,7 @@ BOOST_AUTO_TEST_CASE(PropsRouterTest) {
     actor_ref ref1 = system1->actor_of(p, "actor1");
     ref1.tell(14);
 
-    system1->stop(true);
+    system1->stop(stop_mode::WAIT_FOR_QUEUE);
 
     BOOST_CHECK_EQUAL(test_actor::message_count.load(), 1);
 }

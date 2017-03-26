@@ -10,14 +10,14 @@ class abstract_actor;
 
 class props {
 public:
-	props() :
-		router_pool_set_(false),
-		mailbox_set_(false),
-		network_actor_ref_set_(false) { }
+    props() :
+        router_pool_set_(false),
+        mailbox_set_(false),
+        network_actor_ref_set_(false) { }
 
-	virtual ~props() {}
+    virtual ~props() {}
 
-	bool has_router() const {
+    bool has_router() const {
         return router_pool_set_;
     }
 
@@ -29,7 +29,7 @@ public:
         return network_actor_ref_set_;
     }
 
-    virtual std::shared_ptr<abstract_actor> create_actor_instance(const std::shared_ptr<actor_system>& actor_system,
+    virtual std::unique_ptr<abstract_actor> create_actor_instance(const std::shared_ptr<actor_system>& actor_system,
                                                                   const std::string& name) = 0;
 
 protected:

@@ -34,7 +34,7 @@ BOOST_AUTO_TEST_CASE(ActorLocalFutureTest) {
 
     BOOST_CHECK_EQUAL(f1.get(), "BLAM");
 
-    system1->stop(true);
+    system1->stop(stop_mode::WAIT_FOR_QUEUE);
 }
 
 BOOST_AUTO_TEST_CASE(ActorRemoteFutureTest) {
@@ -45,7 +45,7 @@ BOOST_AUTO_TEST_CASE(ActorRemoteFutureTest) {
     auto la1 = system1->actor_of(props_local, "test_actor1");
     auto ra1 = actor_ref("test_actor1$test_system1@localhost:4506");
 
-	priority_message pm(5, 10);
+    priority_message pm(5, 10);
 
     std::future<std::string> f1 = ra1.ask<std::string>(pm);
     auto status1 = f1.wait_for(std::chrono::seconds(5));
@@ -53,7 +53,7 @@ BOOST_AUTO_TEST_CASE(ActorRemoteFutureTest) {
 
     BOOST_CHECK_EQUAL(f1.get(), "BLAM");
 
-    system1->stop(true);
+    system1->stop(stop_mode::WAIT_FOR_QUEUE);
 }
 
 BOOST_AUTO_TEST_CASE(ActorRemoteFutureSerializationTest) {
@@ -70,7 +70,7 @@ BOOST_AUTO_TEST_CASE(ActorRemoteFutureSerializationTest) {
 
     BOOST_CHECK_EQUAL(f1.get(), "BLAM");
 
-    system1->stop(true);
+    system1->stop(stop_mode::WAIT_FOR_QUEUE);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -2,11 +2,11 @@
 
 #include <boost/asio.hpp>
 #include "actor_channel.h"
-#include "../actor_ref/actor_ref.h"
 
 namespace bumbler {
 
 class actor_system;
+class actor_ref;
 
 class remote_actor_channel : public actor_channel {
 public:

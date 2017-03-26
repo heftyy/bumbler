@@ -1,10 +1,10 @@
 #pragma once
 
 #include <future>
-#include <functional>
 #include <memory>
 #include <boost/thread.hpp>
 #include <boost/asio.hpp>
+#include "../internal/bumbler.h"
 
 namespace bumbler {
 
@@ -14,7 +14,7 @@ public:
 
     ~thread_pool();
 
-    void stop(bool wait = false);
+    void stop(stop_mode stop_mode);
 
     template<typename F, typename... Rest>
     auto push(F&& f, Rest&&... rest) -> std::future<decltype(f(rest...))> {
@@ -52,8 +52,8 @@ public:
 
 private:
     boost::asio::io_service io_service_;
-    std::unique_ptr<boost::asio::io_service::work> work_;
     boost::thread_group threads_;
+    std::unique_ptr<boost::asio::io_service::work> work_;
 };
 
 }

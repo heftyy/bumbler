@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/any.hpp>
 
@@ -9,6 +10,11 @@ namespace utility {
     std::string get_current_time();
 
     std::string format_time(boost::posix_time::ptime time);
+
+    template<typename To, typename From>
+    std::unique_ptr<To> static_unique_cast(std::unique_ptr<From>&& p) {
+        return std::unique_ptr<To>{ static_cast<To*>(p.release()) };
+    }
 
     template <typename To, typename From, typename Deleter>
     std::unique_ptr<To, Deleter> dynamic_unique_cast(std::unique_ptr<From, Deleter>&& p) {
@@ -21,10 +27,10 @@ namespace utility {
         return std::unique_ptr<To, Deleter>(nullptr); // or throw std::bad_cast() if you prefer
     }
 
-	template<typename T>
-	bool is_type(const boost::any& data) {
-		return data.type() == typeid(T);
-	}
+    template<typename T>
+    bool is_type(const boost::any& data) {
+        return data.type() == typeid(T);
+    }
 }
 
 }

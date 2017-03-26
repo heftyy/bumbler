@@ -1,5 +1,6 @@
 #include "actor_system_storage.h"
 #include "actor_system.h"
+#include "../messages/message.h"
 
 namespace bumbler {
 
@@ -11,25 +12,24 @@ void actor_system_storage::destroy() {
     this->systems_.clear();
 }
 
-void actor_system_storage::add_system(std::shared_ptr<actor_system> actor_system) {
+void actor_system_storage::register_system(const std::shared_ptr<actor_system>& actor_system) {
     std::lock_guard<std::mutex> guard(this->systems_mutex_);
-    systems_.insert(std::make_pair(actor_system->system_name(), actor_system));
+    systems_.insert(std::make_pair(actor_system->system_key(), actor_system));
 }
 
-void actor_system_storage::remove_system(std::string system_name) {
+void actor_system_storage::remove_system(const identifier& system_ident) {
     std::lock_guard<std::mutex> guard(this->systems_mutex_);
-    auto search = systems_.find(system_name);
+    auto search = systems_.find(system_ident);
     if (search != systems_.end()) {
         systems_.erase(search);
     }
 }
 
-std::shared_ptr<actor_system> actor_system_storage::get_system(std::string system_name) {
+std::shared_ptr<actor_system> actor_system_storage::get_system(const identifier& system_ident) {
     std::lock_guard<std::mutex> guard(this->systems_mutex_);
-    for (auto& pair : systems_) {
-        if (system_name.compare(pair.second->system_name()) == 0) {
-            return pair.second;
-        }
+    auto search = systems_.find(system_ident);
+    if (search != systems_.end()) {
+        return systems_[system_ident];
     }
 
     return nullptr;
@@ -43,6 +43,12 @@ std::shared_ptr<actor_system> actor_system_storage::any() {
     }
 
     return nullptr;
+}
+
+bool actor_system_storage::has_system(const identifier& system_ident)
+{
+    auto search = systems_.find(system_ident);
+    return search != systems_.end();
 }
 
 }

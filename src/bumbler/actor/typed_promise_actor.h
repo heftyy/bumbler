@@ -1,6 +1,5 @@
 #pragma once
 
-#include <boost/any.hpp>
 #include "untyped_actor.h"
 #include "../internal/bumbler.h"
 

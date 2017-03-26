@@ -1,5 +1,9 @@
 #include "logger.h"
 
+#include <boost/log/expressions.hpp>
+#include <boost/log/utility/setup.hpp>
+#include <boost/log/support/date_time.hpp>
+
 namespace attrs   = boost::log::attributes;
 namespace expr    = boost::log::expressions;
 namespace logging = boost::log;

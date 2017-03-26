@@ -24,7 +24,7 @@ int main(int argc, char *argv[]) {
             }
         }
 
-        system1->stop(true);
+        system1->stop(stop_mode::WAIT_FOR_QUEUE);
     }
     catch (std::runtime_error& e) {
         std::cerr << "Exception: " << e.what() << "\n";

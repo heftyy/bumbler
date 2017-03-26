@@ -19,8 +19,8 @@ int stop_actor(std::string actor_name, bool wait = false);
 int tell_actor(std::unique_ptr<message> msg, bool from_remote = false);
 int ask_actor(std::unique_ptr<message> msg, const ResponseFun& response_fn);
 
-const actor_ref get_actor_ref(std::string actor_name);
-std::unique_ptr<actor_channel> get_actor_channel(const std::string& actor_name);
+const actor_ref get_actor_ref(const identifier& actor_name);
+std::unique_ptr<actor_channel> get_actor_channel(const identifier& actor_name);
 
 template<typename Props, typename ...ActorArgs>
 actor_ref actor_of(Props&& props, ActorArgs&&... actor_args);
@@ -38,9 +38,7 @@ template<typename T>
 std::shared_ptr<cancellable> schedule_once(T&& data, const actor_ref& target, const actor_ref& sender, long initial_delay_ms = 0) const;
 
 const std::shared_ptr<udp_server> get_server() const;
-const std::shared_ptr<scheduler> get_scheduler() const;
-const std::shared_ptr<dispatcher> get_dispatcher() const;
-const std::string system_name() const;
+const identifier system_key() const;
 
 bool started();
 bool stopped();

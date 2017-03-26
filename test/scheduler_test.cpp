@@ -4,6 +4,8 @@
 #include <bumbler/actor_system/actor_system.h>
 #include <bumbler/actor/routing/round_robin_pool.h>
 #include <bumbler/actor/props/typed_props.h>
+#include <bumbler/scheduler/cancellable.h>
+#include <bumbler/messages/message.h>
 #include "test_actor.h"
 #include "typed_data.h"
 
@@ -41,7 +43,7 @@ BOOST_AUTO_TEST_CASE(SchedulerSingleMessageTest) {
 
     BOOST_LOG_TRIVIAL(debug) << "shutting down test_system1";
 
-    system1->stop(true);
+    system1->stop(stop_mode::WAIT_FOR_QUEUE);
 
     BOOST_LOG_TRIVIAL(debug) << "test_system1 shutdown";
 }
@@ -66,7 +68,7 @@ BOOST_AUTO_TEST_CASE(SchedulerBroadcastTest) {
 
     BOOST_LOG_TRIVIAL(debug) << "shutting down test_system1 and waiting for tasks to finish";
 
-    system1->stop(true);
+    system1->stop(stop_mode::WAIT_FOR_QUEUE);
 
     BOOST_LOG_TRIVIAL(debug) << "test_system1 shutdown";
 }

@@ -1,6 +1,9 @@
 #include "packet_structs.h"
 #include "../actor/actor_ref/actor_ref.h"
 #include "../messages/typed_message.h"
+#include "../messages/commands/commands.h"
+
+#include <sstream>
 
 namespace bumbler {
 

@@ -1,6 +1,5 @@
 #pragma once
 
-#include <future>
 #include "abstract_actor.h"
 
 namespace bumbler {
@@ -11,8 +10,7 @@ public:
             : abstract_actor(actor_system, name) {
     }
 
-    void stop_actor(bool wait = false) override;
-
+    void stop_actor(stop_mode stop_mode) override { };
     void tell(std::unique_ptr<message> msg) override;
 };
 

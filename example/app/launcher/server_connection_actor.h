@@ -2,7 +2,6 @@
 
 #include <iostream>
 #include <atomic>
-#include <bumbler/interruptible_thread.h>
 #include <bumbler/actor/remote_actor.h>
 #include <bumbler/actor_system/actor_system.h>
 #include <communication/message_settings.h>

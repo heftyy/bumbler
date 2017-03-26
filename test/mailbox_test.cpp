@@ -8,6 +8,7 @@
 #include <bumbler/actor/props/typed_props.h>
 #include <bumbler/actor/local_actor.h>
 #include <bumbler/actor_system/actor_system.h>
+#include <bumbler/messages/typed_message.h>
 #include "test_actor.h"
 
 using namespace bumbler;
@@ -49,8 +50,8 @@ BOOST_AUTO_TEST_CASE(PriorityMailboxTest) {
 
     for (auto const& entry : map) {
         // add 4 messages with priority from the map
-		auto pm = priority_message(entry.first, entry.second);
-		auto tm = typed_message_factory::create(actor_ref::none(), actor_ref::none(), typed_variant_factory::create(pm));
+        auto pm = priority_message(entry.first, entry.second);
+        auto tm = typed_message_factory::create(actor_ref::none(), actor_ref::none(), typed_variant_factory::create(pm));
 
         mailbox->push_message(std::move(tm));
     }
@@ -101,7 +102,7 @@ BOOST_AUTO_TEST_CASE(ActorPriorityMailboxTest) {
     // this will block for 1000ms+
     la1.tell(bumbler::stop_actor(5));
 
-    system1->stop(false);
+    system1->stop(stop_mode::IGNORE_QUEUE);
 
     BOOST_CHECK_EQUAL(test_actor::message_count.load(), 4);
 }

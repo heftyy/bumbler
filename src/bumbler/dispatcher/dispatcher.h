@@ -1,7 +1,6 @@
 #pragma once
 
 #include <future>
-#include <boost/any.hpp>
 
 #include "../thread_pool/thread_pool.h"
 
@@ -14,11 +13,11 @@ public:
     }
 
     ~dispatcher() {
-        this->thread_pool_->stop(false);
+        this->thread_pool_->stop(stop_mode::IGNORE_QUEUE);
     }
 
-    void stop(bool wait = false) {
-        this->thread_pool_->stop(wait);
+    void stop(stop_mode stop_mode) {
+        this->thread_pool_->stop(stop_mode);
     }
 
     template<typename F, typename ...Rest>

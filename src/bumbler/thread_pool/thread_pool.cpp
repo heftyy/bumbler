@@ -1,4 +1,5 @@
 #include "thread_pool.h"
+#include "../internal/bumbler.h"
 
 namespace bumbler {
 
@@ -10,12 +11,12 @@ thread_pool::thread_pool(std::size_t pool_size)
 }
 
 thread_pool::~thread_pool() {
-    this->stop();
+    this->stop(stop_mode::IGNORE_QUEUE);
 }
 
-void thread_pool::stop(bool wait) {
+void thread_pool::stop(stop_mode stop_mode) {
     // Force all threads to return from io_service::run().
-    if(wait) work_.reset();
+    if(stop_mode == stop_mode::IGNORE_QUEUE) work_.reset();
     else io_service_.stop();
 
     // Suppress all exceptions.

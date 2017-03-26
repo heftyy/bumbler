@@ -71,7 +71,7 @@ public:
         if (thread_ && thread_->joinable()) {
             thread_->join();
         }
-		thread_.reset(nullptr);
+        thread_.reset(nullptr);
     }
 
 private:

@@ -37,7 +37,7 @@ public:
 
 protected:
     void on_receive(const boost::any& data) override {
-	    ++message_count;
+        ++message_count;
 
         if(is_type<int>(data)) {
             int in = cast_message<int>(data);

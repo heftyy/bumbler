@@ -21,7 +21,7 @@ public:
     mailbox(mailbox&&) = default; // support moving
     mailbox& operator=(mailbox&&) = default;
 
-	virtual ~mailbox() { }
+    virtual ~mailbox() { }
     virtual std::unique_ptr<mailbox> clone() const = 0;
 
 protected:

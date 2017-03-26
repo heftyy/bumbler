@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <memory>
+#include <mutex>
 #include "router_pool.h"
 
 namespace bumbler {
@@ -18,20 +19,9 @@ public:
 
     void tell_one(std::unique_ptr<message> msg) override;
 
-    virtual std::unique_ptr<router_pool> clone() const override  {
-        return std::unique_ptr<router_pool>(new smallest_mailbox_pool(*this));
-    }
-
 protected:
-    smallest_mailbox_pool(const smallest_mailbox_pool& rhs) :
-            router_pool(rhs) { }
-
-    smallest_mailbox_pool& operator=(const smallest_mailbox_pool& rhs) {
-        if(this != &rhs) {
-            router_pool::operator=(rhs);
-        }
-        return *this;
-    }
+    smallest_mailbox_pool(const smallest_mailbox_pool& rhs) = delete;
+    smallest_mailbox_pool& operator=(const smallest_mailbox_pool& rhs) = delete;
 
 private:
     std::mutex mailbox_mutex_;

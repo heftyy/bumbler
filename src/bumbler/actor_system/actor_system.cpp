@@ -3,6 +3,9 @@
 #include "actor_system_errors.h"
 #include "actor_system_storage.h"
 #include "../dispatcher/dispatcher.h"
+#include "../scheduler/scheduler.h"
+#include "../messages/typed_message.h"
+#include "../actor/actor_ref/actor_ref.h"
 #include "../actor/typed_promise_actor.h"
 #include "../actor/channels/local_actor_channel.h"
 #include "../actor/abstract_actor.h"
@@ -12,12 +15,20 @@
 
 namespace bumbler {
 
-void actor_system::init() {
-    actor_system_storage::instance().add_system(shared_from_this());
+actor_system::actor_system(const std::string& name, int port)
+    : port_(port), system_key_(name) {}
+
+actor_system::~actor_system() {
+    stop();
+}
+
+void actor_system::init(int thread_pool_size) {
+    dispatcher_ = std::make_unique<dispatcher>(thread_pool_size);
+    scheduler_ = std::make_unique<scheduler>();
 
     work_ = std::make_unique<boost::asio::io_service::work>(io_service_);
 
-    server_ = std::make_shared<udp_server>(io_service_, port_);
+    server_ = std::make_unique<udp_server>(io_service_, port_);
     server_->send_completed_function = [&]() { send_completed(); };
     server_->receive_function = [&](std::unique_ptr<packet> packet,
                                     boost::asio::ip::udp::endpoint sender_endpoint) {
@@ -26,7 +37,7 @@ void actor_system::init() {
 
     //create a future that is going to wait until the io_service thread has started and io_service is reading messages
     auto promise_ptr = std::make_shared<std::promise<int>>();
-	auto f = promise_ptr->get_future();
+    auto f = promise_ptr->get_future();
 
     io_service_.post([promise_ptr] () {
         BOOST_LOG_TRIVIAL(debug) << "[IO_SERVICE] run thread started";
@@ -47,31 +58,33 @@ void actor_system::init() {
 
     stopped_ = false;
     started_ = true;
+
+    actor_system_storage::instance().register_system(shared_from_this());
 }
 
-void actor_system::stop(bool wait) {
+void actor_system::stop(stop_mode stop_mode) {
     if (stopped_) return;
 
     for (auto iter = actors_.begin(); iter != actors_.end();) {
-        iter->second->stop_actor(wait);
+        iter->second->stop_actor(stop_mode);
         actors_.erase(iter++);
     }
 
-	scheduler_.reset();
-	dispatcher_->stop(wait);
-	actor_system_storage::instance().remove_system(system_name_);
+    scheduler_.reset();
+    dispatcher_->stop(stop_mode);
+    actor_system_storage::instance().remove_system(system_key_);
 
     if(!started_) {
         server_.reset();
         return;
     }
 
-    //BOOST_LOG_TRIVIAL(debug) << "[ACTOR_SYSTEM] SHUTTING DOWN";
+    BOOST_LOG_TRIVIAL(debug) << "[ACTOR_SYSTEM] SHUTTING DOWN";
     server_->stop();
     started_ = false;
     stopped_ = true;
 
-	if (work_) work_.reset();
+    if (work_) work_.reset();
     if (!io_service_.stopped()) io_service_.stop();
     if (io_service_thread_->joinable()) io_service_thread_->join();
 
@@ -84,92 +97,120 @@ void actor_system::stop(bool wait) {
 }
 
 std::shared_ptr<actor_system> actor_system::create_system(const std::string& name, int port, int thread_pool_size) {
-    std::shared_ptr<actor_system> system = std::make_shared<concrete_actor_system>(name, port, thread_pool_size);
-    system->init();
+    std::shared_ptr<actor_system> system = std::make_shared<actor_system>(name, port);
+    system->init(thread_pool_size);
 
     return system;
 }
 
-int actor_system::stop_actor(const std::string& actor_name, bool wait) {
-    if (stopped_.load()) throw new actor_system_stopped(system_name());
+int actor_system::stop_actor(const identifier& actor_ident, stop_mode stop_mode) {
+    if (stopped_.load()) throw new actor_system_stopped(system_key_.to_string());
     std::lock_guard<std::mutex> guard(actors_write_mutex_);
 
-    auto search = actors_.find(actor_name);
+    auto search = actors_.find(actor_ident);
     if (search != actors_.end()) {
-        actors_[actor_name]->stop_actor(wait);
+        search->second->stop_actor(stop_mode);
         actors_.erase(search);
         return 0;
     }
 
-    throw new actor_not_found(actor_name);
+    throw new actor_not_found(actor_ident.to_string());
 }
 
-int actor_system::tell_actor(std::unique_ptr<message> msg) {
-    if (stopped_.load()) throw new actor_system_stopped(system_name());
+void actor_system::tell_actor(std::unique_ptr<message> msg) {
+    if (stopped_.load()) throw new actor_system_stopped(system_key_.to_string());
 
-    if (msg->get_target().system_name.compare(system_name_) != 0)
-        throw new wrong_actor_system(msg->get_target().system_name);
+    if (msg->get_target().system_key != system_key_)
+        throw new wrong_actor_system(msg->get_target().system_key.to_string());
 
-    std::lock_guard<std::mutex> guard(actors_read_mutex_);
-    std::string actor_name = msg->get_target().actor_name;
+    identifier actor_key = msg->get_target().actor_key;
 
-    auto search = actors_.find(actor_name);
-    if (search != actors_.end()) {
-        actors_[actor_name]->pass_message(std::move(msg));
-        return 0;
+    if (msg->is_kill_actor()) {
+        stop_actor(actor_key, stop_mode::IGNORE_QUEUE);
     }
-
-    throw new actor_not_found(msg->get_target().actor_name);
+    else if (msg->is_stop_actor()) {
+        stop_actor(actor_key, stop_mode::WAIT_FOR_QUEUE);
+    }
+    else {
+        auto search = actors_.find(actor_key);
+        if (search != actors_.end()) {
+            search->second->tell(std::move(msg));
+        }
+        else {
+            throw new actor_not_found(msg->get_target().actor_key.to_string());
+        }
+    }
 }
-
-int actor_system::ask_actor(std::unique_ptr<message> msg, const ResponseFun& response_fn) {
+#if 0
+void actor_system::ask_actor(std::unique_ptr<message> msg, const ResponseFun& response_fn) {
     if (stopped_.load()) throw new actor_system_stopped(system_name());
 
     if (msg->get_target().system_name.compare(system_name_) != 0)
         throw new wrong_actor_system(msg->get_target().system_name);
 
-    std::lock_guard<std::mutex> guard(actors_read_mutex_);
-
-    std::string actor_name = msg->get_target().actor_name;
+    std::string actor_ident = msg->get_target().actor_ident;
 
     auto p = typed_props<promise_actor, typed_promise_actor>(response_fn);
     actor_ref p_actor = actor_of(p, get_next_temporary_actor_name());
 
     msg->set_sender(p_actor);
 
-    auto search = actors_.find(actor_name);
-    if (search != actors_.end()) {
-        actors_[actor_name]->pass_message(std::move(msg));
-        return 0;
+    if (msg->is_kill_actor()) {
+        stop_actor(actor_key, stop_mode::IGNORE_QUEUE);
     }
+    else if (msg->is_stop_actor()) {
+        stop_actor(actor_key, stop_mode::WAIT_FOR_QUEUE);
+    }
+    else {
+        auto search = actors_.find(actor_key);
+        if (search != actors_.end()) {
+            search->second->tell(std::move(msg));
+        }
+        else {
+            throw new actor_not_found(msg->get_target().actor_key.to_string());
+        }
+    }
+}
+#endif
 
-    throw new actor_not_found(msg->get_target().actor_name);
+bool actor_system::has_actor(const identifier& actor_ident)
+{
+    auto search = actors_.find(actor_ident);
+    return search != actors_.end();
 }
 
-const actor_ref actor_system::get_actor_ref(const std::string& actor_name) {
+actor_ref actor_system::get_actor_ref(const identifier& actor_ident) {
     if (stopped_) nullptr;
-    std::lock_guard<std::mutex> guard(actors_read_mutex_);
 
-    auto search = actors_.find(actor_name);
+    auto search = actors_.find(actor_ident);
     if (search != actors_.end()) {
-        return actors_[actor_name]->get_self();
+        return search->second->get_self();
     }
     else {
         return actor_ref::none();
     }
 }
 
-std::unique_ptr<actor_channel> actor_system::get_actor_channel(const std::string& actor_name) {
+std::unique_ptr<actor_channel> actor_system::get_actor_channel(const identifier& actor_ident) {
     if (stopped_) nullptr;
-    std::lock_guard<std::mutex> guard(actors_read_mutex_);
 
-    auto search = actors_.find(actor_name);
+    auto search = actors_.find(actor_ident);
     if (search != actors_.end()) {
-        auto actor_ptr = actors_[actor_name];
-        return std::make_unique<local_actor_channel>(actor_ptr);
+        return std::make_unique<local_actor_channel>(search->first, shared_from_this());
     }
 
     return nullptr;
+}
+
+size_t actor_system::actor_mailbox_size(const identifier& actor_ident) {
+    if (stopped_) return 0;
+
+    auto search = actors_.find(actor_ident);
+    if (search != actors_.end()) {
+        return search->second->mailbox_size();
+    }
+
+    return 0;
 }
 
 void actor_system::receive(std::unique_ptr<packet> packet, const boost::asio::ip::udp::endpoint& sender_endpoint) const {
@@ -186,7 +227,8 @@ void actor_system::receive(std::unique_ptr<packet> packet, const boost::asio::ip
 
     if (!msg->get_target().is_none()) {
         try {
-            auto target_system = actor_system_storage::instance().get_system(msg->get_target().system_name);
+            auto target = msg->get_target();
+            auto target_system = actor_system_storage::instance().get_system(target.system_key);
             if(target_system != nullptr) {
                 target_system->tell_actor(std::move(msg));
             }
@@ -196,6 +238,16 @@ void actor_system::receive(std::unique_ptr<packet> packet, const boost::asio::ip
         }
     }
     return;
+}
+
+void actor_system::send_data(const std::string& data, const boost::asio::ip::udp::endpoint& target_endpoint)
+{
+    server_->do_send(data, target_endpoint);
+}
+
+std::shared_ptr<cancellable> actor_system::schedule_with_variant(std::unique_ptr<variant> variant, const actor_ref & target, const actor_ref & sender, long initial_delay_ms, long interval_ms) const
+{
+    return scheduler_->schedule(typed_message_factory::create(target, sender, std::move(variant)), initial_delay_ms, interval_ms);
 }
 
 std::string actor_system::get_next_temporary_actor_name() const {
@@ -213,23 +265,16 @@ std::string actor_system::get_next_temporary_actor_name() const {
     return temp_name;
 }
 
-int actor_system::add_actor(std::shared_ptr<abstract_actor> actor) {
-    if (stopped_.load()) throw new actor_system_stopped(system_name());
+void actor_system::add_actor(std::unique_ptr<abstract_actor> actor) {
+    if (stopped_.load()) throw new actor_system_stopped(system_key_.to_string());
 
     std::lock_guard<std::mutex> guard(actors_write_mutex_);
-    auto search = actors_.find(actor->actor_name());
+    auto search = actors_.find(actor->actor_key());
     if (search != actors_.end()) {
-        throw new actor_already_exists(actor->actor_name());
+        throw new actor_already_exists(actor->actor_key().to_string());
     }
 
-    actors_.emplace(actor->actor_name(), std::move(actor));
-    return 0;
-}
-
-actor_system::actor_system(const std::string& name, int port, int thread_pool_size)
-        : port_(port), system_name_(name),
-          dispatcher_(std::make_shared<dispatcher>(thread_pool_size)),
-          scheduler_(std::make_shared<scheduler>()) {
+    actors_.emplace(actor->actor_key(), std::move(actor));
 }
 
 }

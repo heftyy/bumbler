@@ -1,21 +1,21 @@
 #pragma once
 
 #include "actor_channel.h"
-#include "../actor_ref/actor_ref.h"
+#include "../../internal/identifier.h"
 
 namespace bumbler {
 
-class abstract_actor;
+class actor_system;
 
 class local_actor_channel : public actor_channel {
 public:
     local_actor_channel() : actor_channel() { }
 
-    local_actor_channel(const std::shared_ptr<abstract_actor>& actor_ptr) :
-            actor_ptr_(actor_ptr) { }
+    local_actor_channel(const identifier& actor, const std::shared_ptr<actor_system>& system) : actor_identifier_(actor), system_(system) {}
 
 private:
-    std::weak_ptr<abstract_actor> actor_ptr_;
+    identifier actor_identifier_;
+    std::weak_ptr<actor_system> system_;
 
     virtual bool expired() override;
     virtual void tell_impl(std::unique_ptr<message> msg) override;

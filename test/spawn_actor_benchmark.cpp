@@ -3,6 +3,7 @@
 #include <memory>
 #include <future>
 #include <boost/test/unit_test.hpp>
+#include <boost/log/expressions.hpp>
 #include <bumbler/thread_pool/thread_pool.h>
 #include <bumbler/actor/props/typed_props.h>
 #include <bumbler/actor_system/actor_system.h>
@@ -17,8 +18,7 @@ BOOST_AUTO_TEST_SUITE(actor_benchmark)
 
 
 BOOST_AUTO_TEST_CASE(SpawnActorBenchmark) {
-    boost::log::core::get()->set_filter(
-            boost::log::trivial::severity >= boost::log::trivial::info);
+    boost::log::core::get()->set_filter(boost::log::trivial::severity >= boost::log::trivial::info);
 
     auto system1 = actor_system::create_system("test_system1", 4525);
 
@@ -28,7 +28,7 @@ BOOST_AUTO_TEST_CASE(SpawnActorBenchmark) {
         auto la1 = system1->actor_of(props_local, "benchmark_actor" + std::to_string(i));
     }
 
-    system1->stop(true);
+    system1->stop(stop_mode::WAIT_FOR_QUEUE);
 }
 
 

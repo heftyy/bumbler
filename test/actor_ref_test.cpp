@@ -16,8 +16,8 @@ BOOST_AUTO_TEST_SUITE(actor_suite)
 BOOST_AUTO_TEST_CASE(ActorRefTest) {
     actor_ref test_ref = actor_ref("test_actor", "test_system");
 
-    BOOST_CHECK_EQUAL(test_ref.actor_name, "test_actor");
-    BOOST_CHECK_EQUAL(test_ref.system_name, "test_system");
+    BOOST_CHECK_EQUAL(test_ref.actor_key.to_string(), "test_actor");
+    BOOST_CHECK_EQUAL(test_ref.system_key.to_string(), "test_system");
 
     actor_ref none_ref = actor_ref::none();
 
@@ -47,7 +47,7 @@ BOOST_AUTO_TEST_CASE(ActorRefResolveTest) {
     ref2.resolve();
     BOOST_CHECK_EQUAL(ref2.is_resolved(), true);
 
-    system1->stop(false);
+    system1->stop(stop_mode::IGNORE_QUEUE);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

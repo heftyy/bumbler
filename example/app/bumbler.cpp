@@ -1,4 +1,5 @@
 #include <boost/log/trivial.hpp>
+#include <bumbler/messages/message.h>
 #include <bumbler/actor_system/actor_system.h>
 #include <bumbler/actor/props/typed_props.h>
 #include <bumbler/logger/logger.h>
@@ -9,7 +10,7 @@
 
 int main(int argc, char *argv[]) {
 
-	auto system = actor_system::create_system("actor_system", 4444);
+    auto system = actor_system::create_system("actor_system", 4444);
 
     auto props_local = bumbler::typed_props<local_actor, out_actor>();
 
@@ -30,7 +31,7 @@ int main(int argc, char *argv[]) {
 
     std::this_thread::sleep_for(std::chrono::seconds(1));
 
-    system->stop(true);
+    system->stop(stop_mode::WAIT_FOR_QUEUE);
 
     INFO << "EXIT";
 

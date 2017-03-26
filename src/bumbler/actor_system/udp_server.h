@@ -66,14 +66,14 @@ public:
         });
 
         try {
-	        auto bytes_recvd = future_socket_.receive_from(boost::asio::buffer(data_, PACKET_MAX_LENGTH), sender_endpoint_);
+            auto bytes_recvd = future_socket_.receive_from(boost::asio::buffer(data_, PACKET_MAX_LENGTH), sender_endpoint_);
             if (bytes_recvd &&
                 sender_endpoint_.address().to_string().compare(target_endpoint.address().to_string()) == 0) {
                 std::string string_data(data_.begin(), data_.begin() + bytes_recvd * sizeof(char));
                 try {
                     stop_deadline = true;
                     deadline_check.join();
-	                auto received_packet = packet::parse(string_data);
+                    auto received_packet = packet::parse(string_data);
                     return std::move(std::unique_ptr<packet>(new packet(received_packet)));
                 }
                 catch (std::exception e) {
@@ -92,9 +92,7 @@ public:
         return nullptr;
     }
 
-    //void do_send(std::unique_ptr<std::vector<char>> data, udp::endpoint& target_endpoint)
-    void do_send(const std::string& data, udp::endpoint& target_endpoint) {
-        //std::cout << "do_send thread id = " << std::this_thread::get_id() << std::endl;
+    void do_send(const std::string& data, const udp::endpoint& target_endpoint) {
         socket_.async_send_to(
                 boost::asio::buffer(data.c_str(), data.length()), target_endpoint,
                 [this](boost::system::error_code, std::size_t) {
@@ -125,7 +123,7 @@ private:
                     if (!ec && bytes_recvd > 0) {
                         std::string string_data(data_.begin(), data_.begin() + bytes_recvd * sizeof(char));
                         try {
-	                        auto received_packet = packet::parse(string_data);
+                            auto received_packet = packet::parse(string_data);
                             receive_function(
                                     std::move(std::unique_ptr<packet>(new packet(received_packet))),
                                     sender_endpoint_

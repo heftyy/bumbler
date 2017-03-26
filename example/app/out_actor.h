@@ -2,9 +2,7 @@
 
 #include <iostream>
 #include <atomic>
-#include <bumbler/actor/local_actor.h>
-#include <bumbler/messages/commands/commands.h>
-#include <communication/message_settings.h>
+#include <bumbler/actor/untyped_actor.h>
 
 class out_actor : public bumbler::untyped_actor {
 public:
@@ -17,7 +15,7 @@ public:
 protected:
     void on_receive(const boost::any& data) {
         BOOST_LOG_TRIVIAL(debug) << "[OUT_ACTOR] on_receive thread id = " << std::this_thread::get_id();
-        BOOST_LOG_TRIVIAL(debug) << "[OUT_ACTOR] received message from " << get_sender().actor_name;
+        BOOST_LOG_TRIVIAL(debug) << "[OUT_ACTOR] received message from " << get_sender().actor_key.to_string();
 
         if(is_type<int>(data)) {
             int in = cast_message<int>(data);

@@ -1,10 +1,10 @@
 #include "router.h"
 #include "router_pool.h"
+#include "../../messages/message.h"
 
 namespace bumbler {
 
-void router::stop_actor(bool wait) {
-    router_pool_->stop(wait);
+void router::stop_actor(stop_mode stop_mode) {
 }
 
 void router::set_router_pool(std::unique_ptr<router_pool> pool) {

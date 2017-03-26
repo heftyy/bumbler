@@ -2,8 +2,8 @@
 
 #include <memory>
 #include <map>
-#include <iostream>
 #include <mutex>
+#include "../internal/identifier.h"
 
 namespace bumbler {
 
@@ -18,13 +18,12 @@ public:
 
     void destroy();
 
-    void add_system(std::shared_ptr<actor_system> actor_system);
+    void register_system(const std::shared_ptr<actor_system>& actor_system);
+    void remove_system(const identifier& system_ident);
 
-    void remove_system(std::string system_name);
-
-    std::shared_ptr<actor_system> get_system(std::string system_name);
-
+    std::shared_ptr<actor_system> get_system(const identifier& system_ident);
     std::shared_ptr<actor_system> any();
+    bool has_system(const identifier& system_ident);
 
 private:
     actor_system_storage() { }
@@ -38,7 +37,7 @@ private:
 
     ~actor_system_storage();
 
-    std::map<std::string, std::shared_ptr<actor_system>> systems_;
+    std::map<identifier, std::shared_ptr<actor_system>> systems_;
     std::mutex systems_mutex_;
 };
 
