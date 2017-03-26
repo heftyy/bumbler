@@ -4,7 +4,6 @@
 #include <functional>
 #include <boost/any.hpp>
 #include "actor_ref/actor_ref.h"
-#include "../messages/commands/commands.h"
 #include "../utility.h"
 
 namespace bumbler {

@@ -7,8 +7,7 @@
 namespace bumbler {
 
 local_actor::local_actor(const std::shared_ptr<actor_system>& actor_system, const std::string& name) :
-    abstract_actor(actor_system, name)    
-{ }
+    abstract_actor(actor_system, name) { }
 
 local_actor::~local_actor() {
     this->stop_actor(stop_mode::IGNORE_QUEUE);
@@ -23,7 +22,7 @@ void local_actor::stop_actor(stop_mode stop_mode) {
 
     stop_flag_ = true;
 
-    if (stop_mode == stop_mode::IGNORE_QUEUE) clear_queue();
+    if (stop_mode == bumbler::stop_mode::IGNORE_QUEUE) clear_queue();
 
     if (queue_thread_future_.valid()) {
         BOOST_LOG_TRIVIAL(debug) << "[ACTOR] stopping";
@@ -57,7 +56,7 @@ void local_actor::create_internal_queue_thread() {
 }
 
 void local_actor::read_messages() {
-    static auto dispatcher_fun_ = [](local_actor& actor) -> int {
+    static DispatchFun dispatcher_fun_ = [](local_actor& actor) -> int {
         size_t throughput = actor.calculate_throughput();
 
         auto msg_vec = actor.mailbox_->pop_messages(throughput);

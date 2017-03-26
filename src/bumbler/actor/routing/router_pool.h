@@ -4,13 +4,14 @@
 #include <vector>
 #include <cassert>
 #include "router_logic.h"
+#include "../../internal/bumbler.h"
 #include "../../internal/identifier.h"
-#include "../../actor_system/actor_system.h"
 
 namespace bumbler {
 
 class abstract_actor;
 class message;
+class actor_system;
 
 class router_pool {
 public:
@@ -19,26 +20,8 @@ public:
 
     void tell(std::unique_ptr<message> msg);
 
-    template<typename ActorType, typename MailboxFunc, typename TypedActorFunc>
     void create(const std::shared_ptr<actor_system>& actor_system, const std::string& router_name,
-                MailboxFunc&& get_mailbox_func, TypedActorFunc&& get_typed_actor_func) {
-        std::string next_router_name = router_name + "/a";
-
-        for(int i = 0; i < this->pool_size_; i++) {
-            auto actor = std::make_unique<ActorType>(actor_system, next_router_name);
-            actor->set_mailbox(get_mailbox_func());
-            actor->init(get_typed_actor_func());
-            actor_system->add_actor(std::move(actor));
-            routees_.push_back(next_router_name);
-
-            if (next_router_name[next_router_name.length() - 1] == 'z') {
-                next_router_name += 'a';
-            }
-            else {
-                next_router_name[next_router_name.length() - 1]++;
-            }
-        }
-    }
+                const ActorCreateFun& get_actor_func, const MailboxCreateFun& get_mailbox_func, const TypedActorCreateFun& get_typed_actor_func);
 
 protected:
     int pool_size_;

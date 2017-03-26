@@ -6,6 +6,8 @@
 #include <boost/log/expressions.hpp>
 #include <bumbler/logger/logger.h>
 #include <bumbler/actor/props/typed_props.h>
+#include <bumbler/actor/routing/router.h>
+#include <bumbler/actor/local_actor.h>
 #include <bumbler/thread_pool/thread_pool.h>
 #include <bumbler/actor_system/actor_system.h>
 #include <bumbler/actor/routing/round_robin_pool.h>

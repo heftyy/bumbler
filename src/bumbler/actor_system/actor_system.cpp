@@ -5,6 +5,7 @@
 #include "../dispatcher/dispatcher.h"
 #include "../scheduler/scheduler.h"
 #include "../messages/typed_message.h"
+#include "../messages/commands/command.h"
 #include "../actor/actor_ref/actor_ref.h"
 #include "../actor/typed_promise_actor.h"
 #include "../actor/channels/local_actor_channel.h"
@@ -217,7 +218,7 @@ void actor_system::receive(std::unique_ptr<packet> packet, const boost::asio::ip
     std::stringstream ss(packet->data.data);
     boost::archive::text_iarchive ia(ss);
 
-    std::unique_ptr<message> msg;
+    std::unique_ptr<typed_message> msg;
     ia >> msg;
 
     actor_ref sender = msg->get_sender();
@@ -238,6 +239,11 @@ void actor_system::receive(std::unique_ptr<packet> packet, const boost::asio::ip
         }
     }
     return;
+}
+
+std::future<int> actor_system::dispatch(const DispatchFun& dispatch_fun, local_actor& actor)
+{
+    return dispatcher_->push(dispatch_fun, actor);
 }
 
 void actor_system::send_data(const std::string& data, const boost::asio::ip::udp::endpoint& target_endpoint)

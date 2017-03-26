@@ -3,6 +3,7 @@
 #include <atomic>
 #include <memory>
 #include "actor_ref/actor_ref.h"
+#include "../internal/bumbler.h"
 
 namespace bumbler {
 
@@ -17,8 +18,8 @@ public:
 
     abstract_actor(abstract_actor && rhs) = delete;
     abstract_actor(const abstract_actor & rhs) = delete;
-    abstract_actor & operator=(abstract_actor && rhs) = delete;
-    abstract_actor & operator=(const abstract_actor & rhs) = delete;
+    abstract_actor& operator=(abstract_actor && rhs) = delete;
+    abstract_actor& operator=(const abstract_actor & rhs) = delete;
     virtual ~abstract_actor();
 
     virtual void init(std::unique_ptr<untyped_actor> u_actor);

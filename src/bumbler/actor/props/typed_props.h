@@ -1,10 +1,10 @@
 #pragma once
 
 #include <memory>
+#include "../mailbox/fifo_mailbox.h"
 #include "../local_actor.h"
 #include "../promise_actor.h"
 #include "../routing/router.h"
-#include "../mailbox/fifo_mailbox.h"
 #include "props.h"
 
 namespace bumbler {
@@ -15,16 +15,22 @@ public:
     using DefaultMailbox = fifo_mailbox;
 
     template<typename ...Args>
-    typed_props(Args&& ... args) : props() {
+    typed_props(Args&&... args) : props() {
         static_assert(
-                (std::is_base_of<untyped_actor, TypedActor>::value),
-                "TypedActor template has to be a derived from untyped_actor class"
-        );
+            (std::is_base_of<untyped_actor, TypedActor>::value),
+            "TypedActor template has to be a derived from untyped_actor class"
+            );
 
-        get_typed_actor_function_ = [args...]() -> std::unique_ptr<untyped_actor> {
+        get_typed_actor_function_ = [args...]()->std::unique_ptr<untyped_actor> {
             return std::make_unique<TypedActor>(std::forward<Args>(args)...);
         };
+
+        get_actor_function_ = [](const std::shared_ptr<actor_system>& system, const std::string& name) -> std::unique_ptr<ActorType> {
+            return std::make_unique<ActorType>(system, name);
+        };
     }
+
+    ~typed_props() { }
 
     typed_props(typed_props&& rhs) = default; // support moving
     typed_props& operator=(typed_props&& rhs) = default;
@@ -64,16 +70,17 @@ public:
     }
 
 private:
-    std::function<std::unique_ptr<untyped_actor>(void)> get_typed_actor_function_;
-    std::function<std::unique_ptr<router_pool>(void)> get_router_pool_function_;
-    std::function<std::unique_ptr<mailbox>(void)> get_mailbox_function_;
+    ActorCreateFun get_actor_function_;
+    TypedActorCreateFun get_typed_actor_function_;
+    RouterPoolCreateFun get_router_pool_function_;
+    MailboxCreateFun get_mailbox_function_;
 
     // router instance
     std::unique_ptr<abstract_actor> init_actor_instance(std::unique_ptr<router> actor,
                                                         const std::shared_ptr<actor_system>& ac,
                                                         const std::string& name) const {
         auto pool = get_router_pool_function_();
-        pool->create<local_actor>(ac, name, get_mailbox_function_, get_typed_actor_function_);
+        pool->create(ac, name, get_actor_function_, get_mailbox_function_, get_typed_actor_function_);
         actor->set_router_pool(std::move(pool));
 
         return actor;

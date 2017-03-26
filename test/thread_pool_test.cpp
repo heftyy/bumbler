@@ -81,7 +81,7 @@ BOOST_AUTO_TEST_CASE(ThreadPoolKill) {
     // don't wait for tasks to finish
     // stop(false) will cancel all remining tasks but first 2 might start (2 threads in threadpool)
     // so task_counter should never be > 2
-    tp.stop(false);
+    tp.stop(stop_mode::IGNORE_QUEUE);
 
     BOOST_LOG_TRIVIAL(debug) << "task_counter = " << task_counter;
 

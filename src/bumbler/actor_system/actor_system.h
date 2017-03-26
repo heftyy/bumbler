@@ -82,10 +82,7 @@ public:
         return schedule_with_variant(std::move(variant), target, sender, initial_delay_ms, 0);
     }
 
-    template<typename F, typename ...Rest>
-    auto dispatch(F&& f, Rest&&... rest) -> std::future<decltype(f(rest...))> {
-        return dispatcher_->push(std::forward<F>(f), std::forward<Rest>(rest)...);
-    }
+    std::future<int> dispatch(const DispatchFun& dispatch_fun, class local_actor& actor);
 
     void send_data(const std::string& data, const boost::asio::ip::udp::endpoint& target_endpoint);
 
