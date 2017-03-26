@@ -5,10 +5,10 @@
 #include <cassert>
 #include "router_logic.h"
 #include "../../internal/identifier.h"
+#include "../../actor_system/actor_system.h"
 
 namespace bumbler {
 
-class actor_system;
 class abstract_actor;
 class message;
 
