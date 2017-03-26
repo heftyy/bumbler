@@ -5,6 +5,7 @@
 #include <memory>
 #include <boost/asio.hpp>
 #include "../internal/bumbler.h"
+#include "../dispatcher/dispatcher.h"
 #include "../actor/actor_ref/actor_ref.h"
 
 namespace bumbler {
@@ -14,7 +15,6 @@ class actor_channel;
 class abstract_actor;
 class packet;
 class cancellable;
-class dispatcher;
 class scheduler;
 
 class actor_system : public std::enable_shared_from_this<actor_system> {
